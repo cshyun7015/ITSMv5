@@ -5,6 +5,8 @@ import RequestForm from './RequestForm';
 import KnowledgeList from './KnowledgeList';
 import NotificationBell from './NotificationBell';
 import MyTickets from './MyTickets';
+import IncidentList from './IncidentList';
+import ChangeList from './ChangeList';
 
 export default function Dashboard({ user, onLogout }: { user: any, onLogout: () => void }) {
   const [currentView, setCurrentView] = useState('DASHBOARD');
@@ -65,6 +67,10 @@ export default function Dashboard({ user, onLogout }: { user: any, onLogout: () 
       return <KnowledgeList user={user} />;
     } else if (currentView === 'MY_TICKETS') {
       return <MyTickets user={user} />;
+    } else if (currentView === 'INCIDENTS') {
+      return <IncidentList user={user} />;
+    } else if (currentView === 'CHANGES') {
+      return <ChangeList user={user} />;
     }
   };
 
@@ -80,6 +86,8 @@ export default function Dashboard({ user, onLogout }: { user: any, onLogout: () 
           <li onClick={() => setCurrentView('DASHBOARD')} style={{ cursor: 'pointer', color: currentView === 'DASHBOARD' ? '#339af0' : '#bbb', fontWeight: currentView === 'DASHBOARD' ? 'bold' : 'normal' }}>Dashboard</li>
           <li onClick={() => setCurrentView('CATALOG')} style={{ cursor: 'pointer', color: currentView === 'CATALOG' || currentView === 'REQUEST_FORM' ? '#339af0' : '#bbb', fontWeight: currentView === 'CATALOG' || currentView === 'REQUEST_FORM' ? 'bold' : 'normal' }}>Service Catalog</li>
           <li onClick={() => setCurrentView('MY_TICKETS')} style={{ cursor: 'pointer', color: currentView === 'MY_TICKETS' ? '#339af0' : '#bbb', fontWeight: currentView === 'MY_TICKETS' ? 'bold' : 'normal' }}>My Tickets</li>
+          <li onClick={() => setCurrentView('INCIDENTS')} style={{ cursor: 'pointer', color: currentView === 'INCIDENTS' ? '#ff6b6b' : '#bbb', fontWeight: currentView === 'INCIDENTS' ? 'bold' : 'normal' }}>Incidents</li>
+          <li onClick={() => setCurrentView('CHANGES')} style={{ cursor: 'pointer', color: currentView === 'CHANGES' ? '#339af0' : '#bbb', fontWeight: currentView === 'CHANGES' ? 'bold' : 'normal' }}>Change Mgmt</li>
           <li onClick={() => setCurrentView('KNOWLEDGE')} style={{ cursor: 'pointer', color: currentView === 'KNOWLEDGE' ? '#339af0' : '#bbb', fontWeight: currentView === 'KNOWLEDGE' ? 'bold' : 'normal' }}>Knowledge Base</li>
         </ul>
       </div>
