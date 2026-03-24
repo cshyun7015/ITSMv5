@@ -1,5 +1,6 @@
 package com.itsm.backend.knowledge;
 
+import com.itsm.backend.auth.SecurityUtils;
 import com.itsm.backend.tenant.UserRepository;
 import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
@@ -20,8 +21,8 @@ public class KnowledgeController {
     }
 
     @GetMapping
-    public List<KnowledgeArticle> getArticles(@RequestParam String tenantId, 
-                                              @RequestParam(required = false) String keyword) {
+    public List<KnowledgeArticle> getArticles(@RequestParam(required = false) String keyword) {
+        String tenantId = SecurityUtils.getCurrentTenantId();
         if (keyword != null && !keyword.isBlank()) {
             return articleRepository.findByTenant_TenantIdAndTitleContainingIgnoreCase(tenantId, keyword);
         }
@@ -30,9 +31,9 @@ public class KnowledgeController {
 
     @PostMapping
     public KnowledgeArticle createArticle(@RequestBody Map<String, Object> payload) {
-        String userId = payload.get("authorId").toString();
+        String userId = SecurityUtils.getCurrentUserId();
         var author = userRepository.findById(userId).orElseThrow();
-        
+
         KnowledgeArticle article = new KnowledgeArticle();
         article.setTenant(author.getTenant());
         article.setAuthor(author);
@@ -42,7 +43,7 @@ public class KnowledgeController {
         article.setViewCount(0);
         article.setCreatedAt(LocalDateTime.now());
         article.setUpdatedAt(LocalDateTime.now());
-        
+
         return articleRepository.save(article);
     }
 }

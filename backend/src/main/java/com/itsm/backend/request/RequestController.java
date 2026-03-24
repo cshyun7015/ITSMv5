@@ -1,5 +1,6 @@
 package com.itsm.backend.request;
 
+import com.itsm.backend.auth.SecurityUtils;
 import com.itsm.backend.tenant.UserRepository;
 import com.itsm.backend.catalog.ServiceCatalogRepository;
 import com.itsm.backend.notification.NotificationService;
@@ -26,18 +27,20 @@ public class RequestController {
     }
 
     @GetMapping
-    public List<ServiceRequest> getRequests(@RequestParam String userId) {
+    public List<ServiceRequest> getRequests() {
+        // Server-side: only return requests for the authenticated user
+        String userId = SecurityUtils.getCurrentUserId();
         return requestRepository.findByRequester_UserId(userId);
     }
 
     @PostMapping
     public ServiceRequest createRequest(@RequestBody Map<String, Object> payload) {
-        ServiceRequest req = new ServiceRequest();
-
-        Long catalogId = Long.valueOf(payload.get("catalogId").toString());
-        String userId = payload.get("requesterId").toString();
+        // Server-side: get the real userId from JWT, ignore any client-supplied value
+        String userId = SecurityUtils.getCurrentUserId();
         var requester = userRepository.findById(userId).orElseThrow();
 
+        ServiceRequest req = new ServiceRequest();
+        Long catalogId = Long.valueOf(payload.get("catalogId").toString());
         req.setCatalog(catalogRepository.findById(catalogId).orElseThrow());
         req.setRequester(requester);
         req.setTenant(requester.getTenant());

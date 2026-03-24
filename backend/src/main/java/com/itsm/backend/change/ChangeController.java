@@ -1,5 +1,6 @@
 package com.itsm.backend.change;
 
+import com.itsm.backend.auth.SecurityUtils;
 import com.itsm.backend.tenant.UserRepository;
 import com.itsm.backend.notification.NotificationService;
 import org.springframework.web.bind.annotation.*;
@@ -23,13 +24,14 @@ public class ChangeController {
     }
 
     @GetMapping
-    public List<ChangeRequest> getChanges(@RequestParam String tenantId) {
+    public List<ChangeRequest> getChanges() {
+        String tenantId = SecurityUtils.getCurrentTenantId();
         return changeRepository.findByTenantIdOrderByCreatedAtDesc(tenantId);
     }
 
     @PostMapping
     public ChangeRequest createChange(@RequestBody Map<String, Object> payload) {
-        String requesterId = payload.get("requesterId").toString();
+        String requesterId = SecurityUtils.getCurrentUserId();
         var requester = userRepository.findById(requesterId).orElseThrow();
 
         ChangeRequest cr = new ChangeRequest();
@@ -50,7 +52,7 @@ public class ChangeController {
         notificationService.sendNotification(
             requester,
             "변경 요청 등록 완료",
-            "[" + saved.getChangeType() + "] '" + saved.getTitle() + "' 변경 요청이 초안 상태로 등록되었습니다. (CHG#" + saved.getId() + ")",
+            "[" + saved.getChangeType() + "] '" + saved.getTitle() + "' 변경 요청이 등록되었습니다. (CHG#" + saved.getId() + ")",
             "INFO"
         );
 
@@ -59,7 +61,11 @@ public class ChangeController {
 
     @PatchMapping("/{id}/status")
     public ChangeRequest updateStatus(@PathVariable Long id, @RequestBody Map<String, String> payload) {
+        String tenantId = SecurityUtils.getCurrentTenantId();
         ChangeRequest cr = changeRepository.findById(id).orElseThrow();
+        if (!tenantId.equals(cr.getTenantId())) {
+            throw new SecurityException("Access denied");
+        }
         cr.setStatus(payload.get("status"));
         return changeRepository.save(cr);
     }

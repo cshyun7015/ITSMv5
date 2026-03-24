@@ -7,6 +7,7 @@ import NotificationBell from './NotificationBell';
 import MyTickets from './MyTickets';
 import IncidentList from './IncidentList';
 import ChangeList from './ChangeList';
+import AdminPage from './AdminPage';
 
 export default function Dashboard({ user, onLogout }: { user: any, onLogout: () => void }) {
   const [currentView, setCurrentView] = useState('DASHBOARD');
@@ -19,7 +20,7 @@ export default function Dashboard({ user, onLogout }: { user: any, onLogout: () 
         try {
           const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
           const token = localStorage.getItem('itsm_token');
-          const res = await fetch(`${apiUrl}/api/dashboard/stats?tenantId=${user.tenantId}`, {
+          const res = await fetch(`${apiUrl}/api/dashboard/stats`, {
             headers: { 'Authorization': `Bearer ${token}` }
           });
           if (res.ok) setStats(await res.json());
@@ -71,6 +72,8 @@ export default function Dashboard({ user, onLogout }: { user: any, onLogout: () 
       return <IncidentList user={user} />;
     } else if (currentView === 'CHANGES') {
       return <ChangeList user={user} />;
+    } else if (currentView === 'ADMIN') {
+      return <AdminPage user={user} />;
     }
   };
 
@@ -89,6 +92,9 @@ export default function Dashboard({ user, onLogout }: { user: any, onLogout: () 
           <li onClick={() => setCurrentView('INCIDENTS')} style={{ cursor: 'pointer', color: currentView === 'INCIDENTS' ? '#ff6b6b' : '#bbb', fontWeight: currentView === 'INCIDENTS' ? 'bold' : 'normal' }}>Incidents</li>
           <li onClick={() => setCurrentView('CHANGES')} style={{ cursor: 'pointer', color: currentView === 'CHANGES' ? '#339af0' : '#bbb', fontWeight: currentView === 'CHANGES' ? 'bold' : 'normal' }}>Change Mgmt</li>
           <li onClick={() => setCurrentView('KNOWLEDGE')} style={{ cursor: 'pointer', color: currentView === 'KNOWLEDGE' ? '#339af0' : '#bbb', fontWeight: currentView === 'KNOWLEDGE' ? 'bold' : 'normal' }}>Knowledge Base</li>
+          {user.role === 'ROLE_ADMIN' && (
+            <li onClick={() => setCurrentView('ADMIN')} style={{ cursor: 'pointer', color: currentView === 'ADMIN' ? '#fcc419' : '#bbb', fontWeight: currentView === 'ADMIN' ? 'bold' : 'normal', borderTop: '1px solid #333', paddingTop: '1rem', marginTop: '0.5rem' }}>🔧 MSP Admin</li>
+          )}
         </ul>
       </div>
       

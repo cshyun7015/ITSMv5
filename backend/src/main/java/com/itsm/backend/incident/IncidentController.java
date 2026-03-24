@@ -1,5 +1,6 @@
 package com.itsm.backend.incident;
 
+import com.itsm.backend.auth.SecurityUtils;
 import com.itsm.backend.tenant.UserRepository;
 import com.itsm.backend.notification.NotificationService;
 import org.springframework.web.bind.annotation.*;
@@ -23,13 +24,15 @@ public class IncidentController {
     }
 
     @GetMapping
-    public List<Incident> getIncidents(@RequestParam String tenantId) {
+    public List<Incident> getIncidents() {
+        // Server-side tenant isolation
+        String tenantId = SecurityUtils.getCurrentTenantId();
         return incidentRepository.findByTenantIdOrderByCreatedAtDesc(tenantId);
     }
 
     @PostMapping
     public Incident createIncident(@RequestBody Map<String, Object> payload) {
-        String reporterId = payload.get("reporterId").toString();
+        String reporterId = SecurityUtils.getCurrentUserId();
         var reporter = userRepository.findById(reporterId).orElseThrow();
 
         Incident incident = new Incident();
@@ -58,7 +61,12 @@ public class IncidentController {
 
     @PatchMapping("/{id}/status")
     public Incident updateStatus(@PathVariable Long id, @RequestBody Map<String, String> payload) {
+        String tenantId = SecurityUtils.getCurrentTenantId();
         Incident inc = incidentRepository.findById(id).orElseThrow();
+        // Security: ensure user can only update their own tenant's incidents
+        if (!tenantId.equals(inc.getTenantId())) {
+            throw new SecurityException("Access denied");
+        }
         inc.setStatus(payload.get("status"));
         if ("INC_RESOLVED".equals(payload.get("status"))) {
             inc.setResolvedAt(LocalDateTime.now());

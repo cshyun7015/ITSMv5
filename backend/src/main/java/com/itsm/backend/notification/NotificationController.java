@@ -1,5 +1,6 @@
 package com.itsm.backend.notification;
 
+import com.itsm.backend.auth.SecurityUtils;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
@@ -16,12 +17,14 @@ public class NotificationController {
     }
 
     @GetMapping
-    public List<Notification> getNotifications(@RequestParam String userId) {
+    public List<Notification> getNotifications() {
+        String userId = SecurityUtils.getCurrentUserId();
         return notificationRepository.findByUser_UserIdOrderByCreatedAtDesc(userId);
     }
 
     @GetMapping("/unread-count")
-    public Map<String, Long> getUnreadCount(@RequestParam String userId) {
+    public Map<String, Long> getUnreadCount() {
+        String userId = SecurityUtils.getCurrentUserId();
         return Map.of("count", notificationRepository.countByUser_UserIdAndIsReadFalse(userId));
     }
 
@@ -34,7 +37,8 @@ public class NotificationController {
     }
 
     @PatchMapping("/read-all")
-    public void markAllRead(@RequestParam String userId) {
+    public void markAllRead() {
+        String userId = SecurityUtils.getCurrentUserId();
         var notifications = notificationRepository.findByUser_UserIdOrderByCreatedAtDesc(userId);
         notifications.forEach(n -> n.setRead(true));
         notificationRepository.saveAll(notifications);
