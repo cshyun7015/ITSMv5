@@ -1,26 +1,66 @@
-import { useState } from 'react';
+// Dashboard.tsx
+import { useState, useEffect } from 'react';
 import CatalogList from './CatalogList';
 import RequestForm from './RequestForm';
+import KnowledgeList from './KnowledgeList';
 
 export default function Dashboard({ user, onLogout }: { user: any, onLogout: () => void }) {
   const [currentView, setCurrentView] = useState('DASHBOARD');
   const [selectedCatalogId, setSelectedCatalogId] = useState<number | null>(null);
+  const [stats, setStats] = useState<any>({ openTickets: 0, inProgressTickets: 0, resolvedTickets: 0, slaCompliance: '-', activeIncidents: 0 });
+
+  useEffect(() => {
+    if (currentView === 'DASHBOARD') {
+      const fetchStats = async () => {
+        try {
+          const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+          const token = localStorage.getItem('itsm_token');
+          const res = await fetch(`${apiUrl}/api/dashboard/stats?tenantId=${user.tenantId}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          if (res.ok) setStats(await res.json());
+        } catch (e) {
+          console.error(e);
+        }
+      };
+      fetchStats();
+    }
+  }, [currentView, user.tenantId]);
 
   const renderContent = () => {
     if (currentView === 'DASHBOARD') {
       return (
-        <div style={{ backgroundColor: '#1e1e1e', padding: '2rem', borderRadius: '12px', border: '1px solid #333' }}>
-          <h3 style={{ color: '#fff', marginBottom: '1.5rem' }}>Welcome to ITSM v5 Dashboard</h3>
+        <div style={{ backgroundColor: '#1e1e1e', padding: '2rem', borderRadius: '12px', border: '1px solid #333', boxShadow: '0 4px 15px rgba(0,0,0,0.2)', display: 'flex', flexDirection: 'column' }}>
+          <h3 style={{ color: '#fff', marginBottom: '1.5rem' }}>Welcome to the Secure Dashboard</h3>
           <p style={{ color: '#aaa', lineHeight: '1.6' }}>
-            ITSM v5 is running end-to-end.<br/>
-            Select <strong>Service Catalog</strong> from the menu to request a new service using dynamic forms.
+            You have successfully authenticated against the PostgreSQL backend. The statistics below are aggregated in real-time.
           </p>
+          
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '2rem', marginTop: '3rem' }}>
+            {/* KPI Widget 1 */}
+            <div style={{ backgroundColor: '#2c2c2c', padding: '1.5rem', borderRadius: '8px', borderLeft: '4px solid #339af0', boxShadow: '0 2px 8px rgba(0,0,0,0.2)' }}>
+              <div style={{ color: '#888', marginBottom: '0.5rem', fontSize: '0.9rem' }}>Open SR Tickets (Tenant)</div>
+              <div style={{ color: '#fff', fontSize: '2.4rem', fontWeight: 'bold' }}>{stats.openTickets}</div>
+            </div>
+            {/* KPI Widget 2 */}
+            <div style={{ backgroundColor: '#2c2c2c', padding: '1.5rem', borderRadius: '8px', borderLeft: '4px solid #51cf66', boxShadow: '0 2px 8px rgba(0,0,0,0.2)' }}>
+              <div style={{ color: '#888', marginBottom: '0.5rem', fontSize: '0.9rem' }}>SLA Compliance</div>
+              <div style={{ color: '#fff', fontSize: '2.4rem', fontWeight: 'bold' }}>{stats.slaCompliance}</div>
+            </div>
+            {/* KPI Widget 3 */}
+            <div style={{ backgroundColor: '#2c2c2c', padding: '1.5rem', borderRadius: '8px', borderLeft: '4px solid #fcc419', boxShadow: '0 2px 8px rgba(0,0,0,0.2)' }}>
+              <div style={{ color: '#888', marginBottom: '0.5rem', fontSize: '0.9rem' }}>Active Incidents</div>
+              <div style={{ color: '#fff', fontSize: '2.4rem', fontWeight: 'bold' }}>{stats.activeIncidents}</div>
+            </div>
+          </div>
         </div>
       );
     } else if (currentView === 'CATALOG') {
       return <CatalogList user={user} onSelectCatalog={(id) => { setSelectedCatalogId(id); setCurrentView('REQUEST_FORM'); }} />;
     } else if (currentView === 'REQUEST_FORM') {
       return <RequestForm user={user} catalogId={selectedCatalogId!} onBack={() => setCurrentView('CATALOG')} />;
+    } else if (currentView === 'KNOWLEDGE') {
+      return <KnowledgeList user={user} />;
     }
   };
 
@@ -36,7 +76,7 @@ export default function Dashboard({ user, onLogout }: { user: any, onLogout: () 
           <li onClick={() => setCurrentView('DASHBOARD')} style={{ cursor: 'pointer', color: currentView === 'DASHBOARD' ? '#339af0' : '#bbb', fontWeight: currentView === 'DASHBOARD' ? 'bold' : 'normal' }}>Dashboard</li>
           <li onClick={() => setCurrentView('CATALOG')} style={{ cursor: 'pointer', color: currentView === 'CATALOG' || currentView === 'REQUEST_FORM' ? '#339af0' : '#bbb', fontWeight: currentView === 'CATALOG' || currentView === 'REQUEST_FORM' ? 'bold' : 'normal' }}>Service Catalog</li>
           <li style={{ cursor: 'pointer', color: '#bbb' }}>My Tickets</li>
-          <li style={{ cursor: 'pointer', color: '#bbb' }}>Knowledge Base</li>
+          <li onClick={() => setCurrentView('KNOWLEDGE')} style={{ cursor: 'pointer', color: currentView === 'KNOWLEDGE' ? '#339af0' : '#bbb', fontWeight: currentView === 'KNOWLEDGE' ? 'bold' : 'normal' }}>Knowledge Base</li>
         </ul>
       </div>
       
