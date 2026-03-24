@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react';
 import CatalogList from './CatalogList';
 import RequestForm from './RequestForm';
 import KnowledgeList from './KnowledgeList';
+import NotificationBell from './NotificationBell';
+import MyTickets from './MyTickets';
 
 export default function Dashboard({ user, onLogout }: { user: any, onLogout: () => void }) {
   const [currentView, setCurrentView] = useState('DASHBOARD');
@@ -61,6 +63,8 @@ export default function Dashboard({ user, onLogout }: { user: any, onLogout: () 
       return <RequestForm user={user} catalogId={selectedCatalogId!} onBack={() => setCurrentView('CATALOG')} />;
     } else if (currentView === 'KNOWLEDGE') {
       return <KnowledgeList user={user} />;
+    } else if (currentView === 'MY_TICKETS') {
+      return <MyTickets user={user} />;
     }
   };
 
@@ -75,7 +79,7 @@ export default function Dashboard({ user, onLogout }: { user: any, onLogout: () 
         <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
           <li onClick={() => setCurrentView('DASHBOARD')} style={{ cursor: 'pointer', color: currentView === 'DASHBOARD' ? '#339af0' : '#bbb', fontWeight: currentView === 'DASHBOARD' ? 'bold' : 'normal' }}>Dashboard</li>
           <li onClick={() => setCurrentView('CATALOG')} style={{ cursor: 'pointer', color: currentView === 'CATALOG' || currentView === 'REQUEST_FORM' ? '#339af0' : '#bbb', fontWeight: currentView === 'CATALOG' || currentView === 'REQUEST_FORM' ? 'bold' : 'normal' }}>Service Catalog</li>
-          <li style={{ cursor: 'pointer', color: '#bbb' }}>My Tickets</li>
+          <li onClick={() => setCurrentView('MY_TICKETS')} style={{ cursor: 'pointer', color: currentView === 'MY_TICKETS' ? '#339af0' : '#bbb', fontWeight: currentView === 'MY_TICKETS' ? 'bold' : 'normal' }}>My Tickets</li>
           <li onClick={() => setCurrentView('KNOWLEDGE')} style={{ cursor: 'pointer', color: currentView === 'KNOWLEDGE' ? '#339af0' : '#bbb', fontWeight: currentView === 'KNOWLEDGE' ? 'bold' : 'normal' }}>Knowledge Base</li>
         </ul>
       </div>
@@ -86,6 +90,7 @@ export default function Dashboard({ user, onLogout }: { user: any, onLogout: () 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', paddingBottom: '1rem', borderBottom: '1px solid #333' }}>
           <h2 style={{ color: '#fff', margin: 0, textTransform: 'capitalize' }}>{currentView.replace('_', ' ').toLowerCase()}</h2>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <NotificationBell user={user} />
             <div style={{ textAlign: 'right' }}>
               <div style={{ color: '#fff', fontWeight: 'bold' }}>{user.userName}</div>
               <div style={{ color: '#888', fontSize: '0.8rem' }}>{user.role} | Tenant: {user.tenantId}</div>
