@@ -11,3 +11,7 @@ scrape_configs:
     metrics_path: '/actuator/prometheus'
     static_configs:
       - targets: ['itsm-backend:8080']
+  - job_name: example
+    static_configs:
+      - targets:
+        - '192.168.55.162:8000'
