@@ -100,6 +100,10 @@
 * **인프라 모니터링**: 대상 서버 리소스 등 지표를 Prometheus로 수집.
 * **시각화**: 성능 모니터링, SLA 준수율, 비즈니스 지표(요청 처리량 등)를 Grafana 대시보드로 구성.
 
+### 3.5 공통 파일 첨부 관리 (File Attachment Management)
+* **목표**: 서비스 요청(SR) 및 장애(Incident) 등 각종 티켓 진행 시 참고용 스크린샷, 문서 등을 물리 망/로컬 스토리지에 업로드하고 식별하는 공통 통제 체계 마련.
+* **접근**: MVP 단계에서는 시스템 내부(Docker Volume)에 저장하며, 엔티티 다형성을 통해 어떠한 티켓 타입(`relatedEntityType`) 에도 손쉽게 첨부파일을 매핑할 수 있는 범용적 API 및 컴포넌트 구조 구현.
+
 ## 4. 데이터베이스 테이블 명세 (ERD 초안)
 
 시스템의 근간이 되는 핵심 테이블(테넌트, 사용자, 공통 코드, 요청 관리)에 대한 기본 속성 명세입니다. 다중 고객사 환경(MSP)을 위해 대부분의 테이블에 `tenant_id` 컬럼을 포함하여 데이터를 격리합니다.
@@ -170,6 +174,19 @@
 | | created_at | TIMESTAMP | | N | 요청 접수 일시 |
 | | resolved_at | TIMESTAMP | | Y | 조치 완료 일시 |
 
+### 4.4 공통 첨부파일 (Attachment)
+| 테이블명 | 컬럼명 | 데이터 타입 | PK/FK | Null | 설명 |
+|---|---|---|:---:|:---:|---|
+| **tb_attachment** <br>(공통 첨부파일) | attachment_id | VARCHAR(50) | PK | N | 첨부파일 고유 ID (UUID) |
+| | original_name | VARCHAR(255) | | N | 사용자가 업로드한 원본 파일명 |
+| | file_path | VARCHAR(500) | | N | 서버(또는 로컬)에 저장된 물리적 경로 |
+| | file_size | BIGINT | | N | 파일 크기 (Bytes) |
+| | content_type | VARCHAR(100) | | Y | MIME 타입 (예: image/png) |
+| | related_entity_type | VARCHAR(50) | | N | 연결된 티켓 구분 (예: SERVICE_REQUEST) |
+| | related_entity_id | VARCHAR(50) | FK | N | 연결된 티켓의 고유 ID |
+| | uploaded_by_id | VARCHAR(50) | FK | N | 업로드 사용자 ID (tb_user 참조) |
+| | tenant_id | VARCHAR(50) | FK | N | 테넌트 ID |
+| | created_at | TIMESTAMP | | N | 업로드 일시 |
 ## 5. 디렉토리 및 프로젝트 구조
 
 ### 5.1. 기본 방향: 모놀리식(Modular Monolith) 구조

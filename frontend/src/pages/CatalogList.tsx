@@ -9,7 +9,7 @@ export default function CatalogList({ user, onSelectCatalog }: { user: any, onSe
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
       const token = localStorage.getItem('itsm_token');
       try {
-        const response = await fetch(`${apiUrl}/api/catalog?tenantId=${user.tenantId}`, {
+        const response = await fetch(`${apiUrl}/api/catalogs?tenantId=${user.tenantId}`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (response.ok) {

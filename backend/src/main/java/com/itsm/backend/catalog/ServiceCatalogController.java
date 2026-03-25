@@ -17,9 +17,13 @@ public class ServiceCatalogController {
 
     @GetMapping
     public List<ServiceCatalog> getCatalogs() {
+        String role = SecurityUtils.getCurrentRole();
+        // ADMIN can see all catalogs across tenants (MSP view)
+        if ("ROLE_ADMIN".equals(role)) {
+            return catalogRepository.findByIsPublishedTrue();
+        }
         String tenantId = SecurityUtils.getCurrentTenantId();
-        // MSP: return tenant-specific + system shared catalogs
-        return catalogRepository.findByTenant_TenantIdAndIsPublished(tenantId, true);
+        return catalogRepository.findByTenant_TenantIdAndIsPublishedTrue(tenantId);
     }
 
     @GetMapping("/{id}")

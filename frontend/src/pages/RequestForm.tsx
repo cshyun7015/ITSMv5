@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
+import FileUpload from '../components/FileUpload';
 
 export default function RequestForm({ user, catalogId, onBack }: { user: any, catalogId: number, onBack: () => void }) {
   const [catalog, setCatalog] = useState<any>(null);
   const [formSchema, setFormSchema] = useState<any[]>([]);
   const [formData, setFormData] = useState<any>({});
+  const [files, setFiles] = useState<File[]>([]);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [statusMsg, setStatusMsg] = useState('');
@@ -13,7 +15,7 @@ export default function RequestForm({ user, catalogId, onBack }: { user: any, ca
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
       const token = localStorage.getItem('itsm_token');
       try {
-        const response = await fetch(`${apiUrl}/api/catalog/${catalogId}`, {
+        const response = await fetch(`${apiUrl}/api/catalogs/${catalogId}`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (response.ok) {
@@ -54,6 +56,26 @@ export default function RequestForm({ user, catalogId, onBack }: { user: any, ca
         body: JSON.stringify(payload)
       });
       if (response.ok) {
+        const createdRequest = await response.json();
+        
+        if (files.length > 0) {
+          setStatusMsg('Uploading attachments...');
+          for (let file of files) {
+            const fd = new FormData();
+            fd.append('file', file);
+            fd.append('relatedEntityType', 'SERVICE_REQUEST');
+            fd.append('relatedEntityId', String(createdRequest.id));
+            
+            await fetch(`${apiUrl}/api/attachments/upload`, {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${token}`
+              },
+              body: fd
+            });
+          }
+        }
+
         setStatusMsg('Successfully submitted! Returning to catalog...');
         setTimeout(onBack, 2000);
       } else {
@@ -118,6 +140,8 @@ export default function RequestForm({ user, catalogId, onBack }: { user: any, ca
             </div>
           </div>
         )}
+
+        <FileUpload files={files} onChange={setFiles} />
 
         <button type="submit" style={{ padding: '1rem', borderRadius: '6px', border: 'none', backgroundColor: '#339af0', color: '#fff', fontWeight: 'bold', cursor: 'pointer', marginTop: '1rem', fontSize: '1.1rem', transition: 'background-color 0.2s' }}>
           Submit Request

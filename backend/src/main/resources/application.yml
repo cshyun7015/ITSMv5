@@ -1,6 +1,10 @@
 spring:
   application:
     name: ItsmApplication
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
   profiles:
     active: postgres
   jpa:
@@ -23,6 +27,10 @@ management:
   metrics:
     tags:
       application: ${spring.application.name}
+
+app:
+  upload:
+    dir: ./data/attachments
 
 ---
 spring:
