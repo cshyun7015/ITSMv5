@@ -1,15 +1,12 @@
 package com.itsm.backend.change;
 
 import com.itsm.backend.tenant.Tenant;
-import com.itsm.backend.tenant.User;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "tb_change_request")
-@Getter @Setter
+@jakarta.persistence.Entity
+@jakarta.persistence.Table(name = "tb_change_request")
+@lombok.Data
 public class ChangeRequest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,9 +20,8 @@ public class ChangeRequest {
     @com.fasterxml.jackson.annotation.JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "requester_id")
-    private User requester;
+    private com.itsm.backend.tenant.User requester;
 
-    // Denormalized for JSON output — stored separately, NOT mapped to FK column
     @Column(name = "tenant_code")
     private String tenantId;
 
@@ -38,13 +34,39 @@ public class ChangeRequest {
     private String description;
 
     @Column(columnDefinition = "TEXT")
+    private String changeReason;
+
+    @Column(columnDefinition = "TEXT")
+    private String riskAssessment;
+
+    @Column(columnDefinition = "TEXT")
+    private String impactAnalysis;
+
+    @Column(columnDefinition = "TEXT")
+    private String implementationPlan;
+
+    @Column(columnDefinition = "TEXT")
     private String rollbackPlan;
 
     private String changeType;  // Standard, Normal, Emergency
-    private String status;      // CHG_DRAFT, CHG_REVIEW, CHG_APPROVED, CHG_IN_PROGRESS, CHG_COMPLETED, CHG_FAILED
+    private String status;      // CHG_DRAFT, CHG_SUBMITTED, CHG_REVIEW, CHG_APPROVED, CHG_SCHEDULED, CHG_IMPLEMENTING, CHG_CLOSED
     private String risk;        // Low, Medium, High
+    private String priority;    // Low, Medium, High, Critical
 
     private LocalDateTime plannedStart;
     private LocalDateTime plannedEnd;
+    
     private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
 }

@@ -1,27 +1,34 @@
 import { useState, useEffect } from 'react';
 
 const STATUS_COLOR: Record<string, string> = {
-  CHG_DRAFT: '#74c0fc',
+  CHG_DRAFT: '#868e96',
+  CHG_SUBMITTED: '#339af0',
   CHG_REVIEW: '#fcc419',
   CHG_APPROVED: '#51cf66',
-  CHG_IN_PROGRESS: '#ff922b',
-  CHG_COMPLETED: '#339af0',
-  CHG_FAILED: '#ff6b6b',
+  CHG_SCHEDULED: '#20c997',
+  CHG_IMPLEMENTING: '#fab005',
+  CHG_CLOSED: '#12b886',
 };
 const STATUS_LABEL: Record<string, string> = {
   CHG_DRAFT: '초안',
-  CHG_REVIEW: '검토 중',
-  CHG_APPROVED: '승인됨',
-  CHG_IN_PROGRESS: '진행 중',
-  CHG_COMPLETED: '완료',
-  CHG_FAILED: '실패',
+  CHG_SUBMITTED: '제출됨',
+  CHG_REVIEW: '기술 검토',
+  CHG_APPROVED: 'CAB 승인',
+  CHG_SCHEDULED: '작업 예약',
+  CHG_IMPLEMENTING: '이행 중',
+  CHG_CLOSED: '완료/종료',
 };
 
 export default function ChangeList({ user }: { user: any }) {
   const [changes, setChanges] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ title: '', description: '', rollbackPlan: '', changeType: 'Normal', risk: 'Medium' });
+  const [form, setForm] = useState({ 
+    title: '', description: '', changeReason: '', riskAssessment: '', 
+    impactAnalysis: '', implementationPlan: '', rollbackPlan: '', 
+    changeType: 'Normal', risk: 'Medium', priority: 'Medium',
+    plannedStart: '', plannedEnd: '' 
+  });
   const [submitting, setSubmitting] = useState(false);
 
   const fetchChanges = async () => {
@@ -48,7 +55,16 @@ export default function ChangeList({ user }: { user: any }) {
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ ...form, requesterId: user.userId })
       });
-      if (res.ok) { setShowForm(false); setForm({ title: '', description: '', rollbackPlan: '', changeType: 'Normal', risk: 'Medium' }); fetchChanges(); }
+      if (res.ok) { 
+        setShowForm(false); 
+        setForm({ 
+          title: '', description: '', changeReason: '', riskAssessment: '', 
+          impactAnalysis: '', implementationPlan: '', rollbackPlan: '', 
+          changeType: 'Normal', risk: 'Medium', priority: 'Medium',
+          plannedStart: '', plannedEnd: '' 
+        }); 
+        fetchChanges(); 
+      }
     } catch (e) { console.error(e); } finally { setSubmitting(false); }
   };
 
@@ -67,17 +83,59 @@ export default function ChangeList({ user }: { user: any }) {
         <form onSubmit={handleSubmit} style={{ backgroundColor: '#1e1e1e', padding: '2rem', borderRadius: '8px', border: '1px solid #444', marginBottom: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
           <h4 style={{ color: '#339af0', margin: 0 }}>변경 요청서 (RFC)</h4>
           <input required placeholder="변경 제목 *" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} style={{ padding: '0.8rem', borderRadius: '6px', border: '1px solid #555', backgroundColor: '#2c2c2c', color: '#fff', fontSize: '1rem' }} />
-          <textarea placeholder="변경 설명 및 이유" rows={3} value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} style={{ padding: '0.8rem', borderRadius: '6px', border: '1px solid #555', backgroundColor: '#2c2c2c', color: '#fff', fontSize: '1rem', fontFamily: 'inherit' }} />
-          <textarea placeholder="롤백 계획 (Rollback Plan)" rows={2} value={form.rollbackPlan} onChange={e => setForm({ ...form, rollbackPlan: e.target.value })} style={{ padding: '0.8rem', borderRadius: '6px', border: '1px solid #555', backgroundColor: '#2c2c2c', color: '#fff', fontSize: '1rem', fontFamily: 'inherit' }} />
-          <div style={{ display: 'flex', gap: '1rem' }}>
-            <select value={form.changeType} onChange={e => setForm({ ...form, changeType: e.target.value })} style={{ flex: 1, padding: '0.8rem', borderRadius: '6px', border: '1px solid #555', backgroundColor: '#2c2c2c', color: '#fff' }}>
-              <option>Standard</option><option>Normal</option><option>Emergency</option>
-            </select>
-            <select value={form.risk} onChange={e => setForm({ ...form, risk: e.target.value })} style={{ flex: 1, padding: '0.8rem', borderRadius: '6px', border: '1px solid #555', backgroundColor: '#2c2c2c', color: '#fff' }}>
-              <option>Low</option><option>Medium</option><option>High</option>
-            </select>
+          <textarea placeholder="변경 대상 및 상세 설명" rows={2} value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} style={{ padding: '0.8rem', borderRadius: '6px', border: '1px solid #555', backgroundColor: '#2c2c2c', color: '#fff', fontSize: '1rem', fontFamily: 'inherit' }} />
+          
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+            <textarea placeholder="변경 사유" rows={2} value={form.changeReason} onChange={e => setForm({ ...form, changeReason: e.target.value })} style={{ padding: '0.8rem', borderRadius: '6px', border: '1px solid #555', backgroundColor: '#2c2c2c', color: '#fff', fontSize: '0.9rem' }} />
+            <textarea placeholder="위험도 상세 평가" rows={2} value={form.riskAssessment} onChange={e => setForm({ ...form, riskAssessment: e.target.value })} style={{ padding: '0.8rem', borderRadius: '6px', border: '1px solid #555', backgroundColor: '#2c2c2c', color: '#fff', fontSize: '0.9rem' }} />
           </div>
-          <button type="submit" disabled={submitting} style={{ padding: '0.8rem', borderRadius: '6px', border: 'none', backgroundColor: '#339af0', color: '#fff', fontWeight: 'bold', cursor: 'pointer', fontSize: '1rem' }}>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+            <textarea placeholder="영향도 분석" rows={2} value={form.impactAnalysis} onChange={e => setForm({ ...form, impactAnalysis: e.target.value })} style={{ padding: '0.8rem', borderRadius: '6px', border: '1px solid #555', backgroundColor: '#2c2c2c', color: '#fff', fontSize: '0.9rem' }} />
+            <textarea placeholder="이행 계획 (Implementation)" rows={2} value={form.implementationPlan} onChange={e => setForm({ ...form, implementationPlan: e.target.value })} style={{ padding: '0.8rem', borderRadius: '6px', border: '1px solid #555', backgroundColor: '#2c2c2c', color: '#fff', fontSize: '0.9rem' }} />
+          </div>
+
+          <textarea placeholder="롤백 계획 (Rollback Plan)" rows={2} value={form.rollbackPlan} onChange={e => setForm({ ...form, rollbackPlan: e.target.value })} style={{ padding: '0.8rem', borderRadius: '6px', border: '1px solid #555', backgroundColor: '#2c2c2c', color: '#fff', fontSize: '1rem', fontFamily: 'inherit' }} />
+          
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+              <label style={{ fontSize: '0.8rem', color: '#888' }}>변경 유형</label>
+              <select value={form.changeType} onChange={e => setForm({ ...form, changeType: e.target.value })} style={{ padding: '0.6rem', borderRadius: '6px', border: '1px solid #555', backgroundColor: '#2c2c2c', color: '#fff' }}>
+                <option>Standard</option><option>Normal</option><option>Emergency</option>
+              </select>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+              <label style={{ fontSize: '0.8rem', color: '#888' }}>리스크 등급</label>
+              <select value={form.risk} onChange={e => setForm({ ...form, risk: e.target.value })} style={{ padding: '0.6rem', borderRadius: '6px', border: '1px solid #555', backgroundColor: '#2c2c2c', color: '#fff' }}>
+                <option>Low</option><option>Medium</option><option>High</option>
+              </select>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+              <label style={{ fontSize: '0.8rem', color: '#888' }}>우선순위</label>
+              <select value={form.priority} onChange={e => setForm({ ...form, priority: e.target.value })} style={{ padding: '0.6rem', borderRadius: '6px', border: '1px solid #555', backgroundColor: '#2c2c2c', color: '#fff' }}>
+                <option>Low</option><option>Medium</option><option>High</option><option>Critical</option>
+              </select>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+              <label style={{ fontSize: '0.8rem', color: '#888' }}>상태</label>
+              <select value="CHG_SUBMITTED" disabled style={{ padding: '0.6rem', borderRadius: '6px', border: '1px solid #555', backgroundColor: '#2c2c2c', color: '#888' }}>
+                <option value="CHG_SUBMITTED">제출됨</option>
+              </select>
+            </div>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+              <label style={{ fontSize: '0.8rem', color: '#888' }}>계획된 시작 일시</label>
+              <input type="datetime-local" value={form.plannedStart} onChange={e => setForm({ ...form, plannedStart: e.target.value })} style={{ padding: '0.6rem', borderRadius: '6px', border: '1px solid #555', backgroundColor: '#2c2c2c', color: '#fff' }} />
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+              <label style={{ fontSize: '0.8rem', color: '#888' }}>계획된 종료 일시</label>
+              <input type="datetime-local" value={form.plannedEnd} onChange={e => setForm({ ...form, plannedEnd: e.target.value })} style={{ padding: '0.6rem', borderRadius: '6px', border: '1px solid #555', backgroundColor: '#2c2c2c', color: '#fff' }} />
+            </div>
+          </div>
+
+          <button type="submit" disabled={submitting} style={{ padding: '1rem', borderRadius: '6px', border: 'none', backgroundColor: '#339af0', color: '#fff', fontWeight: 'bold', cursor: 'pointer', fontSize: '1rem', marginTop: '0.5rem' }}>
             {submitting ? 'Submitting...' : '📋 Submit RFC'}
           </button>
         </form>
