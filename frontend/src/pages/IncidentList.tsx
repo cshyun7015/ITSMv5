@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import FileUpload from '../components/FileUpload';
 
 const STATUS_COLOR: Record<string, string> = {
   INC_OPEN: '#ff6b6b',
@@ -25,6 +26,7 @@ export default function IncidentList({ user }: { user: any }) {
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ title: '', description: '', priority: 'Medium', impact: 'Individual' });
   const [submitting, setSubmitting] = useState(false);
+  const [files, setFiles] = useState<File[]>([]);
 
   const fetchIncidents = async () => {
     const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
@@ -50,7 +52,29 @@ export default function IncidentList({ user }: { user: any }) {
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ ...form, reporterId: user.userId })
       });
-      if (res.ok) { setShowForm(false); setForm({ title: '', description: '', priority: 'Medium', impact: 'Individual' }); fetchIncidents(); }
+      if (res.ok) { 
+        const createdIncident = await res.json();
+        
+        // Upload attachments if any
+        if (files.length > 0) {
+          for (let file of files) {
+            const fd = new FormData();
+            fd.append('file', file);
+            fd.append('relatedEntityType', 'INCIDENT');
+            fd.append('relatedEntityId', String(createdIncident.id));
+            await fetch(`${apiUrl}/api/attachments/upload`, {
+              method: 'POST',
+              headers: { 'Authorization': `Bearer ${token}` },
+              body: fd
+            });
+          }
+        }
+
+        setShowForm(false); 
+        setForm({ title: '', description: '', priority: 'Medium', impact: 'Individual' }); 
+        setFiles([]);
+        fetchIncidents(); 
+      }
     } catch (e) { console.error(e); } finally { setSubmitting(false); }
   };
 
@@ -78,6 +102,7 @@ export default function IncidentList({ user }: { user: any }) {
               <option>Service-wide</option><option>Department</option><option>Individual</option>
             </select>
           </div>
+          <FileUpload files={files} onChange={setFiles} />
           <button type="submit" disabled={submitting} style={{ padding: '0.8rem', borderRadius: '6px', border: 'none', backgroundColor: '#ff6b6b', color: '#fff', fontWeight: 'bold', cursor: 'pointer', fontSize: '1rem' }}>
             {submitting ? 'Submitting...' : '🚨 Submit Incident Report'}
           </button>
@@ -102,9 +127,37 @@ export default function IncidentList({ user }: { user: any }) {
             <div style={{ backgroundColor: STATUS_COLOR[inc.status] || '#888', padding: '0.4rem 1rem', borderRadius: '20px', fontSize: '0.85rem', color: '#000', fontWeight: 'bold', whiteSpace: 'nowrap' }}>
               {STATUS_LABEL[inc.status] || inc.status}
             </div>
+            
+            {/* Attachment Preview (Simplified for MVP) */}
+            <IncidentAttachments incidentId={inc.id} token={localStorage.getItem('itsm_token')!} />
           </div>
         ))}
       </div>
+    </div>
+  );
+}
+function IncidentAttachments({ incidentId, token }: { incidentId: number, token: string }) {
+  const [attachments, setAttachments] = useState<any[]>([]);
+  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+
+  useEffect(() => {
+    fetch(`${apiUrl}/api/attachments/list?relatedEntityType=INCIDENT&relatedEntityId=${incidentId}`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
+    .then(res => res.json())
+    .then(data => setAttachments(data))
+    .catch(err => console.error(err));
+  }, [incidentId]);
+
+  if (attachments.length === 0) return null;
+
+  return (
+    <div style={{ marginTop: '0.5rem', display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+      {attachments.map(at => (
+        <a key={at.id} href={`${apiUrl}/api/attachments/download/${at.id}`} target="_blank" rel="noreferrer" style={{ fontSize: '0.75rem', color: '#339af0', textDecoration: 'none', backgroundColor: '#25262b', padding: '0.2rem 0.5rem', borderRadius: '4px', border: '1px solid #333' }}>
+          📎 {at.originalName}
+        </a>
+      ))}
     </div>
   );
 }

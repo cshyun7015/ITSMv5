@@ -60,12 +60,40 @@ export default function MyTickets({ user }: { user: any }) {
                 Created: <span style={{ color: '#fff' }}>{new Date(ticket.createdAt).toLocaleDateString()}</span>
               </div>
             </div>
-            <div style={{ backgroundColor: STATUS_COLOR[ticket.status] || '#888', padding: '0.4rem 1rem', borderRadius: '20px', fontSize: '0.85rem', color: '#000', fontWeight: 'bold', whiteSpace: 'nowrap' }}>
-              {STATUS_LABEL[ticket.status] || ticket.status}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.5rem' }}>
+              <div style={{ backgroundColor: STATUS_COLOR[ticket.status] || '#888', padding: '0.4rem 1rem', borderRadius: '20px', fontSize: '0.85rem', color: '#000', fontWeight: 'bold', whiteSpace: 'nowrap' }}>
+                {STATUS_LABEL[ticket.status] || ticket.status}
+              </div>
+              <ServiceRequestAttachments requestId={ticket.id} token={localStorage.getItem('itsm_token')!} />
             </div>
           </div>
         ))
       )}
+    </div>
+  );
+}
+function ServiceRequestAttachments({ requestId, token }: { requestId: string, token: string }) {
+  const [attachments, setAttachments] = useState<any[]>([]);
+  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+
+  useEffect(() => {
+    fetch(`${apiUrl}/api/attachments/list?relatedEntityType=SERVICE_REQUEST&relatedEntityId=${requestId}`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
+    .then(res => res.json())
+    .then(data => setAttachments(data))
+    .catch(err => console.error(err));
+  }, [requestId]);
+
+  if (attachments.length === 0) return null;
+
+  return (
+    <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+      {attachments.map(at => (
+        <a key={at.id} href={`${apiUrl}/api/attachments/download/${at.id}`} target="_blank" rel="noreferrer" title={at.originalName} style={{ fontSize: '0.7rem', color: '#ccc', textDecoration: 'none', backgroundColor: '#333', padding: '0.1rem 0.4rem', borderRadius: '4px' }}>
+          📎 {at.originalName.length > 15 ? at.originalName.substring(0, 12) + '...' : at.originalName}
+        </a>
+      ))}
     </div>
   );
 }

@@ -46,6 +46,11 @@ public class Incident {
     private String priority;  // Critical, High, Medium, Low
     private String impact;    // Service-wide, Department, Individual
 
+    @com.fasterxml.jackson.annotation.JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "problem_id")
+    private com.itsm.backend.problem.Problem problem;
+
     private LocalDateTime createdAt;
     private LocalDateTime resolvedAt;
 }
