@@ -22,7 +22,7 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .sessionManagement(session -> session.sessionCreationPolicy(org.springframework.security.config.http.SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**", "/api/test", "/actuator/**").permitAll()
+                .requestMatchers("/api/auth/**", "/api/test", "/actuator/**", "/api/events/webhook").permitAll()
                 .anyRequest().authenticated() 
             )
             .addFilterBefore(jwtFilter, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class);

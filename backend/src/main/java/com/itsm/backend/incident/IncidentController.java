@@ -13,14 +13,14 @@ import java.util.Map;
 @CrossOrigin(origins = "*")
 public class IncidentController {
 
+    private final IncidentService incidentService;
     private final IncidentRepository incidentRepository;
-    private final UserRepository userRepository;
-    private final NotificationService notificationService;
+    private final SecurityUtils securityUtils;
 
-    public IncidentController(IncidentRepository incidentRepository, UserRepository userRepository, NotificationService notificationService) {
+    public IncidentController(IncidentService incidentService, IncidentRepository incidentRepository) {
+        this.incidentService = incidentService;
         this.incidentRepository = incidentRepository;
-        this.userRepository = userRepository;
-        this.notificationService = notificationService;
+        this.securityUtils = new SecurityUtils(); // Actually it has static methods
     }
 
     @GetMapping
@@ -33,30 +33,13 @@ public class IncidentController {
     @PostMapping
     public Incident createIncident(@RequestBody Map<String, Object> payload) {
         String reporterId = SecurityUtils.getCurrentUserId();
-        var reporter = userRepository.findById(reporterId).orElseThrow();
-
-        Incident incident = new Incident();
-        incident.setTenant(reporter.getTenant());
-        incident.setTenantId(reporter.getTenant().getTenantId());
-        incident.setReporter(reporter);
-        incident.setReporterId(reporterId);
-        incident.setTitle(payload.get("title").toString());
-        incident.setDescription(payload.getOrDefault("description", "").toString());
-        incident.setStatus("INC_OPEN");
-        incident.setPriority(payload.getOrDefault("priority", "Medium").toString());
-        incident.setImpact(payload.getOrDefault("impact", "Individual").toString());
-        incident.setCreatedAt(LocalDateTime.now());
-
-        Incident saved = incidentRepository.save(incident);
-
-        notificationService.sendNotification(
-            reporter,
-            "장애 신고 접수 완료",
-            "[" + saved.getPriority() + "] '" + saved.getTitle() + "' 장애가 접수되었습니다. (INC#" + saved.getId() + ")",
-            "WARNING"
+        return incidentService.createIncident(
+            reporterId,
+            payload.get("title").toString(),
+            payload.getOrDefault("description", "").toString(),
+            payload.getOrDefault("priority", "Medium").toString(),
+            payload.getOrDefault("impact", "Individual").toString()
         );
-
-        return saved;
     }
 
     @PatchMapping("/{id}/status")
