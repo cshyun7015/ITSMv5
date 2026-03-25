@@ -7,4 +7,5 @@ public interface ServiceRequestRepository extends JpaRepository<ServiceRequest, 
     List<ServiceRequest> findByTenant_TenantId(String tenantId);
     List<ServiceRequest> findByRequester_UserId(String userId);
     long countByTenant_TenantIdAndStatus(String tenantId, String status);
+    long countByStatus(String status);  // admin: all tenants aggregate
 }

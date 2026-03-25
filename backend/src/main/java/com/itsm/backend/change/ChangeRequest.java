@@ -25,14 +25,18 @@ public class ChangeRequest {
     @JoinColumn(name = "requester_id")
     private User requester;
 
+    // Denormalized for JSON output — stored separately, NOT mapped to FK column
+    @Column(name = "tenant_code")
     private String tenantId;
+
+    @Column(name = "requester_code")
     private String requesterId;
 
     private String title;
-    
+
     @Column(columnDefinition = "TEXT")
     private String description;
-    
+
     @Column(columnDefinition = "TEXT")
     private String rollbackPlan;
 

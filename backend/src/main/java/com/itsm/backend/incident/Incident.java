@@ -30,14 +30,17 @@ public class Incident {
     @JoinColumn(name = "assignee_id")
     private User assignee;
 
+    // Denormalized for JSON output — separate columns, not FK columns
+    @Column(name = "tenant_code")
+    private String tenantId;
+
+    @Column(name = "reporter_code")
+    private String reporterId;
+
     private String title;
-    
+
     @Column(columnDefinition = "TEXT")
     private String description;
-    
-    // Computed fields for JSON output
-    private String tenantId;
-    private String reporterId;
 
     private String status;    // INC_OPEN, INC_IN_PROGRESS, INC_RESOLVED, INC_CLOSED
     private String priority;  // Critical, High, Medium, Low
