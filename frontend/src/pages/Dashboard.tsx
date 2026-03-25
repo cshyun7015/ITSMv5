@@ -5,9 +5,9 @@ import RequestForm from './RequestForm';
 import KnowledgeList from './KnowledgeList';
 import NotificationBell from './NotificationBell';
 import MyTickets from './MyTickets';
-import IncidentList from './IncidentList';
 import ChangeList from './ChangeList';
 import AdminPage from './AdminPage';
+import AssetList from './AssetList';
 
 export default function Dashboard({ user, onLogout }: { user: any, onLogout: () => void }) {
   const [currentView, setCurrentView] = useState('DASHBOARD');
@@ -72,6 +72,8 @@ export default function Dashboard({ user, onLogout }: { user: any, onLogout: () 
       return <IncidentList user={user} />;
     } else if (currentView === 'CHANGES') {
       return <ChangeList user={user} />;
+    } else if (currentView === 'ASSETS') {
+      return <AssetList user={user} />;
     } else if (currentView === 'ADMIN') {
       return <AdminPage user={user} />;
     }
@@ -91,6 +93,7 @@ export default function Dashboard({ user, onLogout }: { user: any, onLogout: () 
           <li onClick={() => setCurrentView('MY_TICKETS')} style={{ cursor: 'pointer', color: currentView === 'MY_TICKETS' ? '#339af0' : '#bbb', fontWeight: currentView === 'MY_TICKETS' ? 'bold' : 'normal' }}>My Tickets</li>
           <li onClick={() => setCurrentView('INCIDENTS')} style={{ cursor: 'pointer', color: currentView === 'INCIDENTS' ? '#ff6b6b' : '#bbb', fontWeight: currentView === 'INCIDENTS' ? 'bold' : 'normal' }}>Incidents</li>
           <li onClick={() => setCurrentView('CHANGES')} style={{ cursor: 'pointer', color: currentView === 'CHANGES' ? '#339af0' : '#bbb', fontWeight: currentView === 'CHANGES' ? 'bold' : 'normal' }}>Change Mgmt</li>
+          <li onClick={() => setCurrentView('ASSETS')} style={{ cursor: 'pointer', color: currentView === 'ASSETS' ? '#339af0' : '#bbb', fontWeight: currentView === 'ASSETS' ? 'bold' : 'normal' }}>Assets / CMDB</li>
           <li onClick={() => setCurrentView('KNOWLEDGE')} style={{ cursor: 'pointer', color: currentView === 'KNOWLEDGE' ? '#339af0' : '#bbb', fontWeight: currentView === 'KNOWLEDGE' ? 'bold' : 'normal' }}>Knowledge Base</li>
           {user.role === 'ROLE_ADMIN' && (
             <li onClick={() => setCurrentView('ADMIN')} style={{ cursor: 'pointer', color: currentView === 'ADMIN' ? '#fcc419' : '#bbb', fontWeight: currentView === 'ADMIN' ? 'bold' : 'normal', borderTop: '1px solid #333', paddingTop: '1rem', marginTop: '0.5rem' }}>🔧 MSP Admin</li>

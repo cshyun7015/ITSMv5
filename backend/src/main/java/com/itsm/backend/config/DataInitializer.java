@@ -14,6 +14,8 @@ import com.itsm.backend.incident.IncidentRepository;
 import com.itsm.backend.change.ChangeRequest;
 import com.itsm.backend.change.ChangeRequestRepository;
 import com.itsm.backend.tenant.UserRepository;
+import com.itsm.backend.cmdb.ConfigurationItem;
+import com.itsm.backend.cmdb.CIRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +33,7 @@ public class DataInitializer implements CommandLineRunner {
     @Autowired private ServiceRequestRepository serviceRequestRepository;
     @Autowired private IncidentRepository incidentRepository;
     @Autowired private ChangeRequestRepository changeRequestRepository;
+    @Autowired private CIRepository ciRepository;
 
     @Override
     @Transactional
@@ -220,6 +223,32 @@ public class DataInitializer implements CommandLineRunner {
                 a.setCreatedAt(LocalDateTime.now().minusDays(7));
                 a.setUpdatedAt(LocalDateTime.now().minusDays(1));
                 knowledgeArticleRepository.save(a);
+            }
+        }
+
+        // ===== 7. CONFIGURATION ITEMS (CMDB/ITAM) =====
+        if (ciRepository.count() == 0) {
+            var admin = userRepository.findByUserId("admin").get();
+            Object[][] cis = {
+                {"Production Web Server 01", "SERVER", "IN_USE", "SN-SRV-001", "Dell PowerEdge R750", "Main DataCenter - Rack A1", "CPU: 32C, RAM: 128GB, SSD: 2TB"},
+                {"Development Database Server", "SERVER", "IN_USE", "SN-SRV-002", "HP ProLiant DL380", "Main DataCenter - Rack B2", "CPU: 16C, RAM: 64GB, SSD: 4TB"},
+                {"CEO Laptop (MacBook Pro)", "LAPTOP", "IN_USE", "SN-LAP-101", "Apple MacBook Pro 16\"", "Headquarters - 10F", "M3 Max, 64GB RAM, 1TB SSD"},
+                {"Core Switch - HQ", "NETWORK_DEVICE", "IN_USE", "SN-NET-501", "Cisco Catalyst 9300", "Headquarters - Server Room", "48-port PoE+, 10G Uplink"},
+                {"Backup Storage Array", "STORAGE", "IN_USE", "SN-STO-901", "NetApp AFF A400", "DR Site - Rack C1", "Capacity: 100TB, NVMe"},
+                {"Spare Monitor 27\"", "MONITOR", "IN_STOCK", "SN-MON-202", "Dell UltraSharp 27\"", "IT Storage Room", "4K Resolution, USB-C"},
+            };
+            for (Object[] ciData : cis) {
+                ConfigurationItem ci = new ConfigurationItem();
+                ci.setName((String) ciData[0]);
+                ci.setType((String) ciData[1]);
+                ci.setStatus((String) ciData[2]);
+                ci.setSerialNumber((String) ciData[3]);
+                ci.setModel((String) ciData[4]);
+                ci.setLocation((String) ciData[5]);
+                ci.setSpecifications((String) ciData[6]);
+                ci.setTenant(tenantA);
+                ci.setOwner(admin);
+                ciRepository.save(ci);
             }
         }
     }
