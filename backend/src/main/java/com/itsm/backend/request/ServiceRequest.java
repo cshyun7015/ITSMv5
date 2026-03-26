@@ -48,6 +48,14 @@ public class ServiceRequest {
     private String status;
     private String priority;
     
+    @Column(columnDefinition = "TEXT")
+    private String resolution;
+
+    @org.hibernate.annotations.CreationTimestamp
     private LocalDateTime createdAt;
+
+    @org.hibernate.annotations.UpdateTimestamp
+    private LocalDateTime updatedAt;
+
     private LocalDateTime resolvedAt;
 }

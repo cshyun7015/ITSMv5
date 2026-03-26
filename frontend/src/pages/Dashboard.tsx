@@ -14,10 +14,13 @@ import ProblemList from './ProblemList';
 import ServiceList from './ServiceList';
 import ReleaseList from './ReleaseList';
 import CatalogManagement from '../components/admin/CatalogManagement';
+import ServiceRequestManagement from '../components/admin/ServiceRequestManagement';
+import ServiceRequestDetail from '../components/admin/ServiceRequestDetail';
 
 export default function Dashboard({ user, onLogout }: { user: any, onLogout: () => void }) {
   const [currentView, setCurrentView] = useState('DASHBOARD');
   const [selectedCatalogId, setSelectedCatalogId] = useState<number | null>(null);
+  const [selectedRequestId, setSelectedRequestId] = useState<number | null>(null);
   const [stats, setStats] = useState<any>({ openTickets: 0, inProgressTickets: 0, resolvedTickets: 0, slaCompliance: '-', activeIncidents: 0 });
 
   const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
@@ -95,6 +98,10 @@ export default function Dashboard({ user, onLogout }: { user: any, onLogout: () 
       return <ReleaseList user={user} />;
     } else if (currentView === 'ADMIN') {
       return <AdminPage user={user} />;
+    } else if (currentView === 'SR_MANAGEMENT') {
+      return <ServiceRequestManagement apiUrl={apiUrl} headers={headers} onSelectDetail={(id: number) => { setSelectedRequestId(id); setCurrentView('SR_DETAIL'); }} />;
+    } else if (currentView === 'SR_DETAIL') {
+      return <ServiceRequestDetail apiUrl={apiUrl} headers={headers} requestId={selectedRequestId} onBack={() => setCurrentView('SR_MANAGEMENT')} currentUser={user} />;
     }
   };
 
@@ -127,10 +134,13 @@ export default function Dashboard({ user, onLogout }: { user: any, onLogout: () 
           <li onClick={() => setCurrentView('CHANGES')} style={{ cursor: 'pointer', paddingLeft: '0.5rem', color: currentView === 'CHANGES' ? '#339af0' : '#bbb', fontWeight: currentView === 'CHANGES' ? 'bold' : 'normal' }}>🔄 변경 관리</li>
           <li onClick={() => setCurrentView('RELEASE')} style={{ cursor: 'pointer', paddingLeft: '0.5rem', color: currentView === 'RELEASE' ? '#339af0' : '#bbb', fontWeight: currentView === 'RELEASE' ? 'bold' : 'normal' }}>🚀 릴리스 관리</li>
           
-          {user.role === 'ROLE_ADMIN' && (
+          {(user.role === 'ROLE_ADMIN' || user.role === 'ROLE_AGENT') && (
             <>
               <li style={{ color: '#555', fontSize: '0.75rem', fontWeight: 'bold', marginTop: '1rem', borderTop: '1px solid #333', paddingTop: '1rem', textTransform: 'uppercase' }}>관리자 기능</li>
-              <li onClick={() => setCurrentView('ADMIN')} style={{ cursor: 'pointer', paddingLeft: '0.5rem', color: currentView === 'ADMIN' ? '#fcc419' : '#bbb', fontWeight: currentView === 'ADMIN' ? 'bold' : 'normal' }}>🛠️ 시스템 관리</li>
+              <li onClick={() => setCurrentView('SR_MANAGEMENT')} style={{ cursor: 'pointer', paddingLeft: '0.5rem', color: currentView === 'SR_MANAGEMENT' || currentView === 'SR_DETAIL' ? '#fcc419' : '#bbb', fontWeight: currentView === 'SR_MANAGEMENT' ? 'bold' : 'normal' }}>📋 서비스 요청 관리</li>
+              {user.role === 'ROLE_ADMIN' && (
+                <li onClick={() => setCurrentView('ADMIN')} style={{ cursor: 'pointer', paddingLeft: '0.5rem', color: currentView === 'ADMIN' ? '#fcc419' : '#bbb', fontWeight: currentView === 'ADMIN' ? 'bold' : 'normal' }}>🛠️ 시스템 관리</li>
+              )}
             </>
           )}
         </ul>

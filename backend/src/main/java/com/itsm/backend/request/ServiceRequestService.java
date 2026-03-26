@@ -1,62 +1,93 @@
 package com.itsm.backend.request;
 
+import com.itsm.backend.catalog.ServiceCatalog;
 import com.itsm.backend.catalog.ServiceCatalogRepository;
-import com.itsm.backend.notification.NotificationService;
+import com.itsm.backend.tenant.User;
 import com.itsm.backend.tenant.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class ServiceRequestService {
 
-    private final ServiceRequestRepository requestRepository;
-    private final ServiceCatalogRepository catalogRepository;
+    private final ServiceRequestRepository repository;
     private final UserRepository userRepository;
-    private final NotificationService notificationService;
-
-    public ServiceRequestService(ServiceRequestRepository requestRepository, 
-                                 ServiceCatalogRepository catalogRepository, 
-                                 UserRepository userRepository, 
-                                 NotificationService notificationService) {
-        this.requestRepository = requestRepository;
-        this.catalogRepository = catalogRepository;
-        this.userRepository = userRepository;
-        this.notificationService = notificationService;
-    }
+    private final ServiceCatalogRepository catalogRepository;
 
     public List<ServiceRequest> getRequestsForUser(String userId) {
-        return requestRepository.findByRequester_UserId(userId);
+        return repository.findByRequester_UserId(userId);
+    }
+
+    public Page<ServiceRequest> getAllRequests(String search, String status, String tenantId, Pageable pageable) {
+        if (tenantId != null && !tenantId.isEmpty()) {
+            return repository.findByTenant_TenantId(tenantId, pageable);
+        }
+        return repository.findAll(pageable);
     }
 
     @Transactional
     public ServiceRequest createRequest(String userId, Map<String, Object> payload) {
-        var requester = userRepository.findById(userId).orElseThrow();
-
-        ServiceRequest req = new ServiceRequest();
+        User requester = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        
         Long catalogId = Long.valueOf(payload.get("catalogId").toString());
-        req.setCatalog(catalogRepository.findById(catalogId).orElseThrow());
-        req.setRequester(requester);
-        req.setTenant(requester.getTenant());
-        req.setTitle(payload.get("title").toString());
-        req.setDescription(payload.getOrDefault("description", "").toString());
-        req.setFormData(payload.get("formData").toString());
-        req.setStatus("REQ_STATUS_OPEN");
-        req.setPriority(payload.getOrDefault("priority", "Medium").toString());
-        req.setCreatedAt(LocalDateTime.now());
+        ServiceCatalog catalog = catalogRepository.findById(catalogId)
+                .orElseThrow(() -> new RuntimeException("Catalog not found"));
 
-        ServiceRequest saved = requestRepository.save(req);
+        ServiceRequest sr = new ServiceRequest();
+        sr.setRequester(requester);
+        sr.setTenant(requester.getTenant());
+        sr.setCatalog(catalog);
+        sr.setTitle(payload.getOrDefault("title", catalog.getCatalogName() + " 요청").toString());
+        sr.setDescription(payload.getOrDefault("description", "").toString());
+        sr.setFormData(payload.getOrDefault("formData", "{}").toString());
+        sr.setStatus("OPEN");
+        sr.setPriority(payload.getOrDefault("priority", "MEDIUM").toString());
+        
+        return repository.save(sr);
+    }
 
-        notificationService.sendNotification(
-            requester,
-            "서비스 요청 접수 완료",
-            "요청 '" + saved.getTitle() + "' 이(가) 성공적으로 접수되었습니다. (ID: " + saved.getId() + ")",
-            "SUCCESS"
-        );
+    @Transactional
+    public ServiceRequest updateRequest(Long id, Map<String, Object> updates) {
+        ServiceRequest sr = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Request not found"));
+        
+        if (updates.containsKey("status")) {
+            String newStatus = updates.get("status").toString();
+            sr.setStatus(newStatus);
+            if ("RESOLVED".equals(newStatus) || "CLOSED".equals(newStatus)) {
+                sr.setResolvedAt(LocalDateTime.now());
+            }
+        }
+        if (updates.containsKey("priority")) sr.setPriority(updates.get("priority").toString());
+        if (updates.containsKey("resolution")) sr.setResolution(updates.get("resolution").toString());
+        if (updates.containsKey("assigneeId")) {
+            String assigneeId = updates.get("assigneeId").toString();
+            User assignee = userRepository.findById(assigneeId)
+                    .orElseThrow(() -> new RuntimeException("Assignee not found"));
+            sr.setAssignee(assignee);
+        }
+        if (updates.containsKey("title")) sr.setTitle(updates.get("title").toString());
+        if (updates.containsKey("description")) sr.setDescription(updates.get("description").toString());
 
-        return saved;
+        return repository.save(sr);
+    }
+
+    @Transactional
+    public void deleteRequest(Long id) {
+        repository.deleteById(id);
+    }
+
+    public Optional<ServiceRequest> getRequest(Long id) {
+        return repository.findById(id);
     }
 }
