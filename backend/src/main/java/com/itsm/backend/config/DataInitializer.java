@@ -58,11 +58,45 @@ public class DataInitializer implements CommandLineRunner {
             em.persist(buildUser("user02",  tenantB,      "박지호 대리",      "ROLE_USER",     "jiho@beta.startup"));
 
             String[][] codes = {
+                // Service Request Status
                 {"REQ_STATUS_OPEN",        "REQ_STATUS", "신규 접수",   "1"},
                 {"REQ_STATUS_ASSIGNED",    "REQ_STATUS", "담당자 할당", "2"},
                 {"REQ_STATUS_IN_PROGRESS", "REQ_STATUS", "처리 중",     "3"},
                 {"REQ_STATUS_RESOLVED",    "REQ_STATUS", "조치 완료",   "4"},
-                {"REQ_STATUS_CLOSED",      "REQ_STATUS", "종료/승인",   "5"}
+                {"REQ_STATUS_CLOSED",      "REQ_STATUS", "종료/승인",   "5"},
+                
+                // Incident Status
+                {"INC_STATUS_OPEN",        "INC_STATUS", "신규 장애",   "1"},
+                {"INC_STATUS_IN_PROGRESS", "INC_STATUS", "장애 처리중", "2"},
+                {"INC_STATUS_RESOLVED",    "INC_STATUS", "장애 조치완료", "3"},
+                {"INC_STATUS_CLOSED",      "INC_STATUS", "장애 종료",   "4"},
+
+                // Change Status
+                {"CHG_STATUS_DRAFT",       "CHG_STATUS", "임시 저장",   "1"},
+                {"CHG_STATUS_REQUESTED",   "CHG_STATUS", "변경 요청",   "2"},
+                {"CHG_STATUS_REVIEW",      "CHG_STATUS", "검토 중",     "3"},
+                {"CHG_STATUS_APPROVED",    "CHG_STATUS", "승인 완료",   "4"},
+                {"CHG_STATUS_IN_PROGRESS", "CHG_STATUS", "변경 작업중", "5"},
+                {"CHG_STATUS_COMPLETED",   "CHG_STATUS", "변경 완료",   "6"},
+
+                // Priority
+                {"PRIO_CRITICAL",          "PRIORITY",   "최긴급(Critical)", "1"},
+                {"PRIO_HIGH",              "PRIORITY",   "긴급(High)",      "2"},
+                {"PRIO_MEDIUM",            "PRIORITY",   "보통(Medium)",    "3"},
+                {"PRIO_LOW",               "PRIORITY",   "낮음(Low)",       "4"},
+
+                // CI Type
+                {"CI_TYPE_SERVER",         "CI_TYPE",    "서버",       "1"},
+                {"CI_TYPE_LAPTOP",         "CI_TYPE",    "노트북",     "2"},
+                {"CI_TYPE_NETWORK",        "CI_TYPE",    "네트워크 장비", "3"},
+                {"CI_TYPE_STORAGE",        "CI_TYPE",    "스토리지",    "4"},
+                {"CI_TYPE_SOFTWARE",       "CI_TYPE",    "소프트웨어",  "5"},
+
+                // CI Status
+                {"CI_STAT_IN_USE",         "CI_STATUS",  "사용 중",     "1"},
+                {"CI_STAT_IN_STOCK",       "CI_STATUS",  "재고품",      "2"},
+                {"CI_STAT_REPAIR",         "CI_STATUS",  "수리 중",     "3"},
+                {"CI_STAT_DISPOSED",       "CI_STATUS",  "폐기됨",      "4"}
             };
             for (String[] c : codes) {
                 CommonCode sc = new CommonCode();
@@ -75,6 +109,24 @@ public class DataInitializer implements CommandLineRunner {
             systemTenant = userRepository.findByUserId("admin").get().getTenant();
             tenantA = userRepository.findByUserId("eng01").map(User::getTenant).orElse(systemTenant);
             tenantB = userRepository.findByUserId("user02").map(User::getTenant).orElse(systemTenant);
+            
+            // Re-check for missing codes
+            String[][] extraCodes = {
+                {"INC_STATUS_OPEN", "INC_STATUS", "신규 장애", "1"}, {"INC_STATUS_IN_PROGRESS", "INC_STATUS", "장애 처리중", "2"}, {"INC_STATUS_RESOLVED", "INC_STATUS", "장애 조치완료", "3"}, {"INC_STATUS_CLOSED", "INC_STATUS", "장애 종료", "4"},
+                {"CHG_STATUS_DRAFT", "CHG_STATUS", "임시 저장", "1"}, {"CHG_STATUS_REQUESTED", "CHG_STATUS", "변경 요청", "2"}, {"CHG_STATUS_REVIEW", "CHG_STATUS", "검토 중", "3"}, {"CHG_STATUS_APPROVED", "CHG_STATUS", "승인 완료", "4"}, {"CHG_STATUS_IN_PROGRESS", "CHG_STATUS", "변경 작업중", "5"}, {"CHG_STATUS_COMPLETED", "CHG_STATUS", "변경 완료", "6"},
+                {"PRIO_CRITICAL", "PRIORITY", "최긴급(Critical)", "1"}, {"PRIO_HIGH", "PRIORITY", "긴급(High)", "2"}, {"PRIO_MEDIUM", "PRIORITY", "보통(Medium)", "3"}, {"PRIO_LOW", "PRIORITY", "낮음(Low)", "4"},
+                {"CI_TYPE_SERVER", "CI_TYPE", "서버", "1"}, {"CI_TYPE_LAPTOP", "CI_TYPE", "노트북", "2"}, {"CI_TYPE_NETWORK", "CI_TYPE", "네트워크 장비", "3"}, {"CI_TYPE_STORAGE", "CI_TYPE", "스토리지", "4"}, {"CI_TYPE_SOFTWARE", "CI_TYPE", "소프트웨어", "5"},
+                {"CI_STAT_IN_USE", "CI_STATUS", "사용 중", "1"}, {"CI_STAT_IN_STOCK", "CI_STATUS", "재고품", "2"}, {"CI_STAT_REPAIR", "CI_STATUS", "수리 중", "3"}, {"CI_STAT_DISPOSED", "CI_STATUS", "폐기됨", "4"}
+            };
+            for (String[] c : extraCodes) {
+                if (em.find(CommonCode.class, c[0]) == null) {
+                    CommonCode sc = new CommonCode();
+                    sc.setCodeId(c[0]); sc.setGroupCode(c[1]);
+                    sc.setCodeName(c[2]); sc.setSortOrder(Integer.parseInt(c[3]));
+                    sc.setIsUse(true);
+                    em.persist(sc);
+                }
+            }
         }
 
         // ===== 2. SERVICE CATALOGS =====

@@ -39,9 +39,14 @@ public class AdminController {
     // ===== TENANT MANAGEMENT =====
 
     @GetMapping("/tenants")
-    public List<Tenant> getTenants() {
+    public org.springframework.data.domain.Page<Tenant> getTenants(
+            @org.springframework.data.web.PageableDefault(sort = "createdAt", direction = org.springframework.data.domain.Sort.Direction.DESC) org.springframework.data.domain.Pageable pageable,
+            @RequestParam(defaultValue = "") String search) {
         assertAdmin();
-        return tenantRepository.findAll();
+        if (search == null || search.isEmpty()) {
+            return tenantRepository.findAll(pageable);
+        }
+        return tenantRepository.findByTenantNameContainingIgnoreCaseOrTenantIdContainingIgnoreCase(search, search, pageable);
     }
 
     @PostMapping("/tenants")
@@ -72,9 +77,14 @@ public class AdminController {
     // ===== USER MANAGEMENT =====
 
     @GetMapping("/users")
-    public List<User> getUsers() {
+    public org.springframework.data.domain.Page<User> getUsers(
+            @org.springframework.data.web.PageableDefault(sort = "userId", direction = org.springframework.data.domain.Sort.Direction.ASC) org.springframework.data.domain.Pageable pageable,
+            @RequestParam(defaultValue = "") String search) {
         assertAdmin();
-        return userRepository.findAll();
+        if (search == null || search.isEmpty()) {
+            return userRepository.findAll(pageable);
+        }
+        return userRepository.findByUserNameContainingIgnoreCaseOrUserIdContainingIgnoreCaseOrEmailContainingIgnoreCase(search, search, search, pageable);
     }
 
     @PostMapping("/users")
@@ -104,6 +114,32 @@ public class AdminController {
         user.setRole(newRole);
         userRepository.save(user);
         return Map.of("userId", userId, "role", newRole);
+    }
+
+    @PatchMapping("/users/{userId}")
+    @Transactional
+    public User updateUser(@PathVariable String userId, @RequestBody Map<String, Object> payload) {
+        assertAdmin();
+        User user = userRepository.findById(userId).orElseThrow();
+        if (payload.containsKey("userName")) user.setUserName(payload.get("userName").toString());
+        if (payload.containsKey("email")) user.setEmail(payload.get("email").toString());
+        if (payload.containsKey("role")) user.setRole(payload.get("role").toString());
+        if (payload.containsKey("password") && !payload.get("password").toString().isEmpty()) {
+            user.setPassword("{noop}" + payload.get("password").toString());
+        }
+        if (payload.containsKey("tenantId")) {
+            Tenant tenant = tenantRepository.findById(payload.get("tenantId").toString()).orElseThrow();
+            user.setTenant(tenant);
+        }
+        return userRepository.save(user);
+    }
+
+    @DeleteMapping("/users/{userId}")
+    @Transactional
+    public void deleteUser(@PathVariable String userId) {
+        assertAdmin();
+        User user = userRepository.findById(userId).orElseThrow();
+        userRepository.delete(user);
     }
 
     @DeleteMapping("/tenants/{tenantId}")

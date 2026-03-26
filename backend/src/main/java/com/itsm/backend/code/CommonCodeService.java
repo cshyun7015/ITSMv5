@@ -12,8 +12,12 @@ import java.util.List;
 public class CommonCodeService {
     private final CommonCodeRepository repository;
 
-    public List<CommonCode> getAllCodes() {
-        return repository.findAll();
+    public org.springframework.data.domain.Page<CommonCode> getAllCodes(org.springframework.data.domain.Pageable pageable) {
+        return repository.findAll(pageable);
+    }
+
+    public org.springframework.data.domain.Page<CommonCode> searchCodes(String keyword, org.springframework.data.domain.Pageable pageable) {
+        return repository.findByCodeNameContainingIgnoreCaseOrCodeIdContainingIgnoreCaseOrGroupCodeContainingIgnoreCase(keyword, keyword, keyword, pageable);
     }
 
     public List<CommonCode> getCodesByGroup(String groupCode) {

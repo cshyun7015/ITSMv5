@@ -1,42 +1,16 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import CustomerManagement from '../components/admin/CustomerManagement';
 import UserManagement from '../components/admin/UserManagement';
 import CodeManagement from '../components/admin/CodeManagement';
 
 export default function AdminPage() {
   const [activeTab, setActiveTab] = useState<'tenants' | 'users' | 'codes'>('tenants');
-  const [tenants, setTenants] = useState<any[]>([]);
-  const [users, setUsers] = useState<any[]>([]);
-  const [codes, setCodes] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
 
   const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
   const headers = () => ({ 
     'Content-Type': 'application/json', 
     'Authorization': `Bearer ${localStorage.getItem('itsm_token')}` 
   });
-
-  const fetchData = async () => {
-    setLoading(true);
-    try {
-      const [tRes, uRes, cRes] = await Promise.all([
-        fetch(`${apiUrl}/api/admin/tenants`, { headers: headers() }),
-        fetch(`${apiUrl}/api/admin/users`, { headers: headers() }),
-        fetch(`${apiUrl}/api/codes`, { headers: headers() })
-      ]);
-      if (tRes.ok) setTenants(await tRes.json());
-      if (uRes.ok) setUsers(await uRes.json());
-      if (cRes.ok) setCodes(await cRes.json());
-    } catch (e) {
-      console.error('Failed to fetch admin data:', e);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchData();
-  }, []);
 
   return (
     <div className="admin-page-container">
@@ -62,37 +36,26 @@ export default function AdminPage() {
         </button>
       </div>
 
-      {loading && <div style={{ color: '#aaa', padding: '2rem', textAlign: 'center' }}>데이터 로딩 중...</div>}
-
-      {!loading && (
-        <div className="admin-tab-content">
-          {activeTab === 'tenants' && (
-            <CustomerManagement 
-              tenants={tenants} 
-              onFetch={fetchData} 
-              apiUrl={apiUrl} 
-              headers={headers} 
-            />
-          )}
-          {activeTab === 'users' && (
-            <UserManagement 
-              users={users} 
-              tenants={tenants} 
-              onFetch={fetchData} 
-              apiUrl={apiUrl} 
-              headers={headers} 
-            />
-          )}
-          {activeTab === 'codes' && (
-            <CodeManagement 
-              codes={codes} 
-              onFetch={fetchData} 
-              apiUrl={apiUrl} 
-              headers={headers} 
-            />
-          )}
-        </div>
-      )}
+      <div className="admin-tab-content">
+        {activeTab === 'tenants' && (
+          <CustomerManagement 
+            apiUrl={apiUrl} 
+            headers={headers} 
+          />
+        )}
+        {activeTab === 'users' && (
+          <UserManagement 
+            apiUrl={apiUrl} 
+            headers={headers} 
+          />
+        )}
+        {activeTab === 'codes' && (
+          <CodeManagement 
+            apiUrl={apiUrl} 
+            headers={headers} 
+          />
+        )}
+      </div>
     </div>
   );
 }
