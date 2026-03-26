@@ -21,6 +21,7 @@ public class ServiceCatalog {
     private String catalogName;
     private String description;
     private String category;
+    private String icon; // e.g., "🔧", "👤", "💻" or SVG path
     
     // JSON configuration string that defines dynamic form fields (e.g. text inputs, dropdowns)
     @Column(columnDefinition = "TEXT")

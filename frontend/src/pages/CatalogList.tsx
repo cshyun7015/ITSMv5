@@ -31,18 +31,27 @@ export default function CatalogList({ user, onSelectCatalog }: { user: any, onSe
       {catalogs.map(cat => (
         <div key={cat.id} 
              onClick={() => onSelectCatalog(cat.id)}
+             className="catalog-card"
              style={{ 
                backgroundColor: '#1e1e1e', 
                padding: '1.5rem', 
                borderRadius: '12px', 
-               border: '1px solid #444', 
+               border: '1px solid #333', 
                cursor: 'pointer', 
-               transition: 'transform 0.2s, boxShadow 0.2s', 
-               boxShadow: '0 4px 10px rgba(0,0,0,0.3)' 
+               transition: 'all 0.2s ease', 
+               boxShadow: '0 4px 10px rgba(0,0,0,0.3)',
+               position: 'relative',
+               overflow: 'hidden'
              }}>
-          <div style={{ color: '#339af0', fontSize: '0.9rem', marginBottom: '0.5rem', fontWeight: 'bold' }}>{cat.category}</div>
-          <h3 style={{ color: '#fff', marginBottom: '1rem' }}>{cat.catalogName}</h3>
-          <p style={{ color: '#aaa', fontSize: '0.95rem', lineHeight: '1.5' }}>{cat.description}</p>
+          <div style={{ position: 'absolute', top: '1rem', right: '1rem', fontSize: '2rem', opacity: 0.15, transform: 'rotate(15deg)' }}>
+            {cat.icon || '📋'}
+          </div>
+          <div style={{ color: '#339af0', fontSize: '0.85rem', marginBottom: '0.5rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{cat.category}</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', marginBottom: '1rem' }}>
+            <span style={{ fontSize: '1.5rem' }}>{cat.icon || '📋'}</span>
+            <h3 style={{ color: '#fff', margin: 0 }}>{cat.catalogName}</h3>
+          </div>
+          <p style={{ color: '#aaa', fontSize: '0.9rem', lineHeight: '1.5', margin: 0 }}>{cat.description}</p>
         </div>
       ))}
     </div>

@@ -13,18 +13,25 @@ import IncidentList from './IncidentList';
 import ProblemList from './ProblemList';
 import ServiceList from './ServiceList';
 import ReleaseList from './ReleaseList';
+import CatalogManagement from '../components/admin/CatalogManagement';
 
 export default function Dashboard({ user, onLogout }: { user: any, onLogout: () => void }) {
   const [currentView, setCurrentView] = useState('DASHBOARD');
   const [selectedCatalogId, setSelectedCatalogId] = useState<number | null>(null);
   const [stats, setStats] = useState<any>({ openTickets: 0, inProgressTickets: 0, resolvedTickets: 0, slaCompliance: '-', activeIncidents: 0 });
 
+  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+  const token = localStorage.getItem('itsm_token');
+
+  const headers = () => ({
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`
+  });
+
   useEffect(() => {
     if (currentView === 'DASHBOARD') {
       const fetchStats = async () => {
         try {
-          const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
-          const token = localStorage.getItem('itsm_token');
           const res = await fetch(`${apiUrl}/api/dashboard/stats`, {
             headers: { 'Authorization': `Bearer ${token}` }
           });
@@ -35,7 +42,7 @@ export default function Dashboard({ user, onLogout }: { user: any, onLogout: () 
       };
       fetchStats();
     }
-  }, [currentView, user.tenantId]);
+  }, [currentView, user.tenantId, apiUrl, token]);
 
   const renderContent = () => {
     if (currentView === 'DASHBOARD') {
@@ -43,21 +50,18 @@ export default function Dashboard({ user, onLogout }: { user: any, onLogout: () 
         <div style={{ backgroundColor: '#1e1e1e', padding: '2rem', borderRadius: '12px', border: '1px solid #333', boxShadow: '0 4px 15px rgba(0,0,0,0.2)', display: 'flex', flexDirection: 'column' }}>
           <h3 style={{ color: '#fff', marginBottom: '1.5rem' }}>Welcome to the Secure Dashboard</h3>
           <p style={{ color: '#aaa', lineHeight: '1.6' }}>
-            You have successfully authenticated against the PostgreSQL backend. The statistics below are aggregated in real-time.
+            You have successfully authenticated against the MariaDB backend via Docker. The statistics below are aggregated in real-time.
           </p>
           
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '2rem', marginTop: '3rem' }}>
-            {/* KPI Widget 1 */}
             <div style={{ backgroundColor: '#2c2c2c', padding: '1.5rem', borderRadius: '8px', borderLeft: '4px solid #339af0', boxShadow: '0 2px 8px rgba(0,0,0,0.2)' }}>
               <div style={{ color: '#888', marginBottom: '0.5rem', fontSize: '0.9rem' }}>Open SR Tickets (Tenant)</div>
               <div style={{ color: '#fff', fontSize: '2.4rem', fontWeight: 'bold' }}>{stats.openTickets}</div>
             </div>
-            {/* KPI Widget 2 */}
             <div style={{ backgroundColor: '#2c2c2c', padding: '1.5rem', borderRadius: '8px', borderLeft: '4px solid #51cf66', boxShadow: '0 2px 8px rgba(0,0,0,0.2)' }}>
               <div style={{ color: '#888', marginBottom: '0.5rem', fontSize: '0.9rem' }}>SLA Compliance</div>
               <div style={{ color: '#fff', fontSize: '2.4rem', fontWeight: 'bold' }}>{stats.slaCompliance}</div>
             </div>
-            {/* KPI Widget 3 */}
             <div style={{ backgroundColor: '#2c2c2c', padding: '1.5rem', borderRadius: '8px', borderLeft: '4px solid #fcc419', boxShadow: '0 2px 8px rgba(0,0,0,0.2)' }}>
               <div style={{ color: '#888', marginBottom: '0.5rem', fontSize: '0.9rem' }}>Active Incidents</div>
               <div style={{ color: '#fff', fontSize: '2.4rem', fontWeight: 'bold' }}>{stats.activeIncidents}</div>
@@ -66,7 +70,9 @@ export default function Dashboard({ user, onLogout }: { user: any, onLogout: () 
         </div>
       );
     } else if (currentView === 'CATALOG') {
-      return <CatalogList user={user} onSelectCatalog={(id) => { setSelectedCatalogId(id); setCurrentView('REQUEST_FORM'); }} />;
+      return user.role === 'ROLE_ADMIN' 
+        ? <CatalogManagement apiUrl={apiUrl} headers={headers} />
+        : <CatalogList user={user} onSelectCatalog={(id) => { setSelectedCatalogId(id); setCurrentView('REQUEST_FORM'); }} />;
     } else if (currentView === 'REQUEST_FORM') {
       return <RequestForm user={user} catalogId={selectedCatalogId!} onBack={() => setCurrentView('CATALOG')} />;
     } else if (currentView === 'KNOWLEDGE') {
@@ -100,7 +106,7 @@ export default function Dashboard({ user, onLogout }: { user: any, onLogout: () 
           <h2 style={{ color: '#fff', margin: 0 }}>ITSM v5</h2>
           <span style={{ fontSize: '0.8rem', color: '#888' }}>Enterprise Service Mgmt</span>
         </div>
-        <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '1rem', overflowY: 'auto' }}>
           <li onClick={() => setCurrentView('DASHBOARD')} style={{ cursor: 'pointer', color: currentView === 'DASHBOARD' ? '#339af0' : '#bbb', fontWeight: currentView === 'DASHBOARD' ? 'bold' : 'normal', fontSize: '0.95rem' }}>📊 대시보드</li>
           
           <li style={{ color: '#555', fontSize: '0.75rem', fontWeight: 'bold', marginTop: '0.5rem', textTransform: 'uppercase' }}>서비스 이행 (Fulfillment)</li>
@@ -122,7 +128,10 @@ export default function Dashboard({ user, onLogout }: { user: any, onLogout: () 
           <li onClick={() => setCurrentView('RELEASE')} style={{ cursor: 'pointer', paddingLeft: '0.5rem', color: currentView === 'RELEASE' ? '#339af0' : '#bbb', fontWeight: currentView === 'RELEASE' ? 'bold' : 'normal' }}>🚀 릴리스 관리</li>
           
           {user.role === 'ROLE_ADMIN' && (
-            <li onClick={() => setCurrentView('ADMIN')} style={{ cursor: 'pointer', color: currentView === 'ADMIN' ? '#fcc419' : '#bbb', fontWeight: currentView === 'ADMIN' ? 'bold' : 'normal', borderTop: '1px solid #333', paddingTop: '1rem', marginTop: '0.5rem' }}>🛠️ 시스템 관리</li>
+            <>
+              <li style={{ color: '#555', fontSize: '0.75rem', fontWeight: 'bold', marginTop: '1rem', borderTop: '1px solid #333', paddingTop: '1rem', textTransform: 'uppercase' }}>관리자 기능</li>
+              <li onClick={() => setCurrentView('ADMIN')} style={{ cursor: 'pointer', paddingLeft: '0.5rem', color: currentView === 'ADMIN' ? '#fcc419' : '#bbb', fontWeight: currentView === 'ADMIN' ? 'bold' : 'normal' }}>🛠️ 시스템 관리</li>
+            </>
           )}
         </ul>
       </div>

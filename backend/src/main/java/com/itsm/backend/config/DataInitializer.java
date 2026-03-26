@@ -131,14 +131,20 @@ public class DataInitializer implements CommandLineRunner {
 
         // ===== 2. SERVICE CATALOGS =====
         if (serviceCatalogRepository.count() == 0) {
-            em.persist(buildCatalog(tenantA, "Request New Hardware",     "Hardware IT",  "Order a new laptop, monitor, or other hardware accessories.",
-                "[{\"name\":\"deviceType\",\"label\":\"Device Type\",\"type\":\"select\",\"options\":[\"Laptop\",\"Monitor\",\"Mouse\",\"Keyboard\"]},{\"name\":\"justification\",\"label\":\"Business Justification\",\"type\":\"textarea\"}]"));
-            em.persist(buildCatalog(tenantA, "Software Installation",   "Software IT",  "Request installation of approved software.",
-                "[{\"name\":\"softwareName\",\"label\":\"Software Name\",\"type\":\"text\"},{\"name\":\"licenseRequired\",\"label\":\"Requires License?\",\"type\":\"checkbox\"}]"));
-            em.persist(buildCatalog(tenantA, "VPN Access Request",       "Network IT",   "Request VPN access for remote work.",
-                "[{\"name\":\"reason\",\"label\":\"Reason for VPN Access\",\"type\":\"textarea\"},{\"name\":\"duration\",\"label\":\"Duration (days)\",\"type\":\"number\"}]"));
-            em.persist(buildCatalog(tenantA, "ID/Password Reset",        "Account Mgmt", "Reset your corporate account credentials.",
-                "[{\"name\":\"accountId\",\"label\":\"Account ID\",\"type\":\"text\"}]"));
+            em.persist(buildCatalog(tenantA, "신규 하드웨어 신청", "장비/기기", "💻", "업무에 필요한 노트북, 모니터 등의 장비를 신청합니다.",
+                "[{\"name\":\"deviceType\",\"label\":\"장비 종류\",\"type\":\"select\",\"options\":[\"노트북\",\"모니터\",\"도킹스테이션\"]},{\"name\":\"justification\",\"label\":\"사유\",\"type\":\"textarea\"}]"));
+            
+            em.persist(buildCatalog(tenantA, "소프트웨어 설치", "SW/앱", "💿", "라이선스가 필요한 상용 소프트웨어 설치를 요청합니다.",
+                "[{\"name\":\"softwareName\",\"label\":\"SW 명칭\",\"type\":\"text\"},{\"name\":\"licenseKey\",\"label\":\"라이선스 보유 여부\",\"type\":\"checkbox\"}]"));
+            
+            em.persist(buildCatalog(tenantA, "VPN 접속 권한", "네트워크", "🌐", "외부망 및 재택근무를 위한 VPN 접속 권한을 신청합니다.",
+                "[{\"name\":\"period\",\"label\":\"사용 기간(일)\",\"type\":\"number\"},{\"name\":\"reason\",\"label\":\"접속 사유\",\"type\":\"textarea\"}]"));
+            
+            em.persist(buildCatalog(tenantA, "계정 및 권한 신청", "보안/계정", "👤", "시스템 신규 계정 생성 및 권한 변경을 요청합니다.",
+                "[{\"name\":\"systemName\",\"label\":\"대상 시스템\",\"type\":\"select\",\"options\":[\"ERP\",\"그룹웨어\",\"포털\"]},{\"name\":\"role\",\"label\":\"희망 권한\",\"type\":\"text\"}]"));
+
+            em.persist(buildCatalog(tenantA, "클라우드 자원 요청", "인프라", "☁️", "AWS/Azure 등 클라우드 서버 인스턴스 생성을 요청합니다.",
+                "[{\"name\":\"region\",\"label\":\"리전\",\"type\":\"select\",\"options\":[\"Seoul\",\"Tokyo\",\"Virginia\"]},{\"name\":\"instanceType\",\"label\":\"사양\",\"type\":\"text\"}]"));
         }
         em.flush();
 
@@ -313,7 +319,7 @@ public class DataInitializer implements CommandLineRunner {
         User u = new User(); u.setUserId(id); u.setTenant(tenant); u.setPassword("{noop}admin123"); u.setUserName(name); u.setRole(role); u.setEmail(email); return u;
     }
 
-    private ServiceCatalog buildCatalog(Tenant tenant, String name, String category, String desc, String schema) {
-        ServiceCatalog c = new ServiceCatalog(); c.setTenant(tenant); c.setCatalogName(name); c.setCategory(category); c.setDescription(desc); c.setFormSchema(schema); c.setIsPublished(true); return c;
+    private ServiceCatalog buildCatalog(Tenant tenant, String name, String category, String icon, String desc, String schema) {
+        ServiceCatalog c = new ServiceCatalog(); c.setTenant(tenant); c.setCatalogName(name); c.setCategory(category); c.setIcon(icon); c.setDescription(desc); c.setFormSchema(schema); c.setIsPublished(true); return c;
     }
 }

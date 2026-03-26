@@ -90,50 +90,68 @@ export default function RequestForm({ user, catalogId, onBack }: { user: any, ca
 
   return (
     <div style={{ backgroundColor: '#1e1e1e', padding: '2.5rem', borderRadius: '12px', border: '1px solid #333', boxShadow: '0 4px 15px rgba(0,0,0,0.2)' }}>
-      <button onClick={onBack} style={{ backgroundColor: 'transparent', border: 'none', color: '#fcc419', cursor: 'pointer', marginBottom: '1.5rem', padding: 0, fontSize: '1rem' }}>
-        &larr; Back to Catalog List
+      <button onClick={onBack} style={{ backgroundColor: 'transparent', border: 'none', color: '#339af0', cursor: 'pointer', marginBottom: '1.5rem', padding: 0, fontSize: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        &larr; 카탈로그 목록으로 돌아가기
       </button>
       
-      <h3 style={{ color: '#fff', marginBottom: '0.5rem', fontSize: '1.6rem' }}>{catalog.catalogName}</h3>
-      <p style={{ color: '#aaa', marginBottom: '2.5rem' }}>{catalog.description}</p>
-      
-      {statusMsg && <div style={{ color: '#51cf66', marginBottom: '1.5rem', padding: '1rem', backgroundColor: 'rgba(81, 207, 102, 0.1)', borderRadius: '6px', fontWeight: 'bold' }}>{statusMsg}</div>}
-
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', maxWidth: '700px' }}>
-        
+      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
+        <span style={{ fontSize: '2.5rem' }}>{catalog.icon || '📋'}</span>
         <div>
-          <label style={{ display: 'block', color: '#ccc', marginBottom: '0.5rem', fontWeight: 'bold' }}>Request Title <span style={{color: '#ff6b6b'}}>*</span></label>
-          <input required type="text" value={title} onChange={e => setTitle(e.target.value)} style={{ width: '100%', padding: '0.8rem', borderRadius: '6px', border: '1px solid #555', backgroundColor: '#2c2c2c', color: '#fff', fontSize: '1rem' }} />
+          <h3 style={{ color: '#fff', margin: 0, fontSize: '1.8rem' }}>{catalog.catalogName}</h3>
+          <div style={{ color: '#339af0', fontSize: '0.9rem', fontWeight: 'bold', textTransform: 'uppercase' }}>{catalog.category}</div>
         </div>
+      </div>
+      <p style={{ color: '#aaa', marginBottom: '2.5rem', fontSize: '1.05rem', lineHeight: '1.6' }}>{catalog.description}</p>
+      
+      {statusMsg && <div style={{ color: '#51cf66', marginBottom: '1.5rem', padding: '1rem', backgroundColor: 'rgba(81, 207, 102, 0.1)', borderRadius: '6px', fontWeight: 'bold', border: '1px solid rgba(81, 207, 102, 0.2)' }}>{statusMsg}</div>}
 
-        <div>
-          <label style={{ display: 'block', color: '#ccc', marginBottom: '0.5rem', fontWeight: 'bold' }}>Detailed Description</label>
-          <textarea value={description} onChange={e => setDescription(e.target.value)} rows={4} style={{ width: '100%', padding: '0.8rem', borderRadius: '6px', border: '1px solid #555', backgroundColor: '#2c2c2c', color: '#fff', fontSize: '1rem', fontFamily: 'inherit' }} />
+      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.8rem', maxWidth: '800px' }}>
+        
+        <div style={{ padding: '1.5rem', backgroundColor: '#252525', borderRadius: '10px', border: '1px solid #333' }}>
+          <h4 style={{ color: '#fff', marginTop: 0, marginBottom: '1.2rem', borderBottom: '1px solid #444', paddingBottom: '0.5rem' }}>기본 정보</h4>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
+            <div>
+              <label style={{ display: 'block', color: '#ccc', marginBottom: '0.5rem', fontWeight: 'bold' }}>요청 제목 <span style={{color: '#ff6b6b'}}>*</span></label>
+              <input required type="text" placeholder="요청 내용을 한 줄로 요약해 주세요" value={title} onChange={e => setTitle(e.target.value)} style={{ width: '100%', padding: '0.8rem', borderRadius: '6px', border: '1px solid #444', backgroundColor: '#1e1e1e', color: '#fff', fontSize: '1rem' }} />
+            </div>
+
+            <div>
+              <label style={{ display: 'block', color: '#ccc', marginBottom: '0.5rem', fontWeight: 'bold' }}>상세 설명</label>
+              <textarea value={description} placeholder="필요한 사항을 상세히 기술해 주세요" onChange={e => setDescription(e.target.value)} rows={4} style={{ width: '100%', padding: '0.8rem', borderRadius: '6px', border: '1px solid #444', backgroundColor: '#1e1e1e', color: '#fff', fontSize: '1rem', fontFamily: 'inherit' }} />
+            </div>
+          </div>
         </div>
 
         {/* Dynamic Form Rendering */}
         {formSchema.length > 0 && (
-          <div style={{ marginTop: '1rem', paddingTop: '1.5rem', borderTop: '1px solid #333' }}>
-            <h4 style={{ color: '#339af0', marginBottom: '1.5rem' }}>Specific Catalog Requirements</h4>
+          <div style={{ padding: '1.5rem', backgroundColor: '#252525', borderRadius: '10px', border: '1px solid #333' }}>
+            <h4 style={{ color: '#339af0', marginTop: 0, marginBottom: '1.2rem', borderBottom: '1px solid #339af044', paddingBottom: '0.5rem' }}>추가 입력 사항</h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               {formSchema.map((field: any, idx: number) => (
                 <div key={idx}>
-                  <label style={{ display: 'inline-block', color: '#ccc', marginBottom: '0.5rem', fontWeight: 'bold' }}>
-                    {field.label} {field.type === 'checkbox' && (
-                       <input type="checkbox" onChange={(e) => setFormData({...formData, [field.name]: e.target.checked})} style={{ transform: 'scale(1.2)', marginLeft: '0.5rem' }} />
-                    )}
+                  <label style={{ display: 'block', color: '#ccc', marginBottom: '0.5rem', fontWeight: 'bold' }}>
+                    {field.label}
                   </label>
                   {field.type === 'text' && (
-                    <input type="text" onChange={(e) => setFormData({...formData, [field.name]: e.target.value})} style={{ width: '100%', padding: '0.8rem', borderRadius: '6px', border: '1px solid #555', backgroundColor: '#2c2c2c', color: '#fff', fontSize: '1rem' }} />
+                    <input type="text" onChange={(e) => setFormData({...formData, [field.name]: e.target.value})} style={{ width: '100%', padding: '0.8rem', borderRadius: '6px', border: '1px solid #444', backgroundColor: '#1e1e1e', color: '#fff', fontSize: '1rem' }} />
+                  )}
+                  {field.type === 'number' && (
+                    <input type="number" onChange={(e) => setFormData({...formData, [field.name]: e.target.value})} style={{ width: '100%', padding: '0.8rem', borderRadius: '6px', border: '1px solid #444', backgroundColor: '#1e1e1e', color: '#fff', fontSize: '1rem' }} />
                   )}
                   {field.type === 'textarea' && (
-                    <textarea onChange={(e) => setFormData({...formData, [field.name]: e.target.value})} rows={3} style={{ width: '100%', padding: '0.8rem', borderRadius: '6px', border: '1px solid #555', backgroundColor: '#2c2c2c', color: '#fff', fontSize: '1rem', fontFamily: 'inherit' }} />
+                    <textarea onChange={(e) => setFormData({...formData, [field.name]: e.target.value})} rows={3} style={{ width: '100%', padding: '0.8rem', borderRadius: '6px', border: '1px solid #444', backgroundColor: '#1e1e1e', color: '#fff', fontSize: '1rem', fontFamily: 'inherit' }} />
                   )}
                   {field.type === 'select' && (
-                    <select onChange={(e) => setFormData({...formData, [field.name]: e.target.value})} style={{ width: '100%', padding: '0.8rem', borderRadius: '6px', border: '1px solid #555', backgroundColor: '#2c2c2c', color: '#fff', fontSize: '1rem' }}>
-                      <option value="">-- Select --</option>
+                    <select onChange={(e) => setFormData({...formData, [field.name]: e.target.value})} style={{ width: '100%', padding: '0.8rem', borderRadius: '6px', border: '1px solid #444', backgroundColor: '#1e1e1e', color: '#fff', fontSize: '1rem' }}>
+                      <option value="">-- 선택하세요 --</option>
                       {field.options?.map((opt: string) => <option key={opt} value={opt}>{opt}</option>)}
                     </select>
+                  )}
+                  {field.type === 'checkbox' && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <input type="checkbox" id={`chk-${idx}`} onChange={(e) => setFormData({...formData, [field.name]: e.target.checked})} style={{ width: '1.2rem', height: '1.2rem', cursor: 'pointer' }} />
+                      <label htmlFor={`chk-${idx}`} style={{ color: '#aaa', cursor: 'pointer' }}>확인함</label>
+                    </div>
                   )}
                 </div>
               ))}
