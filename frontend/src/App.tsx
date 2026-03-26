@@ -5,11 +5,26 @@ import Dashboard from './pages/Dashboard'
 function App() {
   const [user, setUser] = useState<any>(null)
 
-  // Auto-login check if JWT token is persisted (mocking for now via localStorage)
+  // Auto-login check if JWT token is persisted
   useEffect(() => {
     const savedUser = localStorage.getItem('itsm_user');
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
+    const token = localStorage.getItem('itsm_token');
+    
+    if (savedUser && token) {
+      try {
+        // Simple JWT check (Base64 decode payload)
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        const isExpired = payload.exp * 1000 < Date.now();
+        
+        if (isExpired) {
+          console.warn('Token expired, logging out...');
+          handleLogout();
+        } else {
+          setUser(JSON.parse(savedUser));
+        }
+      } catch (e) {
+        handleLogout();
+      }
     }
   }, []);
 

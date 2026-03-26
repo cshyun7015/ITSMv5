@@ -51,6 +51,9 @@ public class Incident {
     @JoinColumn(name = "problem_id")
     private com.itsm.backend.problem.Problem problem;
 
+    @Column(name = "asset_id")
+    private Long assetId;
+
     private LocalDateTime createdAt;
     private LocalDateTime resolvedAt;
 }

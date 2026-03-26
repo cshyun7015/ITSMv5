@@ -24,7 +24,8 @@ export default function IncidentList({ user }: { user: any }) {
   const [incidents, setIncidents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ title: '', description: '', priority: 'Medium', impact: 'Individual' });
+  const [form, setForm] = useState({ title: '', description: '', priority: 'Medium', impact: 'Individual', assetId: '' });
+  const [assets, setAssets] = useState<any[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
 
@@ -39,7 +40,14 @@ export default function IncidentList({ user }: { user: any }) {
     } catch (e) { console.error(e); } finally { setLoading(false); }
   };
 
-  useEffect(() => { fetchIncidents(); }, [user.tenantId]);
+  useEffect(() => { 
+    fetchIncidents(); 
+    // Fetch assets for the form
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+    const token = localStorage.getItem('itsm_token');
+    fetch(`${apiUrl}/api/assets`, { headers: { 'Authorization': `Bearer ${token}` }})
+      .then(res => res.json()).then(setAssets).catch(console.error);
+  }, [user.tenantId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -71,7 +79,7 @@ export default function IncidentList({ user }: { user: any }) {
         }
 
         setShowForm(false); 
-        setForm({ title: '', description: '', priority: 'Medium', impact: 'Individual' }); 
+        setForm({ title: '', description: '', priority: 'Medium', impact: 'Individual', assetId: '' }); 
         setFiles([]);
         fetchIncidents(); 
       }
@@ -102,6 +110,10 @@ export default function IncidentList({ user }: { user: any }) {
               <option>Service-wide</option><option>Department</option><option>Individual</option>
             </select>
           </div>
+          <select value={form.assetId} onChange={e => setForm({ ...form, assetId: e.target.value })} style={{ padding: '0.8rem', borderRadius: '6px', border: '1px solid #555', backgroundColor: '#2c2c2c', color: '#fff' }}>
+            <option value="">-- 관련 자산 선택 (Optional for BIA) --</option>
+            {assets.map(a => <option key={a.id} value={a.id}>{a.assetName} ({a.assetTag})</option>)}
+          </select>
           <FileUpload files={files} onChange={setFiles} />
           <button type="submit" disabled={submitting} style={{ padding: '0.8rem', borderRadius: '6px', border: 'none', backgroundColor: '#ff6b6b', color: '#fff', fontWeight: 'bold', cursor: 'pointer', fontSize: '1rem' }}>
             {submitting ? 'Submitting...' : '🚨 Submit Incident Report'}
@@ -127,6 +139,9 @@ export default function IncidentList({ user }: { user: any }) {
             <div style={{ backgroundColor: STATUS_COLOR[inc.status] || '#888', padding: '0.4rem 1rem', borderRadius: '20px', fontSize: '0.85rem', color: '#000', fontWeight: 'bold', whiteSpace: 'nowrap' }}>
               {STATUS_LABEL[inc.status] || inc.status}
             </div>
+            
+            {/* Business Impact Analysis (BIA) View */}
+            {inc.assetId && <ImpactedServices assetId={inc.assetId} />}
             
             {/* Attachment Preview (Simplified for MVP) */}
             <IncidentAttachments incidentId={inc.id} token={localStorage.getItem('itsm_token')!} />
@@ -157,6 +172,31 @@ function IncidentAttachments({ incidentId, token }: { incidentId: number, token:
         <a key={at.id} href={`${apiUrl}/api/attachments/download/${at.id}`} target="_blank" rel="noreferrer" style={{ fontSize: '0.75rem', color: '#339af0', textDecoration: 'none', backgroundColor: '#25262b', padding: '0.2rem 0.5rem', borderRadius: '4px', border: '1px solid #333' }}>
           📎 {at.originalName}
         </a>
+      ))}
+    </div>
+  );
+}
+function ImpactedServices({ assetId }: { assetId: number }) {
+  const [impacted, setImpacted] = useState<any[]>([]);
+  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+  const token = localStorage.getItem('itsm_token');
+
+  useEffect(() => {
+    fetch(`${apiUrl}/api/services/bia/${assetId}`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
+    .then(res => res.json())
+    .then(setImpacted)
+    .catch(console.error);
+  }, [assetId]);
+
+  if (impacted.length === 0) return null;
+
+  return (
+    <div style={{ marginLeft: '1rem', borderLeft: '2px solid #ff6b6b', paddingLeft: '1rem' }}>
+      <div style={{ fontSize: '0.75rem', color: '#ff6b6b', fontWeight: 'bold', marginBottom: '0.2rem' }}>⚠️ Business Impact (BIA)</div>
+      {impacted.map(svc => (
+        <div key={svc.id} style={{ fontSize: '0.85rem', color: '#fff' }}>• {svc.name} <span style={{ fontSize: '0.7rem', color: '#888' }}>({svc.criticality})</span></div>
       ))}
     </div>
   );

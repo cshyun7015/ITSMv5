@@ -28,4 +28,14 @@ public class CIController {
     public ConfigurationItem createCI(@RequestBody ConfigurationItem ci) {
         return ciService.createCI(ci);
     }
+
+    @PutMapping("/{id}")
+    public ConfigurationItem updateCI(@PathVariable Long id, @RequestBody ConfigurationItem ci) {
+        return ciService.updateCI(id, ci);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteCI(@PathVariable Long id) {
+        ciService.deleteCI(id);
+    }
 }

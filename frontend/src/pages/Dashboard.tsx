@@ -11,6 +11,8 @@ import AssetList from './AssetList';
 import EventList from './EventList';
 import IncidentList from './IncidentList';
 import ProblemList from './ProblemList';
+import ServiceList from './ServiceList';
+import ReleaseList from './ReleaseList';
 
 export default function Dashboard({ user, onLogout }: { user: any, onLogout: () => void }) {
   const [currentView, setCurrentView] = useState('DASHBOARD');
@@ -77,10 +79,14 @@ export default function Dashboard({ user, onLogout }: { user: any, onLogout: () 
       return <ChangeList user={user} />;
     } else if (currentView === 'ASSETS') {
       return <AssetList user={user} />;
-    } else if (currentView === 'EVENTS') { // New EventList view
+    } else if (currentView === 'EVENTS') {
       return <EventList user={user} />;
     } else if (currentView === 'PROBLEMS') {
       return <ProblemList user={user} />;
+    } else if (currentView === 'SERVICE_MGMT') {
+      return <ServiceList user={user} />;
+    } else if (currentView === 'RELEASE') {
+      return <ReleaseList user={user} />;
     } else if (currentView === 'ADMIN') {
       return <AdminPage user={user} />;
     }
@@ -94,18 +100,29 @@ export default function Dashboard({ user, onLogout }: { user: any, onLogout: () 
           <h2 style={{ color: '#fff', margin: 0 }}>ITSM v5</h2>
           <span style={{ fontSize: '0.8rem', color: '#888' }}>Enterprise Service Mgmt</span>
         </div>
-        <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
-          <li onClick={() => setCurrentView('DASHBOARD')} style={{ cursor: 'pointer', color: currentView === 'DASHBOARD' ? '#339af0' : '#bbb', fontWeight: currentView === 'DASHBOARD' ? 'bold' : 'normal' }}>Dashboard</li>
-          <li onClick={() => setCurrentView('CATALOG')} style={{ cursor: 'pointer', color: currentView === 'CATALOG' || currentView === 'REQUEST_FORM' ? '#339af0' : '#bbb', fontWeight: currentView === 'CATALOG' || currentView === 'REQUEST_FORM' ? 'bold' : 'normal' }}>Service Catalog</li>
-          <li onClick={() => setCurrentView('MY_TICKETS')} style={{ cursor: 'pointer', color: currentView === 'MY_TICKETS' ? '#339af0' : '#bbb', fontWeight: currentView === 'MY_TICKETS' ? 'bold' : 'normal' }}>My Tickets</li>
-          <li onClick={() => setCurrentView('INCIDENTS')} style={{ cursor: 'pointer', color: currentView === 'INCIDENTS' ? '#ff6b6b' : '#bbb', fontWeight: currentView === 'INCIDENTS' ? 'bold' : 'normal' }}>Incidents</li>
-          <li onClick={() => setCurrentView('CHANGES')} style={{ cursor: 'pointer', color: currentView === 'CHANGES' ? '#339af0' : '#bbb', fontWeight: currentView === 'CHANGES' ? 'bold' : 'normal' }}>Change Mgmt</li>
-          <li onClick={() => setCurrentView('ASSETS')} style={{ cursor: 'pointer', color: currentView === 'ASSETS' ? '#339af0' : '#bbb', fontWeight: currentView === 'ASSETS' ? 'bold' : 'normal' }}>Assets / CMDB</li>
-          <li onClick={() => setCurrentView('EVENTS')} style={{ cursor: 'pointer', color: currentView === 'EVENTS' ? '#ff6b6b' : '#bbb', fontWeight: currentView === 'EVENTS' ? 'bold' : 'normal' }}>Event Mgmt</li>
-          <li onClick={() => setCurrentView('PROBLEMS')} style={{ cursor: 'pointer', color: currentView === 'PROBLEMS' ? '#339af0' : '#bbb', fontWeight: currentView === 'PROBLEMS' ? 'bold' : 'normal' }}>Problem Mgmt</li>
-          <li onClick={() => setCurrentView('KNOWLEDGE')} style={{ cursor: 'pointer', color: currentView === 'KNOWLEDGE' ? '#339af0' : '#bbb', fontWeight: currentView === 'KNOWLEDGE' ? 'bold' : 'normal' }}>Knowledge Base</li>
+        <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <li onClick={() => setCurrentView('DASHBOARD')} style={{ cursor: 'pointer', color: currentView === 'DASHBOARD' ? '#339af0' : '#bbb', fontWeight: currentView === 'DASHBOARD' ? 'bold' : 'normal', fontSize: '0.95rem' }}>📊 대시보드</li>
+          
+          <li style={{ color: '#555', fontSize: '0.75rem', fontWeight: 'bold', marginTop: '0.5rem', textTransform: 'uppercase' }}>서비스 이행 (Fulfillment)</li>
+          <li onClick={() => setCurrentView('CATALOG')} style={{ cursor: 'pointer', paddingLeft: '0.5rem', color: currentView === 'CATALOG' ? '#339af0' : '#bbb', fontWeight: currentView === 'CATALOG' ? 'bold' : 'normal' }}>📋 서비스 카탈로그</li>
+          <li onClick={() => setCurrentView('MY_TICKETS')} style={{ cursor: 'pointer', paddingLeft: '0.5rem', color: currentView === 'MY_TICKETS' ? '#339af0' : '#bbb', fontWeight: currentView === 'MY_TICKETS' ? 'bold' : 'normal' }}>📑 나의 요청 목록</li>
+          
+          <li style={{ color: '#555', fontSize: '0.75rem', fontWeight: 'bold', marginTop: '0.5rem', textTransform: 'uppercase' }}>운영 및 보증 (Operations)</li>
+          <li onClick={() => setCurrentView('EVENTS')} style={{ cursor: 'pointer', paddingLeft: '0.5rem', color: currentView === 'EVENTS' ? '#ff6b6b' : '#bbb', fontWeight: currentView === 'EVENTS' ? 'bold' : 'normal' }}>🔔 이벤트 관리</li>
+          <li onClick={() => setCurrentView('INCIDENTS')} style={{ cursor: 'pointer', paddingLeft: '0.5rem', color: currentView === 'INCIDENTS' ? '#ff6b6b' : '#bbb', fontWeight: currentView === 'INCIDENTS' ? 'bold' : 'normal' }}>🚨 장애 관리 (Incident)</li>
+          <li onClick={() => setCurrentView('PROBLEMS')} style={{ cursor: 'pointer', paddingLeft: '0.5rem', color: currentView === 'PROBLEMS' ? '#339af0' : '#bbb', fontWeight: currentView === 'PROBLEMS' ? 'bold' : 'normal' }}>🧩 문제 관리 (Problem)</li>
+          
+          <li style={{ color: '#555', fontSize: '0.75rem', fontWeight: 'bold', marginTop: '0.5rem', textTransform: 'uppercase' }}>인프라 및 통제 (Infrastructure)</li>
+          <li onClick={() => setCurrentView('ASSETS')} style={{ cursor: 'pointer', paddingLeft: '0.5rem', color: currentView === 'ASSETS' ? '#339af0' : '#bbb', fontWeight: currentView === 'ASSETS' ? 'bold' : 'normal' }}>💻 IT 자산 관리 (ITAM)</li>
+          <li onClick={() => setCurrentView('SERVICE_MGMT')} style={{ cursor: 'pointer', paddingLeft: '0.5rem', color: currentView === 'SERVICE_MGMT' ? '#339af0' : '#bbb', fontWeight: currentView === 'SERVICE_MGMT' ? 'bold' : 'normal' }}>🏗️ 확장 CMDB</li>
+          <li onClick={() => setCurrentView('KNOWLEDGE')} style={{ cursor: 'pointer', paddingLeft: '0.5rem', color: currentView === 'KNOWLEDGE' ? '#339af0' : '#bbb', fontWeight: currentView === 'KNOWLEDGE' ? 'bold' : 'normal' }}>📖 지식 베이스</li>
+ 
+          <li style={{ color: '#555', fontSize: '0.75rem', fontWeight: 'bold', marginTop: '0.5rem', textTransform: 'uppercase' }}>변경 및 전환 (Change)</li>
+          <li onClick={() => setCurrentView('CHANGES')} style={{ cursor: 'pointer', paddingLeft: '0.5rem', color: currentView === 'CHANGES' ? '#339af0' : '#bbb', fontWeight: currentView === 'CHANGES' ? 'bold' : 'normal' }}>🔄 변경 관리</li>
+          <li onClick={() => setCurrentView('RELEASE')} style={{ cursor: 'pointer', paddingLeft: '0.5rem', color: currentView === 'RELEASE' ? '#339af0' : '#bbb', fontWeight: currentView === 'RELEASE' ? 'bold' : 'normal' }}>🚀 릴리스 관리</li>
+          
           {user.role === 'ROLE_ADMIN' && (
-            <li onClick={() => setCurrentView('ADMIN')} style={{ cursor: 'pointer', color: currentView === 'ADMIN' ? '#fcc419' : '#bbb', fontWeight: currentView === 'ADMIN' ? 'bold' : 'normal', borderTop: '1px solid #333', paddingTop: '1rem', marginTop: '0.5rem' }}>🔧 MSP Admin</li>
+            <li onClick={() => setCurrentView('ADMIN')} style={{ cursor: 'pointer', color: currentView === 'ADMIN' ? '#fcc419' : '#bbb', fontWeight: currentView === 'ADMIN' ? 'bold' : 'normal', borderTop: '1px solid #333', paddingTop: '1rem', marginTop: '0.5rem' }}>🛠️ 시스템 관리</li>
           )}
         </ul>
       </div>

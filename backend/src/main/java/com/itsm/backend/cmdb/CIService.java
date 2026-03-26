@@ -39,4 +39,31 @@ public class CIService {
         ci.setTenant(tenant);
         return ciRepository.save(ci);
     }
+
+    @Transactional
+    public ConfigurationItem updateCI(Long id, ConfigurationItem details) {
+        ConfigurationItem ci = ciRepository.findById(id).orElseThrow();
+        // Tenant Check
+        String tenantId = SecurityUtils.getCurrentTenantId();
+        if (!ci.getTenant().getTenantId().equals(tenantId)) {
+            throw new RuntimeException("Unauthorized to update this CI");
+        }
+        ci.setName(details.getName());
+        ci.setType(details.getType());
+        ci.setStatus(details.getStatus());
+        ci.setLocation(details.getLocation());
+        ci.setOwner(details.getOwner());
+        return ciRepository.save(ci);
+    }
+
+    @Transactional
+    public void deleteCI(Long id) {
+        ConfigurationItem ci = ciRepository.findById(id).orElseThrow();
+        // Tenant Check
+        String tenantId = SecurityUtils.getCurrentTenantId();
+        if (!ci.getTenant().getTenantId().equals(tenantId)) {
+            throw new RuntimeException("Unauthorized to delete this CI");
+        }
+        ciRepository.delete(ci);
+    }
 }

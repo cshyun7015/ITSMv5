@@ -59,6 +59,7 @@ public class AdminController {
     }
 
     @PatchMapping("/tenants/{tenantId}")
+    @Transactional
     public Tenant updateTenant(@PathVariable String tenantId, @RequestBody Map<String, Object> payload) {
         assertAdmin();
         Tenant tenant = tenantRepository.findById(tenantId).orElseThrow();
@@ -103,5 +104,13 @@ public class AdminController {
         user.setRole(newRole);
         userRepository.save(user);
         return Map.of("userId", userId, "role", newRole);
+    }
+
+    @DeleteMapping("/tenants/{tenantId}")
+    @Transactional
+    public void deleteTenant(@PathVariable String tenantId) {
+        assertAdmin();
+        Tenant tenant = tenantRepository.findById(tenantId).orElseThrow();
+        tenantRepository.delete(tenant);
     }
 }
