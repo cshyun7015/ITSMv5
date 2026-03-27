@@ -10,14 +10,6 @@ import com.itsm.backend.servicecatalog.ServiceCatalog;
 import com.itsm.backend.servicecatalog.ServiceCatalogRepository;
 import com.itsm.backend.knowledge.Knowledge;
 import com.itsm.backend.knowledge.KnowledgeRepository;
-import com.itsm.backend.servicerequest.ServiceRequest;
-import com.itsm.backend.servicerequest.ServiceRequestRepository;
-import com.itsm.backend.incident.Incident;
-import com.itsm.backend.incident.IncidentRepository;
-import com.itsm.backend.change.Change;
-import com.itsm.backend.change.ChangeRepository;
-import com.itsm.backend.asset.Asset;
-import com.itsm.backend.asset.AssetRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,10 +23,6 @@ public class DataInitializer implements CommandLineRunner {
     @Autowired private UserRepository userRepository;
     @Autowired private ServiceCatalogRepository serviceCatalogRepository;
     @Autowired private KnowledgeRepository knowledgeRepository;
-    @Autowired private ServiceRequestRepository serviceRequestRepository;
-    @Autowired private IncidentRepository incidentRepository;
-    @Autowired private ChangeRepository changeRepository;
-    @Autowired private AssetRepository assetRepository;
     @Autowired private CommonCodeRepository commonCodeRepository;
 
     @Override
