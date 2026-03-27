@@ -56,7 +56,9 @@ public class AssetService {
         // Company Check
         String companyId = SecurityUtils.getCurrentCompanyId();
         String role = SecurityUtils.getCurrentRole();
-        if (!"ROLE_ADMIN".equals(role) && !asset.getCompany().getCompanyId().equals(companyId)) {
+        String assetCompanyId = asset.getCompany() != null ? asset.getCompany().getCompanyId() : null;
+        
+        if (!"ROLE_ADMIN".equals(role) && (assetCompanyId == null || !assetCompanyId.equals(companyId))) {
             throw new RuntimeException("Unauthorized to update this asset");
         }
         
@@ -81,7 +83,9 @@ public class AssetService {
         // Company Check
         String companyId = SecurityUtils.getCurrentCompanyId();
         String role = SecurityUtils.getCurrentRole();
-        if (!"ROLE_ADMIN".equals(role) && !asset.getCompany().getCompanyId().equals(companyId)) {
+        String assetCompanyId = asset.getCompany() != null ? asset.getCompany().getCompanyId() : null;
+        
+        if (!"ROLE_ADMIN".equals(role) && (assetCompanyId == null || !assetCompanyId.equals(companyId))) {
             throw new RuntimeException("Unauthorized to delete this asset");
         }
         

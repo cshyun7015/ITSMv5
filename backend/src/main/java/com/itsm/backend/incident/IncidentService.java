@@ -45,7 +45,9 @@ public class IncidentService {
 
         Incident incident = new Incident();
         incident.setCompany(reporter.getCompany());
-        incident.setCompanyId(reporter.getCompany().getCompanyId());
+        if (reporter.getCompany() != null) {
+            incident.setCompanyId(reporter.getCompany().getCompanyId());
+        }
         incident.setReporter(reporter);
         incident.setReporterId(reporterId);
         incident.setTitle(title);
