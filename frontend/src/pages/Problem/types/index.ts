@@ -7,7 +7,7 @@ export interface Problem {
   status: ProblemStatus;
   priority: ProblemPriority;
   createdAt: string;
-  tenantId: string;
+  companyId: string;
 }
 
 export type ProblemStatus = 'OPEN' | 'INVESTIGATING' | 'RESOLVED' | 'CLOSED';

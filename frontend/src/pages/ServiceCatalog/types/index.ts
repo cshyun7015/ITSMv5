@@ -6,9 +6,9 @@ export interface ServiceCatalog {
   icon: string;
   formSchema: string;
   isPublished: boolean;
-  tenant?: {
-    tenantId: string;
-    tenantName: string;
+  company?: {
+    companyId: string;
+    companyName: string;
   };
 }
 

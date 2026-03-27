@@ -1,6 +1,6 @@
 export interface User {
   userId: string;
-  tenantId: string;
+  companyId: string;
   userName: string;
   email: string;
   role: string;
@@ -8,7 +8,7 @@ export interface User {
 
 export interface UserRequest {
   userId?: string;
-  tenantId?: string;
+  companyId?: string;
   userName: string;
   email: string;
   password?: string;

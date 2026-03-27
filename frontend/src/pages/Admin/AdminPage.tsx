@@ -1,17 +1,10 @@
 import React, { useState } from 'react';
-import TenantManagement from './Tenant';
+import CompanyManagement from './Company';
 import UserManagement from './User';
-import CodeManagement from '../../components/admin/CodeManagement';
+import CodeManagement from './Code';
 
 const AdminPage: React.FC<{ user: any }> = ({ user }) => {
   const [activeTab, setActiveTab] = useState('CUSTOMERS');
-  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
-  const token = localStorage.getItem('itsm_token');
-
-  const headers = () => ({
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`
-  });
 
   const tabs = [
     { id: 'CUSTOMERS', label: '🏢 고객사 관리' },
@@ -21,9 +14,9 @@ const AdminPage: React.FC<{ user: any }> = ({ user }) => {
 
   const renderTabContent = () => {
     switch (activeTab) {
-      case 'CUSTOMERS': return <TenantManagement />;
+      case 'CUSTOMERS': return <CompanyManagement />;
       case 'USERS': return <UserManagement />;
-      case 'CODES': return <CodeManagement apiUrl={apiUrl} headers={headers} />;
+      case 'CODES': return <CodeManagement />;
       default: return null;
     }
   };

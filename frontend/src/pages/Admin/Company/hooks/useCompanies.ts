@@ -1,20 +1,20 @@
 import { useState, useCallback, useEffect } from 'react';
-import { tenantApi } from '../api/tenantApi';
-import type { Tenant } from '../types';
+import { companyApi } from '../api/companyApi';
+import type { Company } from '../types';
 
-export const useTenants = (search: string, page: number, sort: { field: string, dir: string }) => {
-  const [tenants, setTenants] = useState<Tenant[]>([]);
+export const useCompanies = (search: string, page: number, sort: { field: string, dir: string }) => {
+  const [companies, setCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchTenants = useCallback(async () => {
+  const fetchCompanies = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const data = await tenantApi.getTenants(page, 10, search, `${sort.field},${sort.dir}`);
-      setTenants(data.content);
+      const data = await companyApi.getCompanies(page, 10, search, `${sort.field},${sort.dir}`);
+      setCompanies(data.content);
       setTotalPages(data.totalPages);
       setTotalElements(data.totalElements);
     } catch (err) {
@@ -26,10 +26,10 @@ export const useTenants = (search: string, page: number, sort: { field: string, 
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      fetchTenants();
+      fetchCompanies();
     }, 300);
     return () => clearTimeout(timer);
-  }, [fetchTenants]);
+  }, [fetchCompanies]);
 
-  return { tenants, loading, totalPages, totalElements, error, refetch: fetchTenants };
+  return { companies, loading, totalPages, totalElements, error, refetch: fetchCompanies };
 };

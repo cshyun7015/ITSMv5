@@ -1,6 +1,6 @@
 export interface CI {
   id: number;
-  tenantId: string;
+  companyId: string;
   name: string;
   type: string;
   status: string;

@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import type { KnowledgeArticle } from '../types';
 import { knowledgeApi } from '../api/knowledgeApi';
 
-export const useKnowledge = (tenantId: string) => {
+export const useKnowledge = (companyId: string) => {
   const [articles, setArticles] = useState<KnowledgeArticle[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -22,7 +22,7 @@ export const useKnowledge = (tenantId: string) => {
 
   useEffect(() => {
     fetchArticles();
-  }, [tenantId, fetchArticles]);
+  }, [companyId, fetchArticles]);
 
   return { articles, loading, error, fetchArticles };
 };

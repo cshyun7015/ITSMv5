@@ -1,6 +1,6 @@
 export interface Incident {
   id: number;
-  tenantId: string;
+  companyId: string;
   reporterId: string;
   assigneeId: string | null;
   title: string;

@@ -1,6 +1,6 @@
 export interface Release {
   id: number;
-  tenantId: string;
+  companyId: string;
   title: string;
   description: string;
   status: ReleaseStatus;

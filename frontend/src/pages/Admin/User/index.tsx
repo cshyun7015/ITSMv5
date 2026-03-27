@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useUsers } from './hooks/useUsers';
 import { userApi } from './api/userApi';
-import { tenantApi } from '../Tenant/api/tenantApi';
+import { companyApi } from '../Company/api/companyApi';
 import AdminModal from '../../../components/admin/AdminModal';
 import type { User, UserRequest } from './types';
-import type { Tenant } from '../Tenant/types';
+import type { Company } from '../Company/types';
 
 const UserManagement: React.FC = () => {
   const [search, setSearch] = useState('');
@@ -12,29 +12,29 @@ const UserManagement: React.FC = () => {
   const [sort, setSort] = useState({ field: 'userId', dir: 'asc' });
   
   const { users, loading, totalPages, totalElements, error, refetch } = useUsers(search, page, sort);
-  const [tenants, setTenants] = useState<Tenant[]>([]);
+  const [companies, setCompanies] = useState<Company[]>([]);
   
   const [showForm, setShowForm] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [userForm, setUserForm] = useState<UserRequest>({ 
-    userId: '', userName: '', email: '', password: '', tenantId: '', role: 'ROLE_USER' 
+    userId: '', userName: '', email: '', password: '', companyId: '', role: 'ROLE_USER' 
   });
   const [modal, setModal] = useState({ 
     isOpen: false, title: '', message: '', type: 'info' as any, onConfirm: () => {} 
   });
 
-  const fetchTenants = useCallback(async () => {
+  const fetchCompanies = useCallback(async () => {
     try {
-      const data = await tenantApi.getTenants(0, 100);
-      setTenants(data.content || []);
+      const data = await companyApi.getCompanies(0, 100);
+      setCompanies(data.content || []);
     } catch (e) {
-      console.error('Failed to fetch tenants for user mapping:', e);
+      console.error('Failed to fetch companies for user mapping:', e);
     }
   }, []);
 
   useEffect(() => {
-    fetchTenants();
-  }, [fetchTenants]);
+    fetchCompanies();
+  }, [fetchCompanies]);
 
   const handleSort = (field: string) => {
     const isSame = sort.field === field;
@@ -53,7 +53,7 @@ const UserManagement: React.FC = () => {
         type: 'success', 
         onConfirm: () => { setModal({ ...modal, isOpen: false }); setShowForm(false); refetch(); } 
       });
-      setUserForm({ userId: '', userName: '', email: '', password: '', tenantId: '', role: 'ROLE_USER' }); 
+      setUserForm({ userId: '', userName: '', email: '', password: '', companyId: '', role: 'ROLE_USER' }); 
     } catch (err) { 
       setModal({ isOpen: true, title: '오류', message: '오류가 발생했습니다.', type: 'danger', onConfirm: () => setModal({ ...modal, isOpen: false }) });
     }
@@ -134,10 +134,10 @@ const UserManagement: React.FC = () => {
           </div>
           <div>
             <label className="mb-1 block text-sm text-[#aaa]">고객사 선택</label>
-            <select required value={userForm.tenantId} onChange={e => setUserForm({...userForm, tenantId: e.target.value})} className="w-full rounded-md border border-[#555] bg-[#2c2c2c] p-2 text-white text-sm">
+            <select required value={userForm.companyId} onChange={e => setUserForm({...userForm, companyId: e.target.value})} className="w-full rounded-md border border-[#555] bg-[#2c2c2c] p-2 text-white text-sm">
               <option value="">-- 고객사 선택 --</option>
               <option value="system">System (CSP)</option>
-              {tenants.map((t) => <option key={t.tenantId} value={t.tenantId}>{t.tenantName}</option>)}
+              {companies.map((t) => <option key={t.companyId} value={t.companyId}>{t.companyName}</option>)}
             </select>
           </div>
           <div>
@@ -167,9 +167,9 @@ const UserManagement: React.FC = () => {
           </div>
           <div>
             <label className="mb-1 block text-sm text-[#aaa]">고객사</label>
-            <select required value={editingUser.tenantId} onChange={e => setEditingUser({...editingUser, tenantId: e.target.value})} className="w-full rounded-md border border-[#555] bg-[#2c2c2c] p-2 text-white text-sm">
+            <select required value={editingUser.companyId} onChange={e => setEditingUser({...editingUser, companyId: e.target.value})} className="w-full rounded-md border border-[#555] bg-[#2c2c2c] p-2 text-white text-sm">
               <option value="system">System (CSP)</option>
-              {tenants.map((t) => <option key={t.tenantId} value={t.tenantId}>{t.tenantName}</option>)}
+              {companies.map((t) => <option key={t.companyId} value={t.companyId}>{t.companyName}</option>)}
             </select>
           </div>
           <div>
@@ -208,8 +208,8 @@ const UserManagement: React.FC = () => {
                     <div className="text-xs text-[#666]">{u.email}</div>
                   </td>
                   <td className="px-6 py-4">
-                    <span className={`text-sm ${u.tenantId === 'system' ? 'text-[#fcc419] font-bold' : 'text-[#339af0]'}`}>
-                      {u.tenantId === 'system' ? '🛠️ System (CSP)' : u.tenantId}
+                    <span className={`text-sm ${u.companyId === 'system' ? 'text-[#fcc419] font-bold' : 'text-[#339af0]'}`}>
+                      {u.companyId === 'system' ? '🛠️ System (CSP)' : u.companyId}
                     </span>
                   </td>
                   <td className="px-6 py-4">

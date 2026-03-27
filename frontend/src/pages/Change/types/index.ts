@@ -1,6 +1,6 @@
 export interface Change {
   id: number;
-  tenantId: string;
+  companyId: string;
   requesterId: string;
   title: string;
   description: string;

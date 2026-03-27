@@ -159,7 +159,7 @@ export const ServiceRequestDetailView: React.FC<ServiceRequestDetailViewProps> =
             <h4 style={{ color: '#888', marginTop: 0, marginBottom: '0.8rem', fontSize: '0.85rem' }}>요청자 정보</h4>
             <div style={{ color: '#fff', fontWeight: 'bold' }}>{request.requester?.userName || 'System'}</div>
             <div style={{ color: '#666', fontSize: '0.8rem' }}>{request.requester?.email || 'No Email'}</div>
-            <div style={{ color: '#339af0', fontSize: '0.8rem', marginTop: '0.3rem' }}>🏢 {request.tenant?.tenantName || '-'}</div>
+            <div style={{ color: '#339af0', fontSize: '0.8rem', marginTop: '0.3rem' }}>🏢 {request.company?.companyName || '-'}</div>
           </section>
         </div>
       </div>

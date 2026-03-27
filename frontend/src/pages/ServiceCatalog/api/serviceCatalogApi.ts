@@ -28,9 +28,9 @@ export const serviceCatalogApi = {
   },
 
   // Admin methods
-  adminGetServiceCatalogs: async (search: string, page: number, size: number, tenantId?: string): Promise<any> => {
+  adminGetServiceCatalogs: async (search: string, page: number, size: number, companyId?: string): Promise<any> => {
     let url = `${getApiUrl()}/api/admin/catalogs?page=${page}&size=${size}&search=${encodeURIComponent(search)}`;
-    if (tenantId) url += `&tenantId=${tenantId}`;
+    if (companyId) url += `&companyId=${companyId}`;
     const response = await fetch(url, { headers: getHeaders() });
     if (!response.ok) throw new Error('Failed to fetch admin service catalogs');
     return response.json();

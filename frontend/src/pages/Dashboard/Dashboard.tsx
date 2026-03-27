@@ -47,7 +47,7 @@ export default function Dashboard({ user, onLogout }: { user: any, onLogout: () 
       };
       fetchStats();
     }
-  }, [currentView, user.tenantId, apiUrl, token]);
+  }, [currentView, user.companyId, apiUrl, token]);
 
   const renderContent = () => {
     switch (currentView) {
@@ -56,7 +56,7 @@ export default function Dashboard({ user, onLogout }: { user: any, onLogout: () 
           <div style={{ backgroundColor: '#1e1e1e', padding: '2.5rem', borderRadius: '12px', border: '1px solid #333', boxShadow: '0 8px 32px rgba(0,0,0,0.4)', display: 'flex', flexDirection: 'column' }}>
             <h3 style={{ color: '#fff', marginBottom: '1.5rem', fontSize: '1.4rem' }}>Secure MSP Operations Dashboard</h3>
             <p style={{ color: '#aaa', lineHeight: '1.6', fontSize: '0.95rem' }}>
-              Welcome back to the ITIL v5 ITSM platform. All data is isolated by Tenant ID and synced with the backend in real-time.
+              Welcome back to the ITIL v5 ITSM platform. All data is isolated by Company ID and synced with the backend in real-time.
             </p>
             
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '2rem', marginTop: '3rem' }}>

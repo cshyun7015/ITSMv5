@@ -105,7 +105,7 @@ export const ServiceRequestList: React.FC<ServiceRequestListProps> = ({ onSelect
                   <td style={{ padding: '1rem', color: '#fff', fontWeight: 'bold', cursor: 'pointer' }} onClick={() => onSelectDetail(req.id)}>{req.title}</td>
                   <td style={{ padding: '1rem' }}>
                     <div style={{ color: '#aaa', fontSize: '0.9rem' }}>{req.requester?.userName || 'System'}</div>
-                    <div style={{ color: '#555', fontSize: '0.8rem' }}>{req.tenant?.tenantName}</div>
+                    <div style={{ color: '#555', fontSize: '0.8rem' }}>{req.company?.companyName}</div>
                   </td>
                   <td style={{ padding: '1rem', color: '#339af0' }}>{req.catalog?.category}</td>
                   <td style={{ padding: '1rem' }}>

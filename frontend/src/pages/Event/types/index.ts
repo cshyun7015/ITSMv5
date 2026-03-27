@@ -8,7 +8,7 @@ export interface Event {
   instance: string;
   timestamp: string;
   linkedIncidentId: number | null;
-  tenantId?: string;
+  companyId?: string;
 }
 
 export type EventSeverity = 'critical' | 'warning' | 'info';

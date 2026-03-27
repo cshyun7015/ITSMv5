@@ -1,6 +1,6 @@
 export interface SLA {
   id: number;
-  tenantId: string;
+  companyId: string;
   serviceName: string;
   targetValue: number;
   actualValue: number;

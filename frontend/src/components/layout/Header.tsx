@@ -17,7 +17,7 @@ const Header: React.FC<HeaderProps> = ({ currentView, user, onLogout }) => {
         <NotificationBell user={user} />
         <div style={{ textAlign: 'right', borderRight: '1px solid #333', paddingRight: '1.5rem' }}>
           <div style={{ color: '#fff', fontWeight: 'bold', fontSize: '1rem' }}>{user.userName}</div>
-          <div style={{ color: '#888', fontSize: '0.75rem' }}>{user.role} | Tenant: {user.tenantId}</div>
+          <div style={{ color: '#888', fontSize: '0.75rem' }}>{user.role} | Company: {user.companyId}</div>
         </div>
         <button 
           onClick={onLogout} 

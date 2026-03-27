@@ -8,9 +8,9 @@ export interface User {
   role: string;
 }
 
-export interface Tenant {
+export interface Company {
   id: number;
-  tenantName: string;
+  companyName: string;
 }
 
 export interface Catalog {
@@ -30,7 +30,7 @@ export interface ServiceRequest {
   formData?: string;
   requester?: User;
   assignee?: User;
-  tenant?: Tenant;
+  company?: Company;
   catalog?: Catalog;
   createdAt: string;
   updatedAt: string;

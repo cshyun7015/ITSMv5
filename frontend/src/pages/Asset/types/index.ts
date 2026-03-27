@@ -10,7 +10,7 @@ export interface Asset {
   specifications?: string;
   ownerId?: string;
   ownerName?: string;
-  tenantId: string;
+  companyId: string;
   createdAt: string;
   updatedAt: string;
 }

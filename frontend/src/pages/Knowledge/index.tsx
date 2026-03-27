@@ -6,7 +6,7 @@ import KnowledgeDetail from './components/KnowledgeDetail';
 import { KnowledgeArticle } from './types';
 
 const KnowledgePage: React.FC<{ user: any }> = ({ user }) => {
-  const { articles, loading, error, fetchArticles } = useKnowledge(user.tenantId);
+  const { articles, loading, error, fetchArticles } = useKnowledge(user.companyId);
   const [selectedArticle, setSelectedArticle] = useState<KnowledgeArticle | null>(null);
 
   const handleSearch = (keyword: string) => {
