@@ -2,14 +2,14 @@ export type SRStatus = 'OPEN' | 'ASSIGNED' | 'IN_PROGRESS' | 'RESOLVED' | 'CLOSE
 export type SRPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'EMERGENCY';
 
 export type User = {
-  userId: number;
+  userId: string;
   userName: string;
   email: string;
   role: string;
 };
 
 export type Company = {
-  id: number;
+  id: string;
   companyName: string;
 };
 

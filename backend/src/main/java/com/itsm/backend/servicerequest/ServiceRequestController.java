@@ -34,6 +34,12 @@ public class ServiceRequestController {
         return requestService.createRequest(userId, dto);
     }
 
+    @PatchMapping("/{id}/cancel")
+    public ServiceRequestResponse cancelRequest(@PathVariable Long id) {
+        String userId = SecurityUtils.getCurrentUserId();
+        return requestService.cancelRequest(id, userId);
+    }
+
     // --- Admin/Agent Endpoints ---
 
     @GetMapping("/admin/list")

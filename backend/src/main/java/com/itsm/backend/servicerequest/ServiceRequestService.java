@@ -86,6 +86,25 @@ public class ServiceRequestService {
     }
 
     @Transactional
+    public ServiceRequestResponse cancelRequest(Long id, String userId) {
+        ServiceRequest sr = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Request not found"));
+        
+        // Security: Only the requester can cancel
+        if (!sr.getRequester().getUserId().equals(userId)) {
+            throw new RuntimeException("Unauthorized: Only the requester can cancel this request.");
+        }
+        
+        // Only OPEN requests can be canceled
+        if (!"OPEN".equals(sr.getStatus())) {
+            throw new RuntimeException("Only requests in 'OPEN' status can be canceled.");
+        }
+        
+        sr.setStatus("CANCELED");
+        return mapper.toResponse(repository.save(sr));
+    }
+
+    @Transactional
     public void deleteRequest(Long id) {
         repository.deleteById(id);
     }
