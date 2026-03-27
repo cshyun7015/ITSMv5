@@ -1,7 +1,5 @@
-package com.itsm.backend.admin.company.mapper;
+package com.itsm.backend.admin.user;
 
-import com.itsm.backend.admin.company.dto.UserResponse;
-import com.itsm.backend.admin.company.entity.User;
 import org.springframework.stereotype.Component;
 
 @Component

@@ -1,8 +1,5 @@
-package com.itsm.backend.asset.controller;
+package com.itsm.backend.asset;
 
-import com.itsm.backend.asset.dto.AssetResponse;
-import com.itsm.backend.asset.entity.Asset;
-import com.itsm.backend.asset.service.AssetService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;

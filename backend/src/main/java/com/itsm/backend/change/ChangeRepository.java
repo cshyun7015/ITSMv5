@@ -1,6 +1,5 @@
-package com.itsm.backend.change.repository;
+package com.itsm.backend.change;
 
-import com.itsm.backend.change.entity.Change;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 

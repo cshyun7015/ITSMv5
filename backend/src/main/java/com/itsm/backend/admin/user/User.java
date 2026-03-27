@@ -1,5 +1,6 @@
-package com.itsm.backend.admin.company.entity;
+package com.itsm.backend.admin.user;
 
+import com.itsm.backend.admin.company.Company;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;

@@ -1,7 +1,7 @@
-package com.itsm.backend.change.entity;
+package com.itsm.backend.change;
 
-import com.itsm.backend.company.Company;
-import com.itsm.backend.admin.company.entity.User;
+import com.itsm.backend.admin.company.Company;
+import com.itsm.backend.admin.user.User;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDateTime;

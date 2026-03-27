@@ -1,6 +1,6 @@
-package com.itsm.backend.ci.entity;
+package com.itsm.backend.ci;
 
-import com.itsm.backend.company.Company;
+import com.itsm.backend.admin.company.Company;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDateTime;
@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "tb_ci")
 @Data
-public class ConfigurationItem {
+public class CI {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

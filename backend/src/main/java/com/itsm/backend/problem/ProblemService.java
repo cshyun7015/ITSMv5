@@ -1,13 +1,9 @@
-package com.itsm.backend.problem.service;
+package com.itsm.backend.problem;
 
-import com.itsm.backend.incident.entity.Incident;
-import com.itsm.backend.incident.repository.IncidentRepository;
-import com.itsm.backend.problem.dto.ProblemResponse;
-import com.itsm.backend.problem.entity.Problem;
-import com.itsm.backend.problem.mapper.ProblemMapper;
-import com.itsm.backend.problem.repository.ProblemRepository;
-import com.itsm.backend.company.Company;
-import com.itsm.backend.company.CompanyRepository;
+import com.itsm.backend.incident.Incident;
+import com.itsm.backend.incident.IncidentRepository;
+import com.itsm.backend.admin.company.Company;
+import com.itsm.backend.admin.company.CompanyRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

@@ -1,7 +1,7 @@
-package com.itsm.backend.request.entity;
+package com.itsm.backend.servicerequest;
 
-import com.itsm.backend.servicecatalog.entity.ServiceCatalog;
-import com.itsm.backend.company.Company;
+import com.itsm.backend.servicecatalog.ServiceCatalog;
+import com.itsm.backend.admin.company.Company;
 import com.itsm.backend.admin.user.User;
 import jakarta.persistence.*;
 import lombok.Getter;

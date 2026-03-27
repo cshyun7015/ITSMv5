@@ -1,9 +1,6 @@
-package com.itsm.backend.sla.controller;
+package com.itsm.backend.sla;
 
 import com.itsm.backend.auth.SecurityUtils;
-import com.itsm.backend.sla.dto.SLAResponse;
-import com.itsm.backend.sla.entity.SLA;
-import com.itsm.backend.sla.service.SLAService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;

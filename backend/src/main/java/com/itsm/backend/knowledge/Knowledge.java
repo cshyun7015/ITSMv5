@@ -1,7 +1,7 @@
-package com.itsm.backend.knowledge.entity;
+package com.itsm.backend.knowledge;
 
-import com.itsm.backend.company.Company;
-import com.itsm.backend.admin.company.entity.User;
+import com.itsm.backend.admin.company.Company;
+import com.itsm.backend.admin.user.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "tb_knowledge_article")
 @Getter @Setter
-public class KnowledgeArticle {
+public class Knowledge {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

@@ -1,7 +1,7 @@
 package com.itsm.backend.notification;
 
 import org.springframework.stereotype.Service;
-import com.itsm.backend.company.entity.User;
+import com.itsm.backend.admin.user.User;
 import java.time.LocalDateTime;
 
 @Service

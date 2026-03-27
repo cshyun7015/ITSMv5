@@ -1,6 +1,5 @@
-package com.itsm.backend.asset.repository;
+package com.itsm.backend.asset;
 
-import com.itsm.backend.asset.entity.Asset;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 

@@ -1,11 +1,13 @@
 package com.itsm.backend.request;
 
+import com.itsm.backend.admin.company.Company;
 import com.itsm.backend.servicecatalog.ServiceCatalog;
 import com.itsm.backend.servicecatalog.ServiceCatalogRepository;
 import com.itsm.backend.notification.NotificationService;
-import com.itsm.backend.tenant.Tenant;
-import com.itsm.backend.tenant.User;
-import com.itsm.backend.tenant.UserRepository;
+import com.itsm.backend.admin.user.User;
+import com.itsm.backend.admin.user.UserRepository;
+import com.itsm.backend.servicerequest.ServiceRequestRepository;
+import com.itsm.backend.servicerequest.ServiceRequestService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -21,10 +23,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class ServiceRequestServiceTest {
+class ServiceServiceTest {
 
-    @Mock private ServiceRequestRepository requestRepository;
-    @Mock private ServiceCatalogRepository catalogRepository;
+    @Mock private ServiceRequestRepository serviceRequestRepository;
+    @Mock private ServiceCatalogRepository serviceCatalogRepository;
     @Mock private UserRepository userRepository;
     @Mock private NotificationService notificationService;
 
@@ -41,25 +43,25 @@ class ServiceRequestServiceTest {
         payload.put("description", "Need for dev work");
         payload.put("formData", "{}");
 
-        Tenant tenant = new Tenant();
-        tenant.setTenantId("T1");
+        Company company = new Company();
+        company.setCompanyId("T1");
         User user = new User();
         user.setUserId(userId);
-        user.setTenant(tenant);
+        user.setCompany(company);
 
         ServiceCatalog catalog = new ServiceCatalog();
         catalog.setId(1L);
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(catalogRepository.findById(1L)).thenReturn(Optional.of(catalog));
-        when(requestRepository.save(any(ServiceRequest.class))).thenAnswer(i -> {
-            ServiceRequest sr = (ServiceRequest) i.getArguments()[0];
+        when(serviceCatalogRepository.findById(1L)).thenReturn(Optional.of(catalog));
+        when(serviceRequestRepository.save(any(ServiceRequestService.class))).thenAnswer(i -> {
+            ServiceRequestService sr = (ServiceRequestService) i.getArguments()[0];
             sr.setId(100L);
             return sr;
         });
 
         // When
-        ServiceRequest result = serviceRequestService.createRequest(userId, payload);
+        ServiceRequestService result = serviceRequestService.createRequest(userId, payload);
 
         // Then
         assertNotNull(result);

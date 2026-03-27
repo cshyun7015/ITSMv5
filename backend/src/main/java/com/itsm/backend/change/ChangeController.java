@@ -1,9 +1,6 @@
-package com.itsm.backend.change.controller;
+package com.itsm.backend.change;
 
 import com.itsm.backend.auth.SecurityUtils;
-import com.itsm.backend.change.dto.ChangeResponse;
-import com.itsm.backend.change.entity.Change;
-import com.itsm.backend.change.service.ChangeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;

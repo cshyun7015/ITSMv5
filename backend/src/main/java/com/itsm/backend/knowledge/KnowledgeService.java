@@ -1,12 +1,7 @@
-package com.itsm.backend.knowledge.service;
+package com.itsm.backend.knowledge;
 
 import com.itsm.backend.auth.SecurityUtils;
-import com.itsm.backend.knowledge.dto.KnowledgeRequest;
-import com.itsm.backend.knowledge.dto.KnowledgeResponse;
-import com.itsm.backend.knowledge.entity.KnowledgeArticle;
-import com.itsm.backend.knowledge.mapper.KnowledgeMapper;
-import com.itsm.backend.knowledge.repository.KnowledgeRepository;
-import com.itsm.backend.company.UserRepository;
+import com.itsm.backend.admin.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,7 +22,7 @@ public class KnowledgeService {
     public List<KnowledgeResponse> getArticles(String keyword) {
         String companyId = SecurityUtils.getCurrentCompanyId();
         
-        List<KnowledgeArticle> articles;
+        List<Knowledge> articles;
         if (keyword != null && !keyword.isBlank()) {
             articles = articleRepository.findByCompany_CompanyIdAndTitleContainingIgnoreCase(companyId, keyword);
         } else {
@@ -45,7 +40,7 @@ public class KnowledgeService {
         var author = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        KnowledgeArticle article = new KnowledgeArticle();
+        Knowledge article = new Knowledge();
         article.setCompany(author.getCompany());
         article.setAuthor(author);
         article.setTitle(request.getTitle());
@@ -55,7 +50,7 @@ public class KnowledgeService {
         article.setCreatedAt(LocalDateTime.now());
         article.setUpdatedAt(LocalDateTime.now());
 
-        KnowledgeArticle saved = articleRepository.save(article);
+        Knowledge saved = articleRepository.save(article);
         return knowledgeMapper.toResponse(saved);
     }
 }

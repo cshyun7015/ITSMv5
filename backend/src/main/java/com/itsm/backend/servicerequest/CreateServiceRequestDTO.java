@@ -1,4 +1,4 @@
-package com.itsm.backend.request.dto;
+package com.itsm.backend.servicerequest;
 
 import lombok.Getter;
 import lombok.Setter;

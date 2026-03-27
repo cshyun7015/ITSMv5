@@ -1,4 +1,4 @@
-package com.itsm.backend.servicecatalog.entity;
+package com.itsm.backend.servicecatalog;
 
 import com.itsm.backend.admin.company.Company;
 import jakarta.persistence.*;

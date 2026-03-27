@@ -1,7 +1,7 @@
-package com.itsm.backend.problem.entity;
+package com.itsm.backend.problem;
 
-import com.itsm.backend.incident.entity.Incident;
-import com.itsm.backend.company.Company;
+import com.itsm.backend.incident.Incident;
+import com.itsm.backend.admin.company.Company;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

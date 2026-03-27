@@ -1,8 +1,8 @@
 package com.itsm.backend.attachment;
 
-import com.itsm.backend.company.Company;
-import com.itsm.backend.company.entity.User;
-import com.itsm.backend.company.UserRepository;
+import com.itsm.backend.admin.company.Company;
+import com.itsm.backend.admin.user.User;
+import com.itsm.backend.admin.user.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;

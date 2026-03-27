@@ -1,7 +1,7 @@
 package com.itsm.backend.attachment;
 
-import com.itsm.backend.company.Company;
-import com.itsm.backend.company.entity.User;
+import com.itsm.backend.admin.company.Company;
+import com.itsm.backend.admin.user.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

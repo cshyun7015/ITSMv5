@@ -1,7 +1,5 @@
-package com.itsm.backend.release.mapper;
+package com.itsm.backend.release;
 
-import com.itsm.backend.release.entity.Release;
-import com.itsm.backend.release.dto.ReleaseResponse;
 import org.springframework.stereotype.Component;
 
 @Component

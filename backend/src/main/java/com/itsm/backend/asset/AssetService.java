@@ -1,12 +1,8 @@
-package com.itsm.backend.asset.service;
+package com.itsm.backend.asset;
 
-import com.itsm.backend.asset.dto.AssetResponse;
-import com.itsm.backend.asset.entity.Asset;
-import com.itsm.backend.asset.mapper.AssetMapper;
-import com.itsm.backend.asset.repository.AssetRepository;
 import com.itsm.backend.auth.SecurityUtils;
-import com.itsm.backend.company.Company;
-import com.itsm.backend.company.CompanyRepository;
+import com.itsm.backend.admin.company.Company;
+import com.itsm.backend.admin.company.CompanyRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

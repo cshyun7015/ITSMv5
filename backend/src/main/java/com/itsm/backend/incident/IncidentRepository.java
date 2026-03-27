@@ -1,6 +1,5 @@
-package com.itsm.backend.incident.repository;
+package com.itsm.backend.incident;
 
-import com.itsm.backend.incident.entity.Incident;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 

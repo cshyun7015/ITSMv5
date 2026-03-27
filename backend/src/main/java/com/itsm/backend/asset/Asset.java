@@ -1,9 +1,9 @@
-package com.itsm.backend.asset.entity;
+package com.itsm.backend.asset;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.itsm.backend.company.Company;
-import com.itsm.backend.admin.company.entity.User;
+import com.itsm.backend.admin.company.Company;
+import com.itsm.backend.admin.user.User;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDateTime;

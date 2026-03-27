@@ -1,9 +1,6 @@
-package com.itsm.backend.release.controller;
+package com.itsm.backend.release;
 
 import com.itsm.backend.auth.SecurityUtils;
-import com.itsm.backend.release.dto.ReleaseResponse;
-import com.itsm.backend.release.entity.Release;
-import com.itsm.backend.release.service.ReleaseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;

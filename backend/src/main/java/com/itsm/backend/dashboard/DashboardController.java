@@ -2,7 +2,7 @@ package com.itsm.backend.dashboard;
 
 import com.itsm.backend.auth.SecurityUtils;
 import com.itsm.backend.incident.IncidentRepository;
-import com.itsm.backend.request.repository.ServiceRequestRepository;
+import com.itsm.backend.servicerequest.ServiceRequestRepository;
 import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 

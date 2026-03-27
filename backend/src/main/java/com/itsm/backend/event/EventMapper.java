@@ -1,7 +1,5 @@
-package com.itsm.backend.event.mapper;
+package com.itsm.backend.event;
 
-import com.itsm.backend.event.entity.Event;
-import com.itsm.backend.event.dto.EventResponse;
 import org.springframework.stereotype.Component;
 
 @Component

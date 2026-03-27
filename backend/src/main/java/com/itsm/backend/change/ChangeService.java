@@ -1,14 +1,10 @@
-package com.itsm.backend.change.service;
+package com.itsm.backend.change;
 
-import com.itsm.backend.change.dto.ChangeResponse;
-import com.itsm.backend.change.entity.Change;
-import com.itsm.backend.change.mapper.ChangeMapper;
-import com.itsm.backend.change.repository.ChangeRepository;
 import com.itsm.backend.notification.NotificationService;
-import com.itsm.backend.company.Company;
-import com.itsm.backend.company.CompanyRepository;
-import com.itsm.backend.admin.company.entity.User;
-import com.itsm.backend.company.UserRepository;
+import com.itsm.backend.admin.company.Company;
+import com.itsm.backend.admin.company.CompanyRepository;
+import com.itsm.backend.admin.user.User;
+import com.itsm.backend.admin.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

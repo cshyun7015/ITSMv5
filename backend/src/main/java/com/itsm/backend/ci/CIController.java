@@ -1,9 +1,6 @@
-package com.itsm.backend.ci.controller;
+package com.itsm.backend.ci;
 
 import com.itsm.backend.auth.SecurityUtils;
-import com.itsm.backend.ci.dto.CIResponse;
-import com.itsm.backend.ci.entity.ConfigurationItem;
-import com.itsm.backend.ci.service.CIService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -29,7 +26,7 @@ public class CIController {
     }
 
     @PostMapping
-    public CIResponse createCI(@RequestBody ConfigurationItem ci) {
+    public CIResponse createCI(@RequestBody CI ci) {
         String companyId = SecurityUtils.getCurrentCompanyId();
         return ciService.createCI(ci, companyId);
     }

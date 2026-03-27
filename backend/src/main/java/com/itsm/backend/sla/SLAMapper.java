@@ -1,7 +1,5 @@
-package com.itsm.backend.sla.mapper;
+package com.itsm.backend.sla;
 
-import com.itsm.backend.sla.entity.SLA;
-import com.itsm.backend.sla.dto.SLAResponse;
 import org.springframework.stereotype.Component;
 
 @Component

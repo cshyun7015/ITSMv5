@@ -1,7 +1,8 @@
-package com.itsm.backend.incident.entity;
+package com.itsm.backend.incident;
 
-import com.itsm.backend.company.Company;
-import com.itsm.backend.admin.company.entity.User;
+import com.itsm.backend.admin.company.Company;
+import com.itsm.backend.admin.user.User;
+import com.itsm.backend.problem.Problem;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -48,7 +49,7 @@ public class Incident {
     @com.fasterxml.jackson.annotation.JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "problem_id")
-    private com.itsm.backend.problem.entity.Problem problem;
+    private Problem problem;
 
     @Column(name = "asset_id")
     private Long assetId;

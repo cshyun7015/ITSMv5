@@ -1,6 +1,6 @@
-package com.itsm.backend.release.entity;
+package com.itsm.backend.release;
 
-import com.itsm.backend.company.Company;
+import com.itsm.backend.admin.company.Company;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDateTime;

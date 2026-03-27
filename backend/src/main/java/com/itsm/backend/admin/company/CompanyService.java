@@ -1,10 +1,5 @@
-package com.itsm.backend.admin.company.service;
+package com.itsm.backend.admin.company;
 
-import com.itsm.backend.admin.company.dto.CompanyRequest;
-import com.itsm.backend.admin.company.dto.CompanyResponse;
-import com.itsm.backend.admin.company.entity.Company;
-import com.itsm.backend.admin.company.mapper.CompanyMapper;
-import com.itsm.backend.admin.company.repository.CompanyRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

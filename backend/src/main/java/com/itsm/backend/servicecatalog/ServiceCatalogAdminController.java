@@ -1,9 +1,6 @@
-package com.itsm.backend.servicecatalog.controller;
+package com.itsm.backend.servicecatalog;
 
 import com.itsm.backend.auth.SecurityUtils;
-import com.itsm.backend.servicecatalog.dto.CreateServiceCatalogDTO;
-import com.itsm.backend.servicecatalog.dto.ServiceCatalogResponse;
-import com.itsm.backend.servicecatalog.service.ServiceCatalogService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

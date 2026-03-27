@@ -1,6 +1,5 @@
-package com.itsm.backend.request.repository;
+package com.itsm.backend.servicerequest;
 
-import com.itsm.backend.request.entity.ServiceRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

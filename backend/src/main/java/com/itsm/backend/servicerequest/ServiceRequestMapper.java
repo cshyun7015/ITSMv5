@@ -1,10 +1,8 @@
-package com.itsm.backend.request.mapper;
+package com.itsm.backend.servicerequest;
 
-import com.itsm.backend.request.entity.ServiceRequest;
-import com.itsm.backend.request.dto.ServiceRequestResponse;
 import com.itsm.backend.admin.user.User;
-import com.itsm.backend.company.Company;
-import com.itsm.backend.servicecatalog.entity.ServiceCatalog;
+import com.itsm.backend.admin.company.Company;
+import com.itsm.backend.servicecatalog.ServiceCatalog;
 import org.springframework.stereotype.Component;
 
 @Component

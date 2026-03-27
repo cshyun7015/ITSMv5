@@ -1,12 +1,10 @@
-package com.itsm.backend.ci.mapper;
+package com.itsm.backend.ci;
 
-import com.itsm.backend.ci.entity.ConfigurationItem;
-import com.itsm.backend.ci.dto.CIResponse;
 import org.springframework.stereotype.Component;
 
 @Component
 public class CIMapper {
-    public CIResponse toResponse(ConfigurationItem ci) {
+    public CIResponse toResponse(CI ci) {
         if (ci == null) return null;
         return CIResponse.builder()
                 .id(ci.getId())

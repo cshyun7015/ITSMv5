@@ -1,10 +1,5 @@
-package com.itsm.backend.servicecatalog.service;
+package com.itsm.backend.servicecatalog;
 
-import com.itsm.backend.servicecatalog.dto.CreateServiceCatalogDTO;
-import com.itsm.backend.servicecatalog.dto.ServiceCatalogResponse;
-import com.itsm.backend.servicecatalog.entity.ServiceCatalog;
-import com.itsm.backend.servicecatalog.mapper.ServiceCatalogMapper;
-import com.itsm.backend.servicecatalog.repository.ServiceCatalogRepository;
 import com.itsm.backend.admin.company.Company;
 import com.itsm.backend.admin.company.CompanyRepository;
 import lombok.RequiredArgsConstructor;

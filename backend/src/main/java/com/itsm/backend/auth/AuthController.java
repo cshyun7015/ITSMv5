@@ -1,8 +1,7 @@
 package com.itsm.backend.auth;
 
-import com.itsm.backend.auth.dto.LoginRequest;
-import com.itsm.backend.company.entity.User;
-import com.itsm.backend.company.repository.UserRepository;
+import com.itsm.backend.admin.user.User;
+import com.itsm.backend.admin.user.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

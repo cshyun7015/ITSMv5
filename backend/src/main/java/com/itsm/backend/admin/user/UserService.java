@@ -1,12 +1,7 @@
-package com.itsm.backend.admin.company.service;
+package com.itsm.backend.admin.user;
 
-import com.itsm.backend.admin.company.dto.UserRequest;
-import com.itsm.backend.admin.company.dto.UserResponse;
-import com.itsm.backend.admin.company.entity.Company;
-import com.itsm.backend.admin.company.entity.User;
-import com.itsm.backend.admin.company.mapper.UserMapper;
-import com.itsm.backend.admin.company.repository.CompanyRepository;
-import com.itsm.backend.admin.company.repository.UserRepository;
+import com.itsm.backend.admin.company.Company;
+import com.itsm.backend.admin.company.CompanyRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

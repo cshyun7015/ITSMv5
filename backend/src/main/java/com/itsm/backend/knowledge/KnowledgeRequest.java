@@ -1,4 +1,4 @@
-package com.itsm.backend.knowledge.dto;
+package com.itsm.backend.knowledge;
 
 import lombok.Getter;
 import lombok.Setter;

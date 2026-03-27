@@ -1,6 +1,6 @@
 package com.itsm.backend.notification;
 
-import com.itsm.backend.company.entity.User;
+import com.itsm.backend.admin.user.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

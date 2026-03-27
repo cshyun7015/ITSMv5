@@ -1,10 +1,9 @@
-package com.itsm.backend.knowledge.repository;
+package com.itsm.backend.knowledge;
 
-import com.itsm.backend.knowledge.entity.KnowledgeArticle;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
-public interface KnowledgeRepository extends JpaRepository<KnowledgeArticle, Long> {
-    List<KnowledgeArticle> findByCompany_CompanyIdOrderByCreatedAtDesc(String companyId);
-    List<KnowledgeArticle> findByCompany_CompanyIdAndTitleContainingIgnoreCase(String companyId, String keyword);
+public interface KnowledgeRepository extends JpaRepository<Knowledge, Long> {
+    List<Knowledge> findByCompany_CompanyIdOrderByCreatedAtDesc(String companyId);
+    List<Knowledge> findByCompany_CompanyIdAndTitleContainingIgnoreCase(String companyId, String keyword);
 }

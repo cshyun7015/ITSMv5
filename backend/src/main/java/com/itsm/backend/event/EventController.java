@@ -1,8 +1,6 @@
-package com.itsm.backend.event.controller;
+package com.itsm.backend.event;
 
 import com.itsm.backend.auth.SecurityUtils;
-import com.itsm.backend.event.dto.EventResponse;
-import com.itsm.backend.event.service.EventService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;

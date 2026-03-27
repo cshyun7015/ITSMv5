@@ -7,38 +7,38 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/services")
 @CrossOrigin(origins = "*")
-public class ServiceRequestController {
+public class ServiceController {
 
-    private final ServiceRequestService serviceRequestService;
+    private final ServiceService serviceService;
 
-    public ServiceRequestController(ServiceRequestService serviceRequestService) {
-        this.serviceRequestService = serviceRequestService;
+    public ServiceController(ServiceService serviceService) {
+        this.serviceService = serviceService;
     }
 
     @GetMapping
-    public List<ServiceRequest> getServices() {
+    public List<Service> getServices() {
         String companyId = SecurityUtils.getCurrentCompanyId();
-        return serviceRequestService.getServicesByCompany(companyId);
+        return serviceService.getServicesByCompany(companyId);
     }
 
     @PostMapping
-    public ServiceRequest createService(@RequestBody ServiceRequest serviceRequest) {
+    public Service createService(@RequestBody Service service) {
         String companyId = SecurityUtils.getCurrentCompanyId();
-        return serviceRequestService.createService(serviceRequest, companyId);
+        return serviceService.createService(service, companyId);
     }
 
     @GetMapping("/{id}/dependencies")
     public List<ServiceDependency> getDependencies(@PathVariable Long id) {
-        return serviceRequestService.getDependencies(id);
+        return serviceService.getDependencies(id);
     }
 
     @PostMapping("/{id}/dependencies")
     public void updateDependencies(@PathVariable Long id, @RequestBody List<Long> assetIds) {
-        serviceRequestService.updateDependencies(id, assetIds);
+        serviceService.updateDependencies(id, assetIds);
     }
 
     @GetMapping("/bia/{assetId}")
-    public List<ServiceRequest> getImpactedServices(@PathVariable Long assetId) {
-        return serviceRequestService.getImpactedServices(assetId);
+    public List<Service> getImpactedServices(@PathVariable Long assetId) {
+        return serviceService.getImpactedServices(assetId);
     }
 }

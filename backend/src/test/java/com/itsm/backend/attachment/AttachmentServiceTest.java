@@ -1,8 +1,8 @@
 package com.itsm.backend.attachment;
 
-import com.itsm.backend.tenant.Tenant;
-import com.itsm.backend.tenant.User;
-import com.itsm.backend.tenant.UserRepository;
+import com.itsm.backend.admin.company.Company;
+import com.itsm.backend.admin.user.User;
+import com.itsm.backend.admin.user.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -45,19 +45,19 @@ class AttachmentServiceTest {
         // Given
         MockMultipartFile file = new MockMultipartFile("file", "test.txt", "text/plain", "Hello".getBytes());
         String uploaderId = "user1";
-        String tenantId = "tenant1";
+        String companyId = "tenant1";
         
-        Tenant tenant = new Tenant();
-        tenant.setTenantId(tenantId);
+        Company company = new Company();
+        company.setCompanyId(companyId);
         User uploader = new User();
         uploader.setUserId(uploaderId);
-        uploader.setTenant(tenant);
+        uploader.setCompany(company);
 
         when(userRepository.findById(uploaderId)).thenReturn(Optional.of(uploader));
         when(attachmentRepository.save(any(Attachment.class))).thenAnswer(i -> i.getArguments()[0]);
 
         // When
-        Attachment stored = attachmentService.storeFile(file, "SERVICE_REQUEST", "SR-001", uploaderId, tenantId);
+        Attachment stored = attachmentService.storeFile(file, "SERVICE_REQUEST", "SR-001", uploaderId, companyId);
 
         // Then
         assertNotNull(stored);

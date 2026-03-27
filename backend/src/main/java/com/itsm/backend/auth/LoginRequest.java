@@ -1,4 +1,4 @@
-package com.itsm.backend.auth.dto;
+package com.itsm.backend.auth;
 
 import lombok.Getter;
 import lombok.Setter;

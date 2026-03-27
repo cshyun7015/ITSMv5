@@ -1,6 +1,5 @@
-package com.itsm.backend.problem.repository;
+package com.itsm.backend.problem;
 
-import com.itsm.backend.problem.entity.Problem;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package com.itsm.backend.change.dto;
+package com.itsm.backend.change;
 
 import lombok.Builder;
 import lombok.Getter;

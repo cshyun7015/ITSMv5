@@ -1,7 +1,5 @@
-package com.itsm.backend.asset.mapper;
+package com.itsm.backend.asset;
 
-import com.itsm.backend.asset.entity.Asset;
-import com.itsm.backend.asset.dto.AssetResponse;
 import org.springframework.stereotype.Component;
 
 @Component

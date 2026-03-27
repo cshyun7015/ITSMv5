@@ -1,4 +1,4 @@
-package com.itsm.backend.admin.company.dto;
+package com.itsm.backend.admin.user;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -1,7 +1,5 @@
-package com.itsm.backend.problem.mapper;
+package com.itsm.backend.problem;
 
-import com.itsm.backend.problem.entity.Problem;
-import com.itsm.backend.problem.dto.ProblemResponse;
 import org.springframework.stereotype.Component;
 
 @Component

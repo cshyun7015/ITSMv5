@@ -1,7 +1,5 @@
-package com.itsm.backend.change.mapper;
+package com.itsm.backend.change;
 
-import com.itsm.backend.change.entity.Change;
-import com.itsm.backend.change.dto.ChangeResponse;
 import org.springframework.stereotype.Component;
 
 @Component

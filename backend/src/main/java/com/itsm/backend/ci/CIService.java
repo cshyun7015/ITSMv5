@@ -1,11 +1,7 @@
-package com.itsm.backend.ci.service;
+package com.itsm.backend.ci;
 
-import com.itsm.backend.ci.dto.CIResponse;
-import com.itsm.backend.ci.entity.ConfigurationItem;
-import com.itsm.backend.ci.mapper.CIMapper;
-import com.itsm.backend.ci.repository.CIRepository;
-import com.itsm.backend.company.Company;
-import com.itsm.backend.company.CompanyRepository;
+import com.itsm.backend.admin.company.Company;
+import com.itsm.backend.admin.company.CompanyRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,13 +30,13 @@ public class CIService {
     }
 
     @Transactional
-    public CIResponse createCI(ConfigurationItem ci, String companyId) {
+    public CIResponse createCI(CI ci, String companyId) {
         Company company = companyRepository.findById(companyId).orElseThrow();
         ci.setCompany(company);
         ci.setCompanyId(companyId);
         if (ci.getStatus() == null) ci.setStatus("CI_ACTIVE");
         
-        ConfigurationItem saved = ciRepository.save(ci);
+        CI saved = ciRepository.save(ci);
         return ciMapper.toResponse(saved);
     }
 }

@@ -1,6 +1,5 @@
-package com.itsm.backend.servicecatalog.repository;
+package com.itsm.backend.servicecatalog;
 
-import com.itsm.backend.servicecatalog.entity.ServiceCatalog;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

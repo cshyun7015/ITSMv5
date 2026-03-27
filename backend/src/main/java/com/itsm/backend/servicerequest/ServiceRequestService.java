@@ -1,15 +1,9 @@
-package com.itsm.backend.request.service;
+package com.itsm.backend.servicerequest;
 
-import com.itsm.backend.servicecatalog.entity.ServiceCatalog;
-import com.itsm.backend.servicecatalog.repository.ServiceCatalogRepository;
-import com.itsm.backend.request.dto.CreateServiceRequestDTO;
-import com.itsm.backend.request.dto.ServiceRequestResponse;
-import com.itsm.backend.request.dto.UpdateServiceRequestDTO;
-import com.itsm.backend.request.entity.ServiceRequest;
-import com.itsm.backend.request.mapper.ServiceRequestMapper;
-import com.itsm.backend.request.repository.ServiceRequestRepository;
+import com.itsm.backend.servicecatalog.ServiceCatalog;
+import com.itsm.backend.servicecatalog.ServiceCatalogRepository;
 import com.itsm.backend.admin.user.User;
-import com.itsm.backend.company.UserRepository;
+import com.itsm.backend.admin.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

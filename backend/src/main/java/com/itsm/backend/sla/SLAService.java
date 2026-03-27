@@ -1,11 +1,7 @@
-package com.itsm.backend.sla.service;
+package com.itsm.backend.sla;
 
-import com.itsm.backend.sla.dto.SLAResponse;
-import com.itsm.backend.sla.entity.SLA;
-import com.itsm.backend.sla.mapper.SLAMapper;
-import com.itsm.backend.sla.repository.SLARepository;
-import com.itsm.backend.company.Company;
-import com.itsm.backend.company.CompanyRepository;
+import com.itsm.backend.admin.company.Company;
+import com.itsm.backend.admin.company.CompanyRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

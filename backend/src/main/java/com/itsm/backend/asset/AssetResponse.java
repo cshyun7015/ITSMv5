@@ -1,4 +1,4 @@
-package com.itsm.backend.asset.dto;
+package com.itsm.backend.asset;
 
 import lombok.Builder;
 import lombok.Getter;

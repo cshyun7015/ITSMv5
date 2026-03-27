@@ -1,12 +1,10 @@
-package com.itsm.backend.knowledge.mapper;
+package com.itsm.backend.knowledge;
 
-import com.itsm.backend.knowledge.dto.KnowledgeResponse;
-import com.itsm.backend.knowledge.entity.KnowledgeArticle;
 import org.springframework.stereotype.Component;
 
 @Component
 public class KnowledgeMapper {
-    public KnowledgeResponse toResponse(KnowledgeArticle article) {
+    public KnowledgeResponse toResponse(Knowledge article) {
         return KnowledgeResponse.builder()
                 .id(article.getId())
                 .title(article.getTitle())

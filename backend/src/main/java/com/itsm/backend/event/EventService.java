@@ -1,13 +1,9 @@
-package com.itsm.backend.event.service;
+package com.itsm.backend.event;
 
-import com.itsm.backend.event.entity.Event;
-import com.itsm.backend.event.dto.EventResponse;
-import com.itsm.backend.event.mapper.EventMapper;
-import com.itsm.backend.event.repository.EventRepository;
-import com.itsm.backend.incident.entity.Incident;
-import com.itsm.backend.incident.service.IncidentService;
-import com.itsm.backend.company.Company;
-import com.itsm.backend.company.CompanyRepository;
+import com.itsm.backend.incident.Incident;
+import com.itsm.backend.incident.IncidentService;
+import com.itsm.backend.admin.company.Company;
+import com.itsm.backend.admin.company.CompanyRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

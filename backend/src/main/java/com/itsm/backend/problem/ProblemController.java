@@ -1,9 +1,6 @@
-package com.itsm.backend.problem.controller;
+package com.itsm.backend.problem;
 
 import com.itsm.backend.auth.SecurityUtils;
-import com.itsm.backend.problem.dto.ProblemResponse;
-import com.itsm.backend.problem.entity.Problem;
-import com.itsm.backend.problem.service.ProblemService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

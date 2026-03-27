@@ -1,7 +1,5 @@
-package com.itsm.backend.incident.mapper;
+package com.itsm.backend.incident;
 
-import com.itsm.backend.incident.entity.Incident;
-import com.itsm.backend.incident.dto.IncidentResponse;
 import org.springframework.stereotype.Component;
 
 @Component

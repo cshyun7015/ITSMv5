@@ -1,7 +1,7 @@
 package com.itsm.backend.servicedependency;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.itsm.backend.company.Company;
+import com.itsm.backend.admin.company.Company;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDateTime;
@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "tb_it_service")
 @Data
-public class ServiceRequest {
+public class Service {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

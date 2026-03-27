@@ -1,4 +1,4 @@
-package com.itsm.backend.event.dto;
+package com.itsm.backend.event;
 
 import lombok.Builder;
 import lombok.Getter;

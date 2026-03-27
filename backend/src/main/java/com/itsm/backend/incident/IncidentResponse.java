@@ -1,4 +1,4 @@
-package com.itsm.backend.incident.dto;
+package com.itsm.backend.incident;
 
 import lombok.Builder;
 import lombok.Getter;

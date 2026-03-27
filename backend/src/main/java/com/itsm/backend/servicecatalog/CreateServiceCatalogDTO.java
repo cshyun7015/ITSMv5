@@ -1,4 +1,4 @@
-package com.itsm.backend.servicecatalog.dto;
+package com.itsm.backend.servicecatalog;
 
 import lombok.Getter;
 import lombok.Setter;

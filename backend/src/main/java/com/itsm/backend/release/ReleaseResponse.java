@@ -1,4 +1,4 @@
-package com.itsm.backend.release.dto;
+package com.itsm.backend.release;
 
 import lombok.Builder;
 import lombok.Getter;

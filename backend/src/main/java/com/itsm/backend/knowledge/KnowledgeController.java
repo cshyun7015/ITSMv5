@@ -1,8 +1,5 @@
-package com.itsm.backend.knowledge.controller;
+package com.itsm.backend.knowledge;
 
-import com.itsm.backend.knowledge.dto.KnowledgeRequest;
-import com.itsm.backend.knowledge.dto.KnowledgeResponse;
-import com.itsm.backend.knowledge.service.KnowledgeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 

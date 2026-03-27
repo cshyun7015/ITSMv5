@@ -1,12 +1,8 @@
-package com.itsm.backend.incident.service;
+package com.itsm.backend.incident;
 
-import com.itsm.backend.incident.dto.IncidentResponse;
-import com.itsm.backend.incident.entity.Incident;
-import com.itsm.backend.incident.mapper.IncidentMapper;
-import com.itsm.backend.incident.repository.IncidentRepository;
 import com.itsm.backend.notification.NotificationService;
-import com.itsm.backend.admin.company.entity.User;
-import com.itsm.backend.company.UserRepository;
+import com.itsm.backend.admin.user.User;
+import com.itsm.backend.admin.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

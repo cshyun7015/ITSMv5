@@ -1,4 +1,4 @@
-package com.itsm.backend.problem.dto;
+package com.itsm.backend.problem;
 
 import lombok.Builder;
 import lombok.Getter;

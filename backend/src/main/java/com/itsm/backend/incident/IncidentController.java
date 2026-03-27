@@ -1,17 +1,11 @@
-package com.itsm.backend.incident.controller;
+package com.itsm.backend.incident;
 
 import com.itsm.backend.auth.SecurityUtils;
-import com.itsm.backend.incident.dto.IncidentResponse;
-import com.itsm.backend.incident.entity.Incident;
-import com.itsm.backend.incident.mapper.IncidentMapper;
-import com.itsm.backend.incident.repository.IncidentRepository;
-import com.itsm.backend.incident.service.IncidentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/incidents")

@@ -1,11 +1,7 @@
-package com.itsm.backend.release.service;
+package com.itsm.backend.release;
 
-import com.itsm.backend.release.dto.ReleaseResponse;
-import com.itsm.backend.release.entity.Release;
-import com.itsm.backend.release.mapper.ReleaseMapper;
-import com.itsm.backend.release.repository.ReleaseRepository;
-import com.itsm.backend.company.Company;
-import com.itsm.backend.company.CompanyRepository;
+import com.itsm.backend.admin.company.Company;
+import com.itsm.backend.admin.company.CompanyRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

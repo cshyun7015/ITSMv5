@@ -1,7 +1,5 @@
-package com.itsm.backend.servicecatalog.mapper;
+package com.itsm.backend.servicecatalog;
 
-import com.itsm.backend.servicecatalog.entity.ServiceCatalog;
-import com.itsm.backend.servicecatalog.dto.ServiceCatalogResponse;
 import com.itsm.backend.admin.company.Company;
 import org.springframework.stereotype.Component;
 

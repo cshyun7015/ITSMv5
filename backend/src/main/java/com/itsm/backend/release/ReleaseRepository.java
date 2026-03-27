@@ -1,6 +1,5 @@
-package com.itsm.backend.release.repository;
+package com.itsm.backend.release;
 
-import com.itsm.backend.release.entity.Release;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 

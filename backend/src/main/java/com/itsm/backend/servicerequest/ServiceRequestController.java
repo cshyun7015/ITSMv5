@@ -1,10 +1,6 @@
-package com.itsm.backend.request.controller;
+package com.itsm.backend.servicerequest;
 
 import com.itsm.backend.auth.SecurityUtils;
-import com.itsm.backend.request.dto.CreateServiceRequestDTO;
-import com.itsm.backend.request.dto.ServiceRequestResponse;
-import com.itsm.backend.request.dto.UpdateServiceRequestDTO;
-import com.itsm.backend.request.service.ServiceRequestService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

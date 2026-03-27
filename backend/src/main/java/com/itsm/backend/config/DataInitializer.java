@@ -1,21 +1,21 @@
 package com.itsm.backend.config;
 
-import com.itsm.backend.company.Company;
-import com.itsm.backend.company.entity.User;
-import com.itsm.backend.code.CommonCode;
-import com.itsm.backend.servicecatalog.entity.ServiceCatalog;
-import com.itsm.backend.servicecatalog.repository.ServiceCatalogRepository;
-import com.itsm.backend.knowledge.KnowledgeArticle;
-import com.itsm.backend.knowledge.KnowledgeArticleRepository;
-import com.itsm.backend.request.entity.ServiceRequest;
-import com.itsm.backend.request.repository.ServiceRequestRepository;
+import com.itsm.backend.admin.company.Company;
+import com.itsm.backend.admin.user.User;
+import com.itsm.backend.admin.commoncode.CommonCode;
+import com.itsm.backend.servicecatalog.ServiceCatalog;
+import com.itsm.backend.servicecatalog.ServiceCatalogRepository;
+import com.itsm.backend.knowledge.Knowledge;
+import com.itsm.backend.knowledge.KnowledgeRepository;
+import com.itsm.backend.servicerequest.ServiceRequest;
+import com.itsm.backend.servicerequest.ServiceRequestRepository;
 import com.itsm.backend.incident.Incident;
 import com.itsm.backend.incident.IncidentRepository;
-import com.itsm.backend.change.entity.Change;
-import com.itsm.backend.change.repository.ChangeRepository;
-import com.itsm.backend.company.UserRepository;
-import com.itsm.backend.asset.entity.Asset;
-import com.itsm.backend.asset.repository.AssetRepository;
+import com.itsm.backend.change.Change;
+import com.itsm.backend.change.ChangeRepository;
+import com.itsm.backend.admin.user.UserRepository;
+import com.itsm.backend.asset.Asset;
+import com.itsm.backend.asset.AssetRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +29,7 @@ public class DataInitializer implements CommandLineRunner {
     @Autowired private EntityManager em;
     @Autowired private UserRepository userRepository;
     @Autowired private ServiceCatalogRepository serviceCatalogRepository;
-    @Autowired private KnowledgeArticleRepository knowledgeArticleRepository;
+    @Autowired private KnowledgeRepository knowledgeArticleRepository;
     @Autowired private ServiceRequestRepository serviceRequestRepository;
     @Autowired private IncidentRepository incidentRepository;
     @Autowired private ChangeRepository changeRequestRepository;
@@ -274,7 +274,7 @@ public class DataInitializer implements CommandLineRunner {
                     "# 재택근무 보안 수칙\n\n1. 반드시 VPN 연결 후 업무 시스템 접근\n2. 공용 Wi-Fi 사용 금지\n3. 화면 자동 잠금 설정 (5분)\n4. 업무용 PC로 개인 SNS 접속 자제\n5. 의심스러운 이메일 첨부파일 클릭 금지\n6. USB 드라이브 보안 정책 준수\n7. 화상 통화 시 배경 확인 (민감 정보 노출 방지)\n8. 소프트웨어 임의 설치 금지 (IT 승인 필요)\n9. 업무 종료 후 PC 종료\n10. 보안 인시던트 발생 시 즉시 helpdesk@corp.local 신고"},
             };
             for (Object[] kba : kbas) {
-                KnowledgeArticle a = new KnowledgeArticle();
+                Knowledge a = new Knowledge();
                 a.setTitle((String) kba[0]); a.setCategory((String) kba[1]);
                 a.setViewCount((int) kba[2]); a.setContent((String) kba[3]);
                 a.setCompany(companyA); a.setAuthor(admin);
