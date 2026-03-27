@@ -1,4 +1,4 @@
-export interface Event {
+export type Event = {
   id: number;
   alertName: string;
   status: string;
@@ -9,7 +9,7 @@ export interface Event {
   timestamp: string;
   linkedIncidentId: number | null;
   companyId?: string;
-}
+};
 
 export type EventSeverity = 'critical' | 'warning' | 'info';
 export type EventStatus = 'firing' | 'resolved';

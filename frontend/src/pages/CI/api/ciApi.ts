@@ -1,4 +1,4 @@
-import { CI, CICreateRequest } from '../types';
+import type { CI, CICreateRequest } from '../types';
 
 const getHeaders = () => {
   const token = localStorage.getItem('itsm_token');

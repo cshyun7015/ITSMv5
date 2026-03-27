@@ -1,4 +1,4 @@
-export interface Problem {
+export type Problem = {
   id: number;
   title: string;
   description: string;
@@ -8,16 +8,16 @@ export interface Problem {
   priority: ProblemPriority;
   createdAt: string;
   companyId: string;
-}
+};
 
 export type ProblemStatus = 'OPEN' | 'INVESTIGATING' | 'RESOLVED' | 'CLOSED';
 export type ProblemPriority = 'Critical' | 'High' | 'Medium' | 'Low';
 
-export interface ProblemCreateRequest {
+export type ProblemCreateRequest = {
   title: string;
   description: string;
   priority: string;
   rootCause: string;
   workaround: string;
   status: string;
-}
+};

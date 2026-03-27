@@ -1,5 +1,5 @@
 import React from 'react';
-import { KnowledgeArticle } from '../types';
+import type { KnowledgeArticle } from '../types';
 
 interface Props {
   article: KnowledgeArticle;

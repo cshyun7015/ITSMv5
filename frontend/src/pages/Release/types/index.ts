@@ -1,4 +1,4 @@
-export interface Release {
+export type Release = {
   id: number;
   companyId: string;
   title: string;
@@ -8,7 +8,7 @@ export interface Release {
   targetDate: string | null;
   createdAt: string;
   updatedAt: string;
-}
+};
 
 export type ReleaseStatus = 
   | 'REL_PLANNED' 
@@ -18,9 +18,9 @@ export type ReleaseStatus =
   | 'REL_COMPLETED' 
   | 'REL_ROLLED_BACK';
 
-export interface ReleaseCreateRequest {
+export type ReleaseCreateRequest = {
   title: string;
   description: string;
   releaseType: string;
   targetDate?: string;
-}
+};

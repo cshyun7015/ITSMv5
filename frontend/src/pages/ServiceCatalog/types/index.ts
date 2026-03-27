@@ -1,4 +1,4 @@
-export interface ServiceCatalog {
+export type ServiceCatalog = {
   id: number;
   catalogName: string;
   description: string;
@@ -10,11 +10,11 @@ export interface ServiceCatalog {
     companyId: string;
     companyName: string;
   };
-}
+};
 
-export interface FormField {
+export type FormField = {
   name: string;
   label: string;
   type: 'text' | 'number' | 'textarea' | 'select' | 'checkbox';
   options?: string[];
-}
+};

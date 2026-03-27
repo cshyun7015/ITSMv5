@@ -1,4 +1,4 @@
-import { Event } from '../types';
+import type { Event } from '../types';
 
 const getHeaders = () => {
   const token = localStorage.getItem('itsm_token');

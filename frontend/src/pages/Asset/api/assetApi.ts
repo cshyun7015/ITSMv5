@@ -1,4 +1,4 @@
-import { Asset, AssetCreateRequest } from '../types';
+import type { Asset, AssetCreateRequest } from '../types';
 
 const getHeaders = () => {
   const token = localStorage.getItem('itsm_token');

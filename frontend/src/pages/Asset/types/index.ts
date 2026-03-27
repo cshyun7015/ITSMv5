@@ -1,4 +1,4 @@
-export interface Asset {
+export type Asset = {
   id: number;
   name: string;
   type: string;
@@ -13,9 +13,9 @@ export interface Asset {
   companyId: string;
   createdAt: string;
   updatedAt: string;
-}
+};
 
-export interface AssetCreateRequest {
+export type AssetCreateRequest = {
   name: string;
   type: string;
   status: string;
@@ -24,4 +24,4 @@ export interface AssetCreateRequest {
   manufacturer?: string;
   location?: string;
   specifications?: string;
-}
+};

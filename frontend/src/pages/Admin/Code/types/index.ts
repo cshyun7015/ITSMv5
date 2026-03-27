@@ -1,15 +1,15 @@
-export interface CommonCode {
+export type CommonCode = {
   codeId: string;
   groupCode: string;
   codeName: string;
   sortOrder: number;
   isUse: boolean;
-}
+};
 
-export interface CommonCodeRequest {
+export type CommonCodeRequest = {
   codeId: string;
   groupCode: string;
   codeName: string;
   sortOrder: number;
   isUse: boolean;
-}
+};

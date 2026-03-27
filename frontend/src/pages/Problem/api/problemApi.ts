@@ -1,4 +1,4 @@
-import { Problem, ProblemCreateRequest } from '../types';
+import type { Problem, ProblemCreateRequest } from '../types';
 
 const getHeaders = () => {
   const token = localStorage.getItem('itsm_token');

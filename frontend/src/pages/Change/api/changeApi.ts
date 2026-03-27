@@ -1,4 +1,4 @@
-import { Change, ChangeCreateRequest } from '../types';
+import type { Change, ChangeCreateRequest } from '../types';
 
 const getHeaders = () => {
   const token = localStorage.getItem('itsm_token');

@@ -1,4 +1,4 @@
-export interface Change {
+export type Change = {
   id: number;
   companyId: string;
   requesterId: string;
@@ -17,7 +17,7 @@ export interface Change {
   plannedEnd: string | null;
   createdAt: string;
   updatedAt: string;
-}
+};
 
 export type ChangeStatus = 
   | 'CHG_DRAFT' 
@@ -28,7 +28,7 @@ export type ChangeStatus =
   | 'CHG_IMPLEMENTING' 
   | 'CHG_CLOSED';
 
-export interface ChangeCreateRequest {
+export type ChangeCreateRequest = {
   title: string;
   description: string;
   changeReason: string;
@@ -41,4 +41,4 @@ export interface ChangeCreateRequest {
   priority: string;
   plannedStart?: string;
   plannedEnd?: string;
-}
+};

@@ -1,4 +1,4 @@
-import { Release, ReleaseCreateRequest } from '../types';
+import type { Release, ReleaseCreateRequest } from '../types';
 
 const getHeaders = () => {
   const token = localStorage.getItem('itsm_token');

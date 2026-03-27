@@ -1,4 +1,4 @@
-import { Incident, IncidentCreateRequest } from '../types';
+import type { Incident, IncidentCreateRequest } from '../types';
 
 const getHeaders = () => {
   const token = localStorage.getItem('itsm_token');

@@ -3,7 +3,7 @@ import { useKnowledge } from './hooks/useKnowledge';
 import KnowledgeSearchBar from './components/KnowledgeSearchBar';
 import KnowledgeArticleCard from './components/KnowledgeArticleCard';
 import KnowledgeDetail from './components/KnowledgeDetail';
-import { KnowledgeArticle } from './types';
+import type { KnowledgeArticle } from './types';
 
 const KnowledgePage: React.FC<{ user: any }> = ({ user }) => {
   const { articles, loading, error, fetchArticles } = useKnowledge(user.companyId);

@@ -4,6 +4,10 @@
 
 @layer base {
   body {
-    @apply bg-background text-gray-300 antialiased font-sans m-0 p-0;
+    /* @apply bg-background text-gray-300 antialiased font-sans m-0 p-0; */
+    background-color: #121212;
+    color: #e0e0e0;
+    margin: 0;
+    padding: 0;
   }
 }

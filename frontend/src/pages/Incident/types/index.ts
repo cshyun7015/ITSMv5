@@ -1,4 +1,4 @@
-export interface Incident {
+export type Incident = {
   id: number;
   companyId: string;
   reporterId: string;
@@ -11,16 +11,16 @@ export interface Incident {
   assetId: number | null;
   createdAt: string;
   resolvedAt: string | null;
-}
+};
 
 export type IncidentStatus = 'INC_OPEN' | 'INC_IN_PROGRESS' | 'INC_RESOLVED' | 'INC_CLOSED';
 export type IncidentPriority = 'Critical' | 'High' | 'Medium' | 'Low';
 
-export interface IncidentCreateRequest {
+export type IncidentCreateRequest = {
   title: string;
   description: string;
   priority: string;
   impact: string;
   assetId?: string;
   reporterId: string;
-}
+};

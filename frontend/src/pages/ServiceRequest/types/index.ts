@@ -1,26 +1,26 @@
 export type SRStatus = 'OPEN' | 'ASSIGNED' | 'IN_PROGRESS' | 'RESOLVED' | 'CLOSED' | 'CANCELED';
 export type SRPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'EMERGENCY';
 
-export interface User {
+export type User = {
   userId: number;
   userName: string;
   email: string;
   role: string;
-}
+};
 
-export interface Company {
+export type Company = {
   id: number;
   companyName: string;
-}
+};
 
-export interface Catalog {
+export type Catalog = {
   id: number;
   catalogName: string;
   category: string;
   icon?: string;
-}
+};
 
-export interface ServiceRequest {
+export type ServiceRequest = {
   id: number;
   title: string;
   description: string;
@@ -34,20 +34,20 @@ export interface ServiceRequest {
   catalog?: Catalog;
   createdAt: string;
   updatedAt: string;
-}
+};
 
-export interface ServiceRequestListResponse {
+export type ServiceRequestListResponse = {
   content: ServiceRequest[];
   totalPages: number;
   totalElements: number;
   size: number;
   number: number;
-}
+};
 
-export interface ServiceRequestFilters {
+export type ServiceRequestFilters = {
   search: string;
   status: string;
   page: number;
   size: number;
   sort: string;
-}
+};

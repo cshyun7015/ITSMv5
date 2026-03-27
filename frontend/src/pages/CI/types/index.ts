@@ -1,4 +1,4 @@
-export interface CI {
+export type CI = {
   id: number;
   companyId: string;
   name: string;
@@ -9,13 +9,13 @@ export interface CI {
   specifications?: string;
   createdAt: string;
   updatedAt: string;
-}
+};
 
-export interface CICreateRequest {
+export type CICreateRequest = {
   name: string;
   type: string;
   status: string;
   model?: string;
   location?: string;
   specifications?: string;
-}
+};

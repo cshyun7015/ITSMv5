@@ -1,4 +1,4 @@
-import { SLA, SLACreateRequest } from '../types';
+import type { SLA, SLACreateRequest } from '../types';
 
 const getHeaders = () => {
   const token = localStorage.getItem('itsm_token');
