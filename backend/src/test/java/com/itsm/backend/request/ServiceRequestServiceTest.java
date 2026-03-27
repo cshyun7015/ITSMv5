@@ -1,7 +1,7 @@
 package com.itsm.backend.request;
 
-import com.itsm.backend.catalog.ServiceCatalog;
-import com.itsm.backend.catalog.ServiceCatalogRepository;
+import com.itsm.backend.servicecatalog.ServiceCatalog;
+import com.itsm.backend.servicecatalog.ServiceCatalogRepository;
 import com.itsm.backend.notification.NotificationService;
 import com.itsm.backend.tenant.Tenant;
 import com.itsm.backend.tenant.User;

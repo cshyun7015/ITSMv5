@@ -18,14 +18,14 @@ public class ItServiceController {
 
     @GetMapping
     public List<ItService> getServices() {
-        String tenantId = SecurityUtils.getCurrentTenantId();
-        return itServiceService.getServicesByTenant(tenantId);
+        String companyId = SecurityUtils.getCurrentCompanyId();
+        return itServiceService.getServicesByCompany(companyId);
     }
 
     @PostMapping
     public ItService createService(@RequestBody ItService itService) {
-        String tenantId = SecurityUtils.getCurrentTenantId();
-        return itServiceService.createService(itService, tenantId);
+        String companyId = SecurityUtils.getCurrentCompanyId();
+        return itServiceService.createService(itService, companyId);
     }
 
     @GetMapping("/{id}/dependencies")

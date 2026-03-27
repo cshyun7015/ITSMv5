@@ -2,7 +2,7 @@ package com.itsm.backend.dashboard;
 
 import com.itsm.backend.auth.SecurityUtils;
 import com.itsm.backend.incident.IncidentRepository;
-import com.itsm.backend.request.ServiceRequestRepository;
+import com.itsm.backend.request.repository.ServiceRequestRepository;
 import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
@@ -21,7 +21,7 @@ public class DashboardController {
 
     @GetMapping("/stats")
     public Map<String, Object> getStats() {
-        String tenantId = SecurityUtils.getCurrentTenantId();
+        String companyId = SecurityUtils.getCurrentCompanyId();
         String role = SecurityUtils.getCurrentRole();
         boolean isAdmin = "ROLE_ADMIN".equals(role);
 
@@ -35,10 +35,10 @@ public class DashboardController {
             activeIncidents  = incidentRepository.countByStatusNot("INC_CLOSED");
         } else {
             // 일반 사용자: 자신이 속한 테넌트만
-            openTickets      = requestRepository.countByTenant_TenantIdAndStatus(tenantId, "REQ_STATUS_OPEN");
-            inProgress       = requestRepository.countByTenant_TenantIdAndStatus(tenantId, "REQ_STATUS_IN_PROGRESS");
-            resolved         = requestRepository.countByTenant_TenantIdAndStatus(tenantId, "REQ_STATUS_RESOLVED");
-            activeIncidents  = incidentRepository.countByTenantIdAndStatusNot(tenantId, "INC_CLOSED");
+            openTickets      = requestRepository.countByCompany_CompanyIdAndStatus(companyId, "REQ_STATUS_OPEN");
+            inProgress       = requestRepository.countByCompany_CompanyIdAndStatus(companyId, "REQ_STATUS_IN_PROGRESS");
+            resolved         = requestRepository.countByCompany_CompanyIdAndStatus(companyId, "REQ_STATUS_RESOLVED");
+            activeIncidents  = incidentRepository.countByCompanyIdAndStatusNot(companyId, "INC_CLOSED");
         }
 
         long total = openTickets + inProgress + resolved;

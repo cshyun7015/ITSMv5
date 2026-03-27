@@ -4,18 +4,18 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 /**
- * Utility to extract tenantId and userId from the JWT-populated SecurityContext.
- * Use this in ALL controllers instead of @RequestParam String tenantId.
+ * Utility to extract companyId and userId from the JWT-populated SecurityContext.
+ * Use this in ALL controllers instead of @RequestParam String companyId.
  */
 @Component
 public class SecurityUtils {
 
-    public static String getCurrentTenantId() {
+    public static String getCurrentCompanyId() {
         var auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth instanceof TenantAwareAuthentication taa) {
-            return taa.getTenantId();
+        if (auth instanceof CompanyAwareAuthentication taa) {
+            return taa.getCompanyId();
         }
-        throw new IllegalStateException("No tenant information found in security context");
+        throw new IllegalStateException("No company information found in security context");
     }
 
     public static String getCurrentUserId() {

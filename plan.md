@@ -15,6 +15,7 @@
 * **H/W 및 OS**: Mac Mini M4 (개발), Linux (운영 타겟 환경)
 * **인프라/컨테이너**: 로컬 종속성(Node.js, JDK 등) 없이 **Docker 및 docker-compose** 기반으로 Frontend, Backend 빌드와 구동을 100% 컨테이너화하여 일관성 보장
 * **Frontend**: Node.js 기반 프레임워크 (Vite + React.js / Vue.js 등) - Dockerfile(Multi-stage)을 통한 빌드 및 배포
+  * **해상도**: **1280 * 1024** 해상도에 최적화, 더 큰 화면에서는 자동 확장(Auto) 지원
   * **UI/UX 디자인**: 최근 트렌드를 반영한 가독성 높고 세련된 **엣지 있는(Edgy) 다크 모드(Dark Theme)** 기본 적용
   * **스타일링**: TailwindCSS 또는 최신 UI 컴포넌트 라이브러리를 활용해 고급스럽고 직관적인 인터페이스 구축
 * **Backend**: Java 17+ & Spring Boot 3.x - Dockerfile(Gradle build)을 통한 컨테이너 환경 빌드 및 실행
@@ -39,61 +40,65 @@
 
 초기에는 가장 수요가 높은 `서비스 요청 관리`를 집중 개발하되, 이후 ITIL v5의 핵심 프랙티스들을 포괄하는 통합 ITSM 솔루션으로 전체 기능을 확장합니다.
 
-**1) 시스템 관리 (System Administration)**
-* **목표**: 다중 고객사(MSP) 기반 시스템 운영을 위한 기초 데이터를 최적화하고 전체 권한을 통제
-* **액티비티**: 테넌트(고객사)/조직/부서 등록 -> 사용자 및 역할(RBAC) 부여 -> 프로세스 상태 값, 분류 카테고리 등 공통 코드 집중 관리
+**1) 대시보드 (Dashboard)**
+* **목표**: 방대한 IT 운영 상황, SLA 달성 건전성, 개별 티켓 현황에 대한 빠르고 직관적인 통합 시각화 기능 제공
+* **액티비티**: 사용자 권한(전체 관리자/에이전트/일반 사용자)별 맞춤형 레이아웃 및 위젯(Widget) 동적 매핑 구성 -> 파이 차트, 바 차트 기반의 미결/지연 티켓 통계 그래픽 렌더링 -> 정기/비정기 기간별 실적 리포트(CSV, PDF 포맷) 내보내기 기능 지원
 
-**2) 서비스 카탈로그 관리 (Service Catalog Management)**
+**2) 나의 요청 항목 (My Requests)**
+* **목표**: 개별 사용자가 요청한 서비스 항목의 진행 상태를 실시간으로 확인하고 후속 조치(추가 정보 입력, 피드백 등)를 수행
+* **액티비티**: 내가 신청한 SR/장애 티켓 목록 조회 -> 진행 상태별 필터링 -> 승인 대기 또는 추가 정보 요청 건에 대한 응답 및 대화 기능
+
+**3) 서비스 카탈로그 (Service Catalog)**
 * **목표**: 고객사 권한/등급에 맞게 제공 가능한 IT 서비스 포트폴리오를 표준화하여 게시
 * **액티비티**: 카탈로그 아이템 정의 및 카테고리화 -> 동적 입력 폼(Form) 구성 및 승인 결재선 지정 -> 사용자 웹 포털에 게시
 
-**3) 서비스 요청 관리 (Service Request Management) - 최우선 개발 타겟**
+**4) 서비스 요청 관리 (Service Request Management)**
 * **목표**: 사용자 요청(권한 신청, S/W 설치 등)의 최적화된 접수 및 표준 처리
-* **액티비티**: 카탈로그 아이템 선택 기반의 요청 등록 -> 사용자/문서 정보에 입각한 자동 할당 및 승인 처 -> 작업 수행 -> 완료 및 피드백 수집
+* **액티비티**: 카탈로그 아이템 선택 기반의 요청 등록 -> 사용자/문서 정보에 입각한 자동 할당 및 승인 처리 -> 작업 수행 -> 완료 및 피드백 수집
 
-**4) 이벤트 관리 (Event Management)**
+**5) 이벤트 관리 (Event Management)**
 * **목표**: 인프라 및 서비스 전반에서 발생하는 모든 상태 변화(이벤트)를 수집, 분류하고 불필요한 노이즈를 필터링
 * **액티비티**: 외부 모니터링 툴(Prometheus/Grafana 등)의 알람(Webhook) 수신 -> 로직에 따른 심각도 분류(Severity) 및 상관관계 분석 -> 임계치 초과 건은 '장애 티켓(Incident)'으로 연동/발행
 
-**5) 장애 관리 (Incident Management)**
+**6) 장애 관리 (Incident Management)**
 * **목표**: 예기치 않은 서비스 중단 또는 품질 저하를 최대한 빠르게 복구하여 비즈니스 영향을 최소화
 * **액티비티**: 사용자 직접 신고 접수 또는 이벤트 관리 자동 캡처 -> 티켓 우선순위(Urgency/Impact) 산정 -> 임시 해결책(Workaround) 적용 -> 빠른 서비스 정상화 및 종료 처리
 
-**6) 문제 관리 (Problem Management)**
+**7) 문제 관리 (Problem Management)**
 * **목표**: 인시던트의 근본 원인을 식별하고 재발 가능성을 근본적으로 차단
 * **액티비티**: 트렌드 분석을 통한 반복/대형 장애 식별 -> 근본 원인 분석(RCA, Root Cause Analysis) -> 알려진 오류(Known Error) 관리 및 DB 등재 -> 영구적 해결책(Permanent Fix) 패치 도출
 
-**7) 변경 관리 (Change Management)**
+**8) 변경 관리 (Change Management)**
 * **목표**: IT 서비스나 인프라 환경 변경 시 발생할 수 있는 비즈니스 위험 요소를 선제 파악 및 안전하게 통제
 * **액티비티**: 일반/표준/긴급 등 변경 유형에 따른 요청(RFC) 작성 -> 리스크 및 영향도 평가 진행 -> CAB(변경자문위원회) 회의 및 결재선 승인 
 
-**8) 릴리스 관리 (Release Management)**
+**9) 릴리스 관리 (Release Management)**
 * **목표**: 승인된 변경(Change) 사항을 실제 IT 서비스 운영 환경으로 안전하게 배포하고 무결성을 보장
 * **액티비티**: 릴리스 단위 및 패키지 구성 -> 배포(릴리스) 로드맵 및 장애 시 백업/롤백(Rollback) 계획 수립 -> 승인된 배포의 테스트 및 운영 적용 -> 적용 후 사후 검토(PIR)
 
-**9) 자산 관리 (IT Asset Management - ITAM)**
+**10) 서비스 수준 관리 (Service Level Management)**
+* **목표**: 다수 고객사(MSP 형태)와 체결한 SLA 품질 지표 달성 여부를 보증하고, IT 서비스 전반의 핵심 성과 지표(KPI)를 정량적으로 추적
+* **액티비티**: 고객사별/티켓 유형별 처리 제한 시간(Target Time) 정의 -> 실시간 SLA 준수율 모니터링 -> 처리 기한 도래/위반(Breach) 자동 알림 전송
+
+**11) 자산 관리 (Asset Management)**
 * **목표**: 하드웨어 리소스 및 소프트웨어 라이선스 등 전체 IT 자산의 비용, 조달, 계약 등 재무적/물리적 라이프사이클 통제
 * **액티비티**: 신규 자산 원장 DB 등록 -> 라이선스 할당 수량 및 유효성 추적 -> 재무 비용 및 협력사 유지보수 계약 관리(도입-운영-정비/감가상각-폐기)
 
-**10) 구성 관리 (Configuration Management - CMDB)**
+**12) 구성 관리 (Configuration Management)**
 * **목표**: IT 서비스 운영 파이프라인에 필요한 모든 구성요소(CI, Configuration Item)의 논리적 속성과 상호 의존성을 정확히 동기화 및 유지
 * **액티비티**: 구성 데이터(네트워크, 애플리케이션, 장비 모델 등) 스키마 정의 -> CI 간의 상호 의존성(Relationship) 토폴로지 맵 시각화 -> 변경 작업 전후의 자동화된 구성 스냅샷(정합성) 스캔 및 비교
 
-**11) 서비스 관리 (Service Management)**
+**13) 서비스 관리 (Service Management)**
 * **목표**: 비즈니스에 제공되는 IT 서비스를 논리적 최상위 단위로 정의하고, 이를 구성하는 하부 인프라(CI)와의 연관관계를 통합적으로 설계 및 통제
-* **액티비티**: IT 서비스 개념 정의 및 포트폴리오 등록 -> 서비스와 인프라 구성요소(CI: 서버, DB, 애플리케이션 등) 간의 종속성(Dependency) 매핑 -> 장애 발생 시 하위 CI에서 상위 서비스로 이어지는 비즈니스 영향도 분석(BIA) 뷰 제공
+* **액티비티**: IT 서비스 개념 정의 및 포트폴리오 등록 -> 서비스와 인프라 구성요소(CI: 서버, DB, 애플리케이션 등) 간의 종속성(Dependency) 매핑
 
-**12) 서비스 수준 및 측정 지표 관리 (Service Level & Measurement Management)**
-* **목표**: 다수 고객사(MSP 형태)와 체결한 SLA 품질 지표 달성 여부를 보증하고, IT 서비스 전반의 핵심 성과 지표(KPI)를 정량적으로 추적
-* **액티비티**: 고객사별/티켓 유형별 처리 제한 시간(Target Time) 정의 -> 실시간 SLA 준수율 모니터링 -> 처리 기한 도래/위반(Breach) 자동 알림 전송 -> 서비스 개선(CSI)을 위한 가동률, CSAT(고객 만족도) 등 다양한 성과 지표(Metrics) 통합 추출 및 평가
-
-**13) 지식 관리 (Knowledge Management)**
+**14) 지식 관리 (Knowledge Management)**
 * **목표**: 조직 내 성공 경험과 기술 문서 등 지식 자산을 효과적으로 수집/공유하여 작업자의 문제 해결 속도 극대화
 * **액티비티**: 성공적으로 해결 처리된 장애/요청 티켓의 지식 기반 문서(KBA) 이관 작업 -> 관리자 검토 및 승인 라인 통과 -> 사용자 지원 포털을 통한 자가 해결(Self-Service) 튜토리얼 지원
 
-**14) 대시보드 및 리포팅 (Dashboard & Reporting)**
-* **목표**: 방대한 IT 운영 상황, SLA 달성 건전성, 개별 티켓 현황에 대한 빠르고 직관적인 통합 시각화 기능 제공
-* **액티비티**: 사용자 권한(전체 관리자/에이전트/일반 사용자)별 맞춤형 레이아웃 및 위젯(Widget) 동적 매핑 구성 -> 파이 차트, 바 차트 기반의 미결/지연 티켓 통계 그래픽 렌더링 -> 정기/비정기 기간별 실적 리포트(CSV, PDF 포맷) 내보내기 기능 지원
+**15) 시스템 관리 (System Administration)**
+* **목표**: 다중 고객사(MSP) 기반 시스템 운영을 위한 기초 데이터를 최적화하고 전체 권한을 통제
+* **액티비티**: 테넌트(고객사)/조직/부서 등록 -> 사용자 및 역할(RBAC) 부여 -> 프로세스 상태 값, 분류 카테고리 등 공통 코드 집중 관리
 
 ### 3.4 모니터링 시스템 인터페이스
 * **API 메트릭 수집**: Spring Boot Actuator 및 Micrometer를 통해 자체적인 애플리케이션 상태 노출.
@@ -108,85 +113,7 @@
 
 시스템의 근간이 되는 핵심 테이블(테넌트, 사용자, 공통 코드, 요청 관리)에 대한 기본 속성 명세입니다. 다중 고객사 환경(MSP)을 위해 대부분의 테이블에 `tenant_id` 컬럼을 포함하여 데이터를 격리합니다.
 
-### 4.1 테넌트 (Tenant) 및 사용자 (User) 데이터
-| 테이블명 | 컬럼명 | 데이터 타입 | PK/FK | Null | 설명 |
-|---|---|---|:---:|:---:|---|
-| **tb_tenant** <br>(고객사/테넌트) | tenant_id | VARCHAR(50) | PK | N | 고객사 고유 식별자 |
-| | tenant_name | VARCHAR(100) | | N | 고객사명 (예: A기업, B기업) |
-| | tier | VARCHAR(20) | | N | 서비스 등급 (Free, Standard, Premium) |
-| | is_active | BOOLEAN | | N | 활성화 여부 |
-| | created_at | TIMESTAMP | | N | 생성일시 |
-| **tb_user** <br>(사용자) | user_id | VARCHAR(50) | PK | N | 사용자 고유 로그인 ID |
-| | tenant_id | VARCHAR(50) | FK | N | 소속 테넌트 ID |
-| | password | VARCHAR(255) | | N | 암호화된 비밀번호 |
-| | user_name | VARCHAR(100) | | N | 사용자 이름 |
-| | role | VARCHAR(20) | | N | 권한 (ADMIN, AGENT, USER) |
-| | email | VARCHAR(100) | | Y | 이메일 주소 |
 
-### 4.2 공통 데이터 (Common Data)
-| 테이블명 | 컬럼명 | 데이터 타입 | PK/FK | Null | 설명 |
-|---|---|---|:---:|:---:|---|
-| **tb_common_code** <br>(공통 코드) | code_id | VARCHAR(50) | PK | N | 코드 고유 값 (예: REQ_STATUS_OPEN) |
-| | group_code | VARCHAR(50) | | N | 그룹 코드 (예: REQ_STATUS) |
-| | code_name | VARCHAR(100) | | N | 코드 표시명 (예: 접수, 할당됨) |
-| | sort_order | INT | | N | 노출 정렬 순서 |
-| | is_use | BOOLEAN | | N | 사용 여부 |
-
-**[참고] 주요 공통 코드 데이터 (기초 데이터 예시)**
-시스템 구동 시 초기 데이터(Seed Data)로 등록하여 활용할 사전 정의된 코드 목록입니다.
-
-* **그룹 코드: `REQ_STATUS` (서비스 요청 상태)**
-  * `REQ_STATUS_OPEN`: 신규 접수 (sort_order: 1)
-  * `REQ_STATUS_ASSIGNED`: 담당자 할당 (sort_order: 2)
-  * `REQ_STATUS_IN_PROGRESS`: 처리 중 (sort_order: 3)
-  * `REQ_STATUS_RESOLVED`: 조치 완료 (sort_order: 4)
-  * `REQ_STATUS_CLOSED`: 종료/승인 (sort_order: 5)
-  * `REQ_STATUS_CANCELED`: 작업 취소 (sort_order: 6)
-
-* **그룹 코드: `REQ_CATEGORY` (서비스 요청 카테고리)**
-  * `REQ_CAT_HW`: H/W 장애 및 요청 지원 (sort_order: 1)
-  * `REQ_CAT_SW`: S/W 설치 및 소프트웨어 오류 (sort_order: 2)
-  * `REQ_CAT_NETWORK`: 네트워크 점검 및 외부망 권한 신청 (sort_order: 3)
-  * `REQ_CAT_ACCOUNT`: IT 시스템 계정 생성 및 패스워드 초기화 (sort_order: 4)
-
-* **그룹 코드: `PRIORITY` (작업 우선순위)**
-  * `PRIORITY_HIGH`: 높음 (긴급 조치 필요, 시스템 장애 시) (sort_order: 1)
-  * `PRIORITY_MEDIUM`: 보통 (일반 처리 기준, 표준 SLA 적용) (sort_order: 2)
-  * `PRIORITY_LOW`: 낮음 (단순 문의 건 등) (sort_order: 3)
-
-* **그룹 코드: `USER_ROLE` (시스템/고객 사용자 권한)**
-  * `ROLE_ADMIN`: 전체 시스템 관리자 (공통 코드 관리, 신규 테넌트 생성 등)
-  * `ROLE_AGENT`: 서비스 데스크 (MSP) 작업자 (고객사별 티켓 확인, 처리)
-  * `ROLE_USER`: 고객사 일반 사용자 (본인 테넌트의 티켓 작성 및 조회)
-
-### 4.3 요청 관리 (Request Management)
-| 테이블명 | 컬럼명 | 데이터 타입 | PK/FK | Null | 설명 |
-|---|---|---|:---:|:---:|---|
-| **tb_service_request** <br>(서비스 요청 티켓) | request_id | VARCHAR(50) | PK | N | 요청 티켓 고유 번호 (예: SR-202310-001) |
-| | tenant_id | VARCHAR(50) | FK | N | 테넌트 ID |
-| | requester_id | VARCHAR(50) | FK | N | 요청자 ID (tb_user 참조) |
-| | assignee_id | VARCHAR(50) | FK | Y | 처리 담당자 ID (Agent) |
-| | category_code| VARCHAR(50) | FK | N | 요청 카테고리 (tb_common_code 참조) |
-| | title | VARCHAR(200) | | N | 요청 제목 |
-| | description | TEXT | | N | 요청 상세 내용 |
-| | status_code | VARCHAR(50) | FK | N | 처리 상태 값 (OPEN, IN_PROGRESS, RESOLVED, CLOSED) |
-| | priority | VARCHAR(10) | | N | 우선순위 (HIGH, MEDIUM, LOW) |
-| | created_at | TIMESTAMP | | N | 요청 접수 일시 |
-| | resolved_at | TIMESTAMP | | Y | 조치 완료 일시 |
-
-### 4.4 공통 첨부파일 (Attachment)
-| 테이블명 | 컬럼명 | 데이터 타입 | PK/FK | Null | 설명 |
-|---|---|---|:---:|:---:|---|
-| **tb_attachment** <br>(공통 첨부파일) | attachment_id | VARCHAR(50) | PK | N | 첨부파일 고유 ID (UUID) |
-| | original_name | VARCHAR(255) | | N | 사용자가 업로드한 원본 파일명 |
-| | file_path | VARCHAR(500) | | N | 서버(또는 로컬)에 저장된 물리적 경로 |
-| | file_size | BIGINT | | N | 파일 크기 (Bytes) |
-| | content_type | VARCHAR(100) | | Y | MIME 타입 (예: image/png) |
-| | related_entity_type | VARCHAR(50) | | N | 연결된 티켓 구분 (예: SERVICE_REQUEST) |
-| | related_entity_id | VARCHAR(50) | FK | N | 연결된 티켓의 고유 ID |
-| | uploaded_by_id | VARCHAR(50) | FK | N | 업로드 사용자 ID (tb_user 참조) |
-| | tenant_id | VARCHAR(50) | FK | N | 테넌트 ID |
-| | created_at | TIMESTAMP | | N | 업로드 일시 |
 ## 5. 디렉토리 및 프로젝트 구조
 
 ### 5.1. 기본 방향: 모놀리식(Modular Monolith) 구조
@@ -202,22 +129,22 @@
 │   ├── tsconfig.json          # TypeScript 설정
 │   ├── vite.config.ts         # Vite 빌드 설정
 │   └── /src
-│       ├── App.tsx            # 프론트엔드 메인 엔트리 컴포넌트
-│       ├── main.tsx           # 렌더링 시작점
-│       ├── /assets            
-│       │   └── logo.png       # 정적 이미지 자원
-│       ├── /components        
-│       │   └── CommonTable.tsx # 재사용 가능한 공통 UI 컴포넌트
-│       ├── /pages             
-│       │   ├── LoginPage.tsx  # 로그인 및 권한 검증 화면
-│       │   ├── Dashboard.tsx  # 메인 대시보드 (통계 및 티켓 요약)
-│       │   └── TicketList.tsx # 분류별 서비스 요청(티켓) 관리 목록 화면 
-│       ├── /services          
-│       │   └── apiClient.ts   # Axios/Fetch 기반 전역 API 호출 모듈
-│       ├── /store             
-│       │   └── authStore.ts   # 사용자 인증, 테넌트 정보 등 전역 상태 관리
-│       └── /utils             
-│           └── formatDate.ts  # 공통 유틸리티 클래스 (날짜 변환 등)
+│       ├── /api               # axios 인스턴스, API 호출 함수 (services 역할)
+│       ├── /assets            # 이미지, 폰트, 글로벌 스타일 (CSS/SCSS)
+│       ├── /components        # 재사용 가능한 UI 컴포넌트
+│       │   ├── /common        # 버튼, 입력창 등 공통 컴포넌트
+│       │   ├── /layout        # Header, Sidebar, Footer
+│       │   └── /admin         # 관리자 전용 컴포넌트 (이미 보유 중)
+│       ├── /constants         # 환경 변수, 공통 코드, 메시지 상수
+│       ├── /hooks             # 커스텀 React Hooks (예: useAuth, useDropdown)
+│       ├── /pages             # 라우트 단위 페이지 컴포넌트
+│       │   ├── /Dashboard/
+│       │   └── /Admin/
+│       ├── /store             # 상태 관리 (Zustand, Redux, Context API 등)
+│       ├── /types             # TypeScript 인터페이스 및 타입 정의 (.ts)
+│       ├── /utils             # 순수 함수 (날짜 변환, 포맷팅 등)
+│       ├── App.tsx
+│       └── main.tsx
 └── /backend                   # Java Spring Boot 백엔드 프로젝트
     ├── build.gradle (or pom.xml)
     ├── /src/main/java/com/itsm
@@ -263,26 +190,26 @@
 
 모든 모듈은 **기본적인 CRUD(Create, Read, Update, Delete) 화면과 관리 로직을 필수 포함**하여 개발됩니다.
 
-| 단계 | 주요 작업 내용 | 상태 | 상세 비고 |
-|:---:|---|:---:|---|
-| **Phase 1** | **기반 셋업**: Docker 인프라, 프로젝트 골격, 공통 Response/Exception 규격화 | [완료] | 컨테이너 환경 및 기본 아키텍처 수립 완료 |
-| **Phase 2** | **테넌트 및 사용자 관리**: 멀티 테넌트 스키마, JWT 인증/인가(RBAC), 사용자 CRUD | [완료] | 테넌트 격리 및 기초 사용자 관리 기능 완료 |
-| **Phase 3** | **공통 코드 관리**: 상태/분류 코드 CRUD (Admin FE/BE 통합) | [완료] | **(Phase 3 완료)** 관리자용 코드 관리 UI/API 완비 |
-| **Phase 4** | **서비스 카탈로그 관리**: 카탈로그 아이템 정의, 동적 폼 구성 CRUD | [보강 필요] | 기초 CRUD 존재하나 동적 폼 엔진 고도화 필요 |
-| **Phase 5** | **서비스 요청 관리**: 요청 등록, 작업 워크플로우 및 승인 단계 CRUD | [보강 필요] | 티켓 생성 가능, 복합 승인 워크플로우 로직 대기 중 |
-| **Phase 6** | **IT 자산 관리 (ITAM)**: 하드웨어/소프트웨어 자산 원장 CRUD 및 라이프사이클 관리 | [완료] | **(Phase 3 연계)** 전 기능 CRUD 및 UI 고도화 완료 |
-| **Phase 7** | **구성 관리 (CMDB)**: CI 간 의존성(Relationship) 매핑 및 토폴로지 맵 구현 | [보강 필요] | CI 데이터 구조 완료, 관계 매핑 UI/시각화 미흡 |
-| **Phase 8** | **모니터링 연동**: Prometheus/Grafana 지표 노출 및 대시보드 연동 | [부분 완료] | 인프라 구성 완료, 백엔드 메트릭 수집 고도화 진행 중 |
-| **Phase 9** | **이벤트 관리**: 외부 알람 수신(Webhook), 필터링 및 심각도 분류 로직 | [보강 필요] | Webhook 수신부 존재, 자동 인시던트 생성 로직 보강 중 |
-| **Phase 10** | **장애 관리 (Incident)**: 장애 신고/접수 CRUD, BIA 기반 영향도 자동 분석 | [보강 필요] | 기본 티켓팅 완료, 서비스 영향도(BIA) 엔진 고도화 필요 |
-| **Phase 11** | **문제 관리 (Problem)**: 반복 장애 트렌드 분석, RCA(근본원인) 및 해결책 CRUD | [중단/보강] | 기초 CRUD 존재, 데이터 분석 모델링 미흡 |
-| **Phase 12** | **지식 관리 (Knowledge)**: 지식 베이스(KBA) 문서 작성, 검토 및 공유 CRUD | [보강 필요] | 문서 작성/조회 가능하나 검색 및 티켓 연동 보강 필요 |
-| **Phase 13** | **변경 관리 (Change)**: 변경 요청(RFC) 작성, 영향도 평가 및 CAB 승인 CRUD | [보강 필요] | RFC 기초 등록 가능, 위험도 평가 및 승인 프로세스 미흡 |
-| **Phase 14** | **릴리스 관리 (Release)**: 배포 계획 수립, 배포 로드맵 및 사후 검토(PIR) CRUD | [진행중] | 초기 목록 화면 및 컴포넌트 스켈레톤 생성 완료 |
-| **Phase 15** | **서비스 포트폴리오**: 비즈니스 서비스 정의 및 하부 인프라 종속성 매핑 | [보강 필요] | IT 서비스 엔티티 완료, 자산 관계 연동 고도화 필요 |
-| **Phase 16** | **서비스 수준 관리 (SLA)**: 고객사별 SLA 지표 정의, 준수율 모니터링 및 알림 | [예정] | - |
-| **Phase 17** | **통합 시각화**: 권한별 맞춤형 실시간 대시보드 위젯(Widget) 동적 매핑 | [예정] | - |
-| **Phase 18** | **리포팅 및 최종 QA**: 운영 분석 리포트(PDF/CSV) 출력 및 시스템 안정화 | [예정] | - |
+| 단계 | 주요 작업 내용 | 일정 (예상) | 상태 | 상세 비고 |
+|:---:|---|:---:|:---:|---|
+| **Phase 1** | **기반 셋업**: Docker 인프라, 프로젝트 골격, 공통 Response/Exception 규격화 | 1주 | [완료] | 컨테이너 환경 및 기본 아키텍처 수립 완료 |
+| **Phase 2** | **시스템 관리 (1)**: 테넌트/사용자 관리, 멀티 테넌트 격리, JWT 인증/인가 | 2주 | [완료] | 테넌트 격리 및 기초 사용자 관리 기능 완료 |
+| **Phase 3** | **시스템 관리 (2)**: 공통 코드 관리 (상태/분류 코드 CRUD) | 1주 | [완료] | 관리자용 코드 관리 UI/API 완비 |
+| **Phase 4** | **서비스 카탈로그**: 카탈로그 아이템 정의, 동적 폼 엔진 고도화 | 1주 | [보강 필요] | 기초 CRUD 존재하나 동적 폼 엔진 고도화 필요 |
+| **Phase 5** | **서비스 요청 관리**: 요청 등록, 복합 승인 워크플로우 로직 | 2주 | [보강 필요] | 티켓 생성 가능, 복합 승인 워크플로우 로직 대기 중 |
+| **Phase 6** | **나의 요청 항목**: 개인별 티켓 현황 조회 및 후속 조치 UI | 1주 | [보강 필요] | 사용자 전용 요청 관리 화면 개발 예정 |
+| **Phase 7** | **이벤트 관리**: Webhook 알람 수신, 필터링 및 자동 장애 생성 | 1주 | [보강 필요] | Webhook 수신부 존재, 자동 인시던트 생성 로직 보강 중 |
+| **Phase 8** | **장애 관리**: 장애 신고/접수, 서비스 영향도(BIA) 엔진 고도화 | 1주 | [보강 필요] | 기본 티켓팅 완료, 서비스 영향도(BIA) 엔진 고도화 필요 |
+| **Phase 9** | **문제 관리**: 반복 장애 트렌드 분석, RCA 및 해결책 DB 관리 | 1주 | [중단/보강] | 기초 CRUD 존재, 데이터 분석 모델링 미흡 |
+| **Phase 10** | **변경 관리**: RFC 작성, 리스크 평가 및 CAB 승인 프로세스 | 1주 | [보강 필요] | RFC 기초 등록 가능, 위험도 평가 및 승인 프로세스 미흡 |
+| **Phase 11** | **릴리스 관리**: 배포 계획 수립, 로드맵 및 사후 검토(PIR) | 1주 | [진행중] | 초기 목록 화면 및 컴포넌트 스켈레톤 생성 완료 |
+| **Phase 12** | **서비스 수준 관리**: SLA 지표 정의, 준수율 모니터링 및 알림 | 1주 | [예정] | 고객사별 Target Time 정의 및 모니터링 엔진 |
+| **Phase 13** | **자산 관리**: IT 자산 원장 CRUD 및 라이프사이클 관리 | 1주 | [완료] | 전 기능 CRUD 및 UI 고도화 완료 |
+| **Phase 14** | **구성 관리**: CI 간 의존성 매핑 및 CMDB 토폴로지 시각화 | 2주 | [보강 필요] | CI 데이터 구조 완료, 관계 매핑 UI/시각화 미흡 |
+| **Phase 15** | **서비스 관리**: 비즈니스 서비스 정의 및 하부 인프라 종속성 매핑 | 1주 | [보강 필요] | 서비스 엔티티 완료, 인프라 연동 고도화 필요 |
+| **Phase 16** | **지식 관리**: KBA 문서 작성, 승인 프로세스 및 검색 연동 | 1주 | [보강 필요] | 문서 작성/조회 가능하나 검색 및 티켓 연동 보강 필요 |
+| **Phase 17** | **대시보드**: 권한별 맞춤형 실시간 위젯 동적 매핑 및 시각화 | 1주 | [예정] | 차트 위젯 및 권한별 레이아웃 엔진 개발 |
+| **Phase 18** | **통합 QA 및 리포팅**: 시스템 안정화, 최종 QA 및 운영 리포트 출력 | 1주 | [예정] | 전체 모듈 통합 테스트 및 리포트(PDF/CSV) 출력 기능 |
 
 **[참고] 전체 예상 소요 기간**: 모듈 분리 및 CRUD 고도화를 고려하여 **약 14~16주**를 목표로 합니다.
 

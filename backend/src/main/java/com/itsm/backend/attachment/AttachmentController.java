@@ -1,6 +1,6 @@
 package com.itsm.backend.attachment;
 
-import com.itsm.backend.auth.TenantAwareAuthentication;
+import com.itsm.backend.auth.CompanyAwareAuthentication;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -30,9 +30,9 @@ public class AttachmentController {
             Authentication authentication) {
 
         String uploaderId = authentication.getName();
-        String tenantId = ((TenantAwareAuthentication) authentication).getTenantId();
+        String companyId = ((CompanyAwareAuthentication) authentication).getCompanyId();
 
-        Attachment attachment = attachmentService.storeFile(file, relatedEntityType, relatedEntityId, uploaderId, tenantId);
+        Attachment attachment = attachmentService.storeFile(file, relatedEntityType, relatedEntityId, uploaderId, companyId);
         return ResponseEntity.ok(attachment);
     }
 

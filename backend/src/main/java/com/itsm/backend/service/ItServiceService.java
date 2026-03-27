@@ -1,7 +1,7 @@
 package com.itsm.backend.service;
 
-import com.itsm.backend.tenant.Tenant;
-import com.itsm.backend.tenant.TenantRepository;
+import com.itsm.backend.company.Company;
+import com.itsm.backend.company.CompanyRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
@@ -12,25 +12,25 @@ public class ItServiceService {
 
     private final ItServiceRepository itServiceRepository;
     private final ServiceDependencyRepository dependencyRepository;
-    private final TenantRepository tenantRepository;
+    private final CompanyRepository companyRepository;
 
     public ItServiceService(ItServiceRepository itServiceRepository,
                             ServiceDependencyRepository dependencyRepository,
-                            TenantRepository tenantRepository) {
+                            CompanyRepository companyRepository) {
         this.itServiceRepository = itServiceRepository;
         this.dependencyRepository = dependencyRepository;
-        this.tenantRepository = tenantRepository;
+        this.companyRepository = companyRepository;
     }
 
-    public List<ItService> getServicesByTenant(String tenantId) {
-        return itServiceRepository.findByTenantId(tenantId);
+    public List<ItService> getServicesByCompany(String companyId) {
+        return itServiceRepository.findByCompanyId(companyId);
     }
 
     @Transactional
-    public ItService createService(ItService itService, String tenantId) {
-        Tenant tenant = tenantRepository.findById(tenantId).orElseThrow();
-        itService.setTenant(tenant);
-        itService.setTenantId(tenantId);
+    public ItService createService(ItService itService, String companyId) {
+        Company company = companyRepository.findById(companyId).orElseThrow();
+        itService.setCompany(company);
+        itService.setCompanyId(companyId);
         return itServiceRepository.save(itService);
     }
 

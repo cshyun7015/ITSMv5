@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
-import LoginPage from './pages/LoginPage'
-import Dashboard from './pages/Dashboard'
+import LoginPage from './pages/Auth/LoginPage'
+import Dashboard from './pages/Dashboard/Dashboard'
 
 function App() {
   const [user, setUser] = useState<any>(null)

@@ -1,7 +1,7 @@
 package com.itsm.backend.attachment;
 
-import com.itsm.backend.tenant.Tenant;
-import com.itsm.backend.tenant.User;
+import com.itsm.backend.company.Company;
+import com.itsm.backend.company.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -39,8 +39,8 @@ public class Attachment {
     private User uploadedBy;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "tenant_id", nullable = false)
-    private Tenant tenant;
+    @JoinColumn(name = "company_id", nullable = false)
+    private Company company;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();

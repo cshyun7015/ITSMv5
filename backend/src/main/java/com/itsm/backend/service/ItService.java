@@ -1,7 +1,7 @@
 package com.itsm.backend.service;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.itsm.backend.tenant.Tenant;
+import com.itsm.backend.company.Company;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDateTime;
@@ -25,12 +25,12 @@ public class ItService {
     private String criticality; // LOW, MEDIUM, HIGH, CRITICAL
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "tenant_id")
+    @JoinColumn(name = "company_id")
     @JsonIgnore
-    private Tenant tenant;
+    private Company company;
 
-    @Column(name = "tenant_code")
-    private String tenantId;
+    @Column(name = "company_code")
+    private String companyId;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

@@ -1,8 +1,8 @@
 package com.itsm.backend.attachment;
 
-import com.itsm.backend.tenant.Tenant;
-import com.itsm.backend.tenant.User;
-import com.itsm.backend.tenant.UserRepository;
+import com.itsm.backend.company.Company;
+import com.itsm.backend.company.entity.User;
+import com.itsm.backend.company.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -39,7 +39,7 @@ public class AttachmentService {
         }
     }
 
-    public Attachment storeFile(MultipartFile file, String relatedEntityType, String relatedEntityId, String uploaderId, String tenantId) {
+    public Attachment storeFile(MultipartFile file, String relatedEntityType, String relatedEntityId, String uploaderId, String companyId) {
         String originalFileName = file.getOriginalFilename();
         String fileExtension = "";
         if (originalFileName != null && originalFileName.contains(".")) {
@@ -58,7 +58,7 @@ public class AttachmentService {
             Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
 
             User uploader = userRepository.findById(uploaderId).orElseThrow(() -> new RuntimeException("User not found"));
-            Tenant tenant = uploader.getTenant();
+            Company company = uploader.getCompany();
 
             Attachment attachment = new Attachment();
             attachment.setId(uuid);
@@ -69,7 +69,7 @@ public class AttachmentService {
             attachment.setRelatedEntityType(relatedEntityType);
             attachment.setRelatedEntityId(relatedEntityId);
             attachment.setUploadedBy(uploader);
-            attachment.setTenant(tenant);
+            attachment.setCompany(company);
 
             return attachmentRepository.save(attachment);
 

@@ -1,21 +1,21 @@
 package com.itsm.backend.config;
 
-import com.itsm.backend.tenant.Tenant;
-import com.itsm.backend.tenant.User;
+import com.itsm.backend.company.Company;
+import com.itsm.backend.company.entity.User;
 import com.itsm.backend.code.CommonCode;
-import com.itsm.backend.catalog.ServiceCatalog;
-import com.itsm.backend.catalog.ServiceCatalogRepository;
+import com.itsm.backend.servicecatalog.entity.ServiceCatalog;
+import com.itsm.backend.servicecatalog.repository.ServiceCatalogRepository;
 import com.itsm.backend.knowledge.KnowledgeArticle;
 import com.itsm.backend.knowledge.KnowledgeArticleRepository;
-import com.itsm.backend.request.ServiceRequest;
-import com.itsm.backend.request.ServiceRequestRepository;
+import com.itsm.backend.request.entity.ServiceRequest;
+import com.itsm.backend.request.repository.ServiceRequestRepository;
 import com.itsm.backend.incident.Incident;
 import com.itsm.backend.incident.IncidentRepository;
-import com.itsm.backend.change.ChangeRequest;
-import com.itsm.backend.change.ChangeRequestRepository;
-import com.itsm.backend.tenant.UserRepository;
-import com.itsm.backend.cmdb.ConfigurationItem;
-import com.itsm.backend.cmdb.CIRepository;
+import com.itsm.backend.change.entity.Change;
+import com.itsm.backend.change.repository.ChangeRepository;
+import com.itsm.backend.company.UserRepository;
+import com.itsm.backend.asset.entity.Asset;
+import com.itsm.backend.asset.repository.AssetRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,30 +32,30 @@ public class DataInitializer implements CommandLineRunner {
     @Autowired private KnowledgeArticleRepository knowledgeArticleRepository;
     @Autowired private ServiceRequestRepository serviceRequestRepository;
     @Autowired private IncidentRepository incidentRepository;
-    @Autowired private ChangeRequestRepository changeRequestRepository;
-    @Autowired private CIRepository ciRepository;
+    @Autowired private ChangeRepository changeRequestRepository;
+    @Autowired private AssetRepository assetRepository;
 
     @Override
     @Transactional
     public void run(String... args) throws Exception {
 
         // ===== 1. TENANTS & USERS =====
-        Tenant systemTenant;
-        Tenant tenantA;
-        Tenant tenantB;
+        Company systemCompany;
+        Company companyA;
+        Company companyB;
 
         if (userRepository.findByUserId("admin").isEmpty()) {
-            systemTenant = buildTenant("system", "System Admin (MSP)", "Premium");
-            tenantA     = buildTenant("tenant_a", "ACME Corporation", "Premium");
-            tenantB     = buildTenant("tenant_b", "Beta Startup Inc.", "Standard");
-            em.persist(systemTenant);
-            em.persist(tenantA);
-            em.persist(tenantB);
+            systemCompany = buildCompany("system", "System Admin (MSP)", "Premium");
+            companyA     = buildCompany("company_a", "ACME Corporation", "Premium");
+            companyB     = buildCompany("company_b", "Beta Startup Inc.", "Standard");
+            em.persist(systemCompany);
+            em.persist(companyA);
+            em.persist(companyB);
 
-            em.persist(buildUser("admin",   systemTenant, "Super Admin",   "ROLE_ADMIN",    "admin@msp.sys"));
-            em.persist(buildUser("eng01",   tenantA,      "김민준 Engineer", "ROLE_ENGINEER", "minjun@acme.co"));
-            em.persist(buildUser("user01",  tenantA,      "이서연 사원",      "ROLE_USER",     "seoyeon@acme.co"));
-            em.persist(buildUser("user02",  tenantB,      "박지호 대리",      "ROLE_USER",     "jiho@beta.startup"));
+            em.persist(buildUser("admin",   systemCompany, "Super Admin",   "ROLE_ADMIN",    "admin@msp.sys"));
+            em.persist(buildUser("eng01",   companyA,      "김민준 Engineer", "ROLE_ENGINEER", "minjun@acme.co"));
+            em.persist(buildUser("user01",  companyA,      "이서연 사원",      "ROLE_USER",     "seoyeon@acme.co"));
+            em.persist(buildUser("user02",  companyB,      "박지호 대리",      "ROLE_USER",     "jiho@beta.startup"));
 
             String[][] codes = {
                 // Service Request Status
@@ -106,9 +106,9 @@ public class DataInitializer implements CommandLineRunner {
                 em.persist(sc);
             }
         } else {
-            systemTenant = userRepository.findByUserId("admin").get().getTenant();
-            tenantA = userRepository.findByUserId("eng01").map(User::getTenant).orElse(systemTenant);
-            tenantB = userRepository.findByUserId("user02").map(User::getTenant).orElse(systemTenant);
+            systemCompany = userRepository.findByUserId("admin").get().getCompany();
+            companyA = userRepository.findByUserId("eng01").map(User::getCompany).orElse(systemCompany);
+            companyB = userRepository.findByUserId("user02").map(User::getCompany).orElse(systemCompany);
             
             // Re-check for missing codes
             String[][] extraCodes = {
@@ -131,19 +131,19 @@ public class DataInitializer implements CommandLineRunner {
 
         // ===== 2. SERVICE CATALOGS =====
         if (serviceCatalogRepository.count() == 0) {
-            em.persist(buildCatalog(tenantA, "신규 하드웨어 신청", "장비/기기", "💻", "업무에 필요한 노트북, 모니터 등의 장비를 신청합니다.",
+            em.persist(buildServiceCatalog(companyA, "신규 하드웨어 신청", "장비/기기", "💻", "업무에 필요한 노트북, 모니터 등의 장비를 신청합니다.",
                 "[{\"name\":\"deviceType\",\"label\":\"장비 종류\",\"type\":\"select\",\"options\":[\"노트북\",\"모니터\",\"도킹스테이션\"]},{\"name\":\"justification\",\"label\":\"사유\",\"type\":\"textarea\"}]"));
             
-            em.persist(buildCatalog(tenantA, "소프트웨어 설치", "SW/앱", "💿", "라이선스가 필요한 상용 소프트웨어 설치를 요청합니다.",
+            em.persist(buildServiceCatalog(companyA, "소프트웨어 설치", "SW/앱", "💿", "라이선스가 필요한 상용 소프트웨어 설치를 요청합니다.",
                 "[{\"name\":\"softwareName\",\"label\":\"SW 명칭\",\"type\":\"text\"},{\"name\":\"licenseKey\",\"label\":\"라이선스 보유 여부\",\"type\":\"checkbox\"}]"));
             
-            em.persist(buildCatalog(tenantA, "VPN 접속 권한", "네트워크", "🌐", "외부망 및 재택근무를 위한 VPN 접속 권한을 신청합니다.",
+            em.persist(buildServiceCatalog(companyA, "VPN 접속 권한", "네트워크", "🌐", "외부망 및 재택근무를 위한 VPN 접속 권한을 신청합니다.",
                 "[{\"name\":\"period\",\"label\":\"사용 기간(일)\",\"type\":\"number\"},{\"name\":\"reason\",\"label\":\"접속 사유\",\"type\":\"textarea\"}]"));
             
-            em.persist(buildCatalog(tenantA, "계정 및 권한 신청", "보안/계정", "👤", "시스템 신규 계정 생성 및 권한 변경을 요청합니다.",
+            em.persist(buildServiceCatalog(companyA, "계정 및 권한 신청", "보안/계정", "👤", "시스템 신규 계정 생성 및 권한 변경을 요청합니다.",
                 "[{\"name\":\"systemName\",\"label\":\"대상 시스템\",\"type\":\"select\",\"options\":[\"ERP\",\"그룹웨어\",\"포털\"]},{\"name\":\"role\",\"label\":\"희망 권한\",\"type\":\"text\"}]"));
 
-            em.persist(buildCatalog(tenantA, "클라우드 자원 요청", "인프라", "☁️", "AWS/Azure 등 클라우드 서버 인스턴스 생성을 요청합니다.",
+            em.persist(buildServiceCatalog(companyA, "클라우드 자원 요청", "인프라", "☁️", "AWS/Azure 등 클라우드 서버 인스턴스 생성을 요청합니다.",
                 "[{\"name\":\"region\",\"label\":\"리전\",\"type\":\"select\",\"options\":[\"Seoul\",\"Tokyo\",\"Virginia\"]},{\"name\":\"instanceType\",\"label\":\"사양\",\"type\":\"text\"}]"));
         }
         em.flush();
@@ -151,8 +151,8 @@ public class DataInitializer implements CommandLineRunner {
         // ===== 3. KPI SERVICE REQUESTS (realistic distribution) =====
         if (serviceRequestRepository.count() == 0) {
             var admin = userRepository.findByUserId("admin").get();
-            var cat   = serviceCatalogRepository.findByIsPublishedTrue().stream().findFirst().orElse(null);
-            if (cat != null) {
+            var serviceCatalog = serviceCatalogRepository.findByIsPublishedTrue().stream().findFirst().orElse(null);
+            if (serviceCatalog != null) {
                 // Resolved (SLA achieved)
                 String[][] resolved = {
                     {"노트북 교체 요청 - 홍길동",       "REQ_STATUS_RESOLVED", "High",   "-5"},
@@ -170,8 +170,8 @@ public class DataInitializer implements CommandLineRunner {
                     ServiceRequest sr = new ServiceRequest();
                     sr.setTitle(r[0]); sr.setStatus(r[1]); sr.setPriority(r[2]);
                     sr.setDescription("사용자의 " + r[0] + " 요청이 처리되었습니다.");
-                    sr.setFormData("{}"); sr.setCatalog(cat);
-                    sr.setRequester(admin); sr.setTenant(tenantA);
+                    sr.setFormData("{}"); sr.setCatalog(serviceCatalog);
+                    sr.setRequester(admin); sr.setCompany(companyA);
                     sr.setCreatedAt(LocalDateTime.now().plusDays(Long.parseLong(r[3])));
                     serviceRequestRepository.save(sr);
                 }
@@ -184,8 +184,8 @@ public class DataInitializer implements CommandLineRunner {
                 for (String[] r : inprog) {
                     ServiceRequest sr = new ServiceRequest();
                     sr.setTitle(r[0]); sr.setStatus(r[1]); sr.setPriority(r[2]);
-                    sr.setDescription(r[0]); sr.setFormData("{}"); sr.setCatalog(cat);
-                    sr.setRequester(admin); sr.setTenant(tenantA);
+                    sr.setDescription(r[0]); sr.setFormData("{}"); sr.setCatalog(serviceCatalog);
+                    sr.setRequester(admin); sr.setCompany(companyA);
                     sr.setCreatedAt(LocalDateTime.now().minusDays(1));
                     serviceRequestRepository.save(sr);
                 }
@@ -197,8 +197,8 @@ public class DataInitializer implements CommandLineRunner {
                 for (String[] r : open) {
                     ServiceRequest sr = new ServiceRequest();
                     sr.setTitle(r[0]); sr.setStatus(r[1]); sr.setPriority(r[2]);
-                    sr.setDescription(r[0]); sr.setFormData("{}"); sr.setCatalog(cat);
-                    sr.setRequester(admin); sr.setTenant(tenantA);
+                    sr.setDescription(r[0]); sr.setFormData("{}"); sr.setCatalog(serviceCatalog);
+                    sr.setRequester(admin); sr.setCompany(companyA);
                     sr.setCreatedAt(LocalDateTime.now().minusHours(3));
                     serviceRequestRepository.save(sr);
                 }
@@ -223,7 +223,7 @@ public class DataInitializer implements CommandLineRunner {
                 i.setTitle((String) inc[0]); i.setStatus((String) inc[1]);
                 i.setPriority((String) inc[2]); i.setImpact((String) inc[3]);
                 i.setDescription(i.getTitle() + " - MSP에 의해 감지된 장애입니다.");
-                i.setTenant(tenantA); i.setTenantId("tenant_a");
+                i.setCompany(companyA); i.setCompanyId("company_a");
                 i.setReporter(admin); i.setReporterId("admin");
                 i.setCreatedAt(LocalDateTime.now().plusDays((int) inc[4]));
                 if ("INC_RESOLVED".equals(inc[1])) {
@@ -246,12 +246,12 @@ public class DataInitializer implements CommandLineRunner {
                 {"백업 솔루션 교체 - Veeam → Commvault",             "CHG_DRAFT",     "Normal",    "High",   0},
             };
             for (Object[] chg : changes) {
-                ChangeRequest cr = new ChangeRequest();
+                Change cr = new Change();
                 cr.setTitle((String) chg[0]); cr.setStatus((String) chg[1]);
                 cr.setChangeType((String) chg[2]); cr.setRisk((String) chg[3]);
                 cr.setDescription((String) chg[0] + " 에 대한 RFC 입니다.");
                 cr.setRollbackPlan("이전 버전/설정으로 롤백. 변경 이전 스냅샷 확보 완료.");
-                cr.setTenant(tenantA); cr.setTenantId("tenant_a");
+                cr.setCompany(companyA); cr.setCompanyId("company_a");
                 cr.setRequester(admin); cr.setRequesterId("admin");
                 cr.setCreatedAt(LocalDateTime.now().plusDays((int) chg[4]));
                 changeRequestRepository.save(cr);
@@ -277,15 +277,15 @@ public class DataInitializer implements CommandLineRunner {
                 KnowledgeArticle a = new KnowledgeArticle();
                 a.setTitle((String) kba[0]); a.setCategory((String) kba[1]);
                 a.setViewCount((int) kba[2]); a.setContent((String) kba[3]);
-                a.setTenant(tenantA); a.setAuthor(admin);
+                a.setCompany(companyA); a.setAuthor(admin);
                 a.setCreatedAt(LocalDateTime.now().minusDays(7));
                 a.setUpdatedAt(LocalDateTime.now().minusDays(1));
                 knowledgeArticleRepository.save(a);
             }
         }
 
-        // ===== 7. CONFIGURATION ITEMS (CMDB/ITAM) =====
-        if (ciRepository.count() == 0) {
+        // ===== 7. ASSETS (ITAM) =====
+        if (assetRepository.count() == 0) {
             var admin = userRepository.findByUserId("admin").get();
             Object[][] cis = {
                 {"Production Web Server 01", "SERVER", "IN_USE", "SN-SRV-001", "Dell PowerEdge R750", "Main DataCenter - Rack A1", "CPU: 32C, RAM: 128GB, SSD: 2TB"},
@@ -296,7 +296,7 @@ public class DataInitializer implements CommandLineRunner {
                 {"Spare Monitor 27\"", "MONITOR", "IN_STOCK", "SN-MON-202", "Dell UltraSharp 27\"", "IT Storage Room", "4K Resolution, USB-C"},
             };
             for (Object[] ciData : cis) {
-                ConfigurationItem ci = new ConfigurationItem();
+                Asset ci = new Asset();
                 ci.setName((String) ciData[0]);
                 ci.setType((String) ciData[1]);
                 ci.setStatus((String) ciData[2]);
@@ -304,22 +304,22 @@ public class DataInitializer implements CommandLineRunner {
                 ci.setModel((String) ciData[4]);
                 ci.setLocation((String) ciData[5]);
                 ci.setSpecifications((String) ciData[6]);
-                ci.setTenant(tenantA);
+                ci.setCompany(companyA);
                 ci.setOwner(admin);
-                ciRepository.save(ci);
+                assetRepository.save(ci);
             }
         }
     }
 
-    private Tenant buildTenant(String id, String name, String tier) {
-        Tenant t = new Tenant(); t.setTenantId(id); t.setTenantName(name); t.setTier(tier); t.setIsActive(true); t.setCreatedAt(LocalDateTime.now()); return t;
+    private Company buildCompany(String id, String name, String tier) {
+        Company t = new Company(); t.setCompanyId(id); t.setCompanyName(name); t.setTier(tier); t.setIsActive(true); t.setCreatedAt(LocalDateTime.now()); return t;
     }
 
-    private User buildUser(String id, Tenant tenant, String name, String role, String email) {
-        User u = new User(); u.setUserId(id); u.setTenant(tenant); u.setPassword("{noop}admin123"); u.setUserName(name); u.setRole(role); u.setEmail(email); return u;
+    private User buildUser(String id, Company company, String name, String role, String email) {
+        User u = new User(); u.setUserId(id); u.setCompany(company); u.setPassword("{noop}admin123"); u.setUserName(name); u.setRole(role); u.setEmail(email); return u;
     }
 
-    private ServiceCatalog buildCatalog(Tenant tenant, String name, String category, String icon, String desc, String schema) {
-        ServiceCatalog c = new ServiceCatalog(); c.setTenant(tenant); c.setCatalogName(name); c.setCategory(category); c.setIcon(icon); c.setDescription(desc); c.setFormSchema(schema); c.setIsPublished(true); return c;
+    private ServiceCatalog buildServiceCatalog(Company company, String name, String category, String icon, String desc, String schema) {
+        ServiceCatalog c = new ServiceCatalog(); c.setCompany(company); c.setCatalogName(name); c.setCategory(category); c.setIcon(icon); c.setDescription(desc); c.setFormSchema(schema); c.setIsPublished(true); return c;
     }
 }

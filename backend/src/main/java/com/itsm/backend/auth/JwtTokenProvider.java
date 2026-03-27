@@ -20,14 +20,14 @@ public class JwtTokenProvider {
         this.key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
     }
 
-    public String createToken(String userId, String role, String tenantId) {
+    public String createToken(String userId, String role, String companyId) {
         Date now = new Date();
         Date validity = new Date(now.getTime() + validityInMilliseconds);
 
         return Jwts.builder()
                 .subject(userId)
                 .claim("role", role)
-                .claim("tenantId", tenantId)
+                .claim("companyId", companyId)
                 .issuedAt(now)
                 .expiration(validity)
                 .signWith(key)

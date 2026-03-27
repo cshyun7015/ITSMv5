@@ -1,8 +1,8 @@
 package com.itsm.backend.auth;
 
 import com.itsm.backend.auth.dto.LoginRequest;
-import com.itsm.backend.tenant.User;
-import com.itsm.backend.tenant.UserRepository;
+import com.itsm.backend.company.entity.User;
+import com.itsm.backend.company.repository.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -31,13 +31,13 @@ public class AuthController {
             // Phase 1: Raw password check or handling '{noop}' inserted by Flyway script
             String rawDbPassword = user.getPassword().replace("{noop}", "");
             if (rawDbPassword.equals(request.getPassword()) || user.getPassword().equals(request.getPassword())) {
-                String token = jwtTokenProvider.createToken(user.getUserId(), user.getRole(), user.getTenant().getTenantId());
+                String token = jwtTokenProvider.createToken(user.getUserId(), user.getRole(), user.getCompany().getCompanyId());
                 return ResponseEntity.ok(Map.of(
                     "token", token,
                     "userId", user.getUserId(),
                     "userName", user.getUserName(),
                     "role", user.getRole(),
-                    "tenantId", user.getTenant().getTenantId()
+                    "companyId", user.getCompany().getCompanyId()
                 ));
             }
         }

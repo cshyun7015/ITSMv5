@@ -31,11 +31,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             var claims = jwtTokenProvider.getClaims(token);
             String userId = claims.getSubject();
             String role = claims.get("role", String.class);
-            String tenantId = claims.get("tenantId", String.class);
+            String companyId = claims.get("companyId", String.class);
 
-            // Store tenantId as a detail in the request for downstream extraction
-            TenantAwareAuthentication auth = new TenantAwareAuthentication(
-                    userId, tenantId, null, List.of(new SimpleGrantedAuthority(role)));
+            // Store companyId as a detail in the request for downstream extraction
+            CompanyAwareAuthentication auth = new CompanyAwareAuthentication(
+                    userId, companyId, null, List.of(new SimpleGrantedAuthority(role)));
             auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
             SecurityContextHolder.getContext().setAuthentication(auth);
