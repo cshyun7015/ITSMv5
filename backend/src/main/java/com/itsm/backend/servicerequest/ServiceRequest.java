@@ -37,8 +37,8 @@ public class ServiceRequest {
     @Column(columnDefinition = "TEXT")
     private String description;
     
-    @Column(columnDefinition = "TEXT")
-    private String formData; 
+    @OneToMany(mappedBy = "request", cascade = CascadeType.ALL, orphanRemoval = true)
+    private java.util.List<RequestValue> requestValues = new java.util.ArrayList<>();
 
     private String status;
     private String priority;

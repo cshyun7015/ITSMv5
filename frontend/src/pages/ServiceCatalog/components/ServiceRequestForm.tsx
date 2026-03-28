@@ -23,10 +23,10 @@ export const ServiceRequestForm: React.FC<ServiceRequestFormProps> = ({ user, ca
   useEffect(() => {
     const fetchCatalog = async () => {
       try {
-        const data = await serviceCatalogApi.getCatalog(catalogId);
+        const data = await serviceCatalogApi.getServiceCatalog(catalogId);
         setCatalog(data);
-        if (data.formSchema) {
-          setFormSchema(JSON.parse(data.formSchema));
+        if (data.fields) {
+          setFormSchema(data.fields);
         }
       } catch (err) {
         console.error(err);
@@ -37,17 +37,22 @@ export const ServiceRequestForm: React.FC<ServiceRequestFormProps> = ({ user, ca
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.debug('[FORM] User:', user?.userId, 'submitting request for catalog:', catalogId);
     setIsSubmitting(true);
-    setStatusMsg('Submitting request...');
+    setStatusMsg('요청을 제출하는 중...');
     
     const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
     const token = localStorage.getItem('itsm_token');
 
+    // Currently the backend still expects 'formData' as a string if ServiceRequest hasn't been refactored.
+    // If we refactored ServiceRequest, we'd need a different structure.
+    // Let's assume for this step we keep the payload as is for compatibility, 
+    // OR we update the backend to handle the new structured RequestValue.
     const payload = {
       catalogId,
       title: title || `${catalog?.catalogName} 요청`,
       description,
-      formData: JSON.stringify(formData)
+      formData: JSON.stringify(formData) 
     };
 
     try {
@@ -64,7 +69,7 @@ export const ServiceRequestForm: React.FC<ServiceRequestFormProps> = ({ user, ca
         const createdRequest = await response.json();
         
         if (files.length > 0) {
-          setStatusMsg('Uploading attachments...');
+          setStatusMsg('첨부 파일을 업로드하는 중...');
           for (let file of files) {
             const fd = new FormData();
             fd.append('file', file);
@@ -79,14 +84,14 @@ export const ServiceRequestForm: React.FC<ServiceRequestFormProps> = ({ user, ca
           }
         }
 
-        setStatusMsg('Successfully submitted! Returning to catalog...');
+        setStatusMsg('요청이 성공적으로 제출되었습니다! 목록으로 돌아갑니다...');
         setTimeout(onBack, 2000);
       } else {
-        setStatusMsg('Failed to submit request.');
+        setStatusMsg('요청 제출에 실패했습니다.');
         setIsSubmitting(false);
       }
     } catch (err) {
-      setStatusMsg('Error: ' + err);
+      setStatusMsg('오류 발생: ' + err);
       setIsSubmitting(false);
     }
   };
@@ -112,23 +117,32 @@ export const ServiceRequestForm: React.FC<ServiceRequestFormProps> = ({ user, ca
       </button>
 
       <div style={{ backgroundColor: '#1e1e1e', padding: '3rem', borderRadius: '16px', border: '1px solid #333', boxShadow: '0 10px 40px rgba(0,0,0,0.5)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', marginBottom: '1rem' }}>
-          <div style={{ 
-            fontSize: '3.5rem', 
-            width: '80px', 
-            height: '80px', 
-            display: 'flex', 
-            alignItems: 'center', 
-            justifyContent: 'center',
-            backgroundColor: '#252525',
-            borderRadius: '16px',
-            border: '1px solid #444'
-          }}>
-            {catalog.icon || '📋'}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+            <div style={{ 
+              fontSize: '3.5rem', 
+              width: '80px', 
+              height: '80px', 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center',
+              backgroundColor: '#252525',
+              borderRadius: '16px',
+              border: '1px solid #444'
+            }}>
+              {catalog.icon || '📋'}
+            </div>
+            <div>
+              <h2 style={{ color: '#fff', margin: 0, fontSize: '2.2rem', fontWeight: 700 }}>{catalog.catalogName}</h2>
+              <div style={{ color: '#339af0', fontSize: '1rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '1px', marginTop: '4px' }}>{catalog.category}</div>
+            </div>
           </div>
-          <div>
-            <h2 style={{ color: '#fff', margin: 0, fontSize: '2.2rem', fontWeight: 700 }}>{catalog.catalogName}</h2>
-            <div style={{ color: '#339af0', fontSize: '1rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '1px', marginTop: '4px' }}>{catalog.category}</div>
+          <div style={{ textAlign: 'right', padding: '1rem', backgroundColor: '#252525', borderRadius: '12px', border: '1px solid #333' }}>
+            <div style={{ color: '#aaa', fontSize: '0.85rem', marginBottom: '4px' }}>목표 처리 시간 (SLA)</div>
+            <div style={{ color: '#ff922b', fontSize: '1.2rem', fontWeight: 700 }}>{catalog.slaHours || 24}시간</div>
+            {catalog.ownerName && (
+              <div style={{ marginTop: '8px', color: '#888', fontSize: '0.85rem' }}>책임자: {catalog.ownerName}</div>
+            )}
           </div>
         </div>
         <p style={{ color: '#aaa', marginBottom: '3rem', fontSize: '1.1rem', lineHeight: '1.7' }}>{catalog.description}</p>
@@ -168,26 +182,29 @@ export const ServiceRequestForm: React.FC<ServiceRequestFormProps> = ({ user, ca
                 {formSchema.map((field: FormField, idx: number) => (
                   <div key={idx}>
                     <label style={{ display: 'block', color: '#ccc', marginBottom: '0.5rem', fontWeight: 630 }}>
-                      {field.label}
+                      {field.fieldLabel} {field.isRequired && <span style={{color: '#ff6b6b'}}>*</span>}
                     </label>
-                    {field.type === 'text' && (
-                      <input type="text" onChange={(e) => setFormData({...formData, [field.name]: e.target.value})} style={{ width: '100%', padding: '1rem', borderRadius: '8px', border: '2px solid #333', backgroundColor: '#1e1e1e', color: '#fff', fontSize: '1rem' }} onFocus={e => e.target.style.borderColor = '#339af0'} onBlur={e => e.target.style.borderColor = '#333'} />
+                    {field.fieldType === 'TEXT' && (
+                      <input required={field.isRequired} type="text" onChange={(e) => setFormData({...formData, [field.fieldName]: e.target.value})} style={{ width: '100%', padding: '1rem', borderRadius: '8px', border: '2px solid #333', backgroundColor: '#1e1e1e', color: '#fff', fontSize: '1rem' }} onFocus={e => e.target.style.borderColor = '#339af0'} onBlur={e => e.target.style.borderColor = '#333'} />
                     )}
-                    {field.type === 'number' && (
-                      <input type="number" onChange={(e) => setFormData({...formData, [field.name]: e.target.value})} style={{ width: '100%', padding: '1rem', borderRadius: '8px', border: '2px solid #333', backgroundColor: '#1e1e1e', color: '#fff', fontSize: '1rem' }} onFocus={e => e.target.style.borderColor = '#339af0'} onBlur={e => e.target.style.borderColor = '#333'} />
+                    {field.fieldType === 'NUMBER' && (
+                      <input required={field.isRequired} type="number" onChange={(e) => setFormData({...formData, [field.fieldName]: e.target.value})} style={{ width: '100%', padding: '1rem', borderRadius: '8px', border: '2px solid #333', backgroundColor: '#1e1e1e', color: '#fff', fontSize: '1rem' }} onFocus={e => e.target.style.borderColor = '#339af0'} onBlur={e => e.target.style.borderColor = '#333'} />
                     )}
-                    {field.type === 'textarea' && (
-                      <textarea onChange={(e) => setFormData({...formData, [field.name]: e.target.value})} rows={3} style={{ width: '100%', padding: '1rem', borderRadius: '8px', border: '2px solid #333', backgroundColor: '#1e1e1e', color: '#fff', fontSize: '1rem', fontFamily: 'inherit' }} onFocus={e => e.target.style.borderColor = '#339af0'} onBlur={e => e.target.style.borderColor = '#333'} />
+                    {field.fieldType === 'DATE' && (
+                      <input required={field.isRequired} type="date" onChange={(e) => setFormData({...formData, [field.fieldName]: e.target.value})} style={{ width: '100%', padding: '1rem', borderRadius: '8px', border: '2px solid #333', backgroundColor: '#1e1e1e', color: '#fff', fontSize: '1rem' }} onFocus={e => e.target.style.borderColor = '#339af0'} onBlur={e => e.target.style.borderColor = '#333'} />
                     )}
-                    {field.type === 'select' && (
-                      <select onChange={(e) => setFormData({...formData, [field.name]: e.target.value})} style={{ width: '100%', padding: '1rem', borderRadius: '8px', border: '2px solid #333', backgroundColor: '#1e1e1e', color: '#fff', fontSize: '1rem' }} onFocus={e => e.target.style.borderColor = '#339af0'} onBlur={e => e.target.style.borderColor = '#333'}>
-                        <option value="">-- 선텍해 주세요 --</option>
-                        {field.options?.map((opt: string) => <option key={opt} value={opt}>{opt}</option>)}
+                    {field.fieldType === 'textarea' && (
+                      <textarea required={field.isRequired} onChange={(e) => setFormData({...formData, [field.fieldName]: e.target.value})} rows={3} style={{ width: '100%', padding: '1rem', borderRadius: '8px', border: '2px solid #333', backgroundColor: '#1e1e1e', color: '#fff', fontSize: '1rem', fontFamily: 'inherit' }} onFocus={e => e.target.style.borderColor = '#339af0'} onBlur={e => e.target.style.borderColor = '#333'} />
+                    )}
+                    {field.fieldType === 'SELECT' && (
+                      <select required={field.isRequired} onChange={(e) => setFormData({...formData, [field.fieldName]: e.target.value})} style={{ width: '100%', padding: '1rem', borderRadius: '8px', border: '2px solid #333', backgroundColor: '#1e1e1e', color: '#fff', fontSize: '1rem' }} onFocus={e => e.target.style.borderColor = '#339af0'} onBlur={e => e.target.style.borderColor = '#333'}>
+                        <option value="">-- 선택해 주세요 --</option>
+                        {field.fieldOptions && JSON.parse(field.fieldOptions).map((opt: string) => <option key={opt} value={opt}>{opt}</option>)}
                       </select>
                     )}
-                    {field.type === 'checkbox' && (
+                    {field.fieldType === 'CHECKBOX' && (
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.5rem' }}>
-                        <input type="checkbox" id={`chk-${idx}`} onChange={(e) => setFormData({...formData, [field.name]: e.target.checked})} style={{ width: '1.4rem', height: '1.4rem', accentColor: '#339af0', cursor: 'pointer' }} />
+                        <input type="checkbox" id={`chk-${idx}`} onChange={(e) => setFormData({...formData, [field.fieldName]: e.target.checked})} style={{ width: '1.4rem', height: '1.4rem', accentColor: '#339af0', cursor: 'pointer' }} />
                         <label htmlFor={`chk-${idx}`} style={{ color: '#aaa', cursor: 'pointer', fontSize: '1.05rem' }}>확인하였습니다</label>
                       </div>
                     )}

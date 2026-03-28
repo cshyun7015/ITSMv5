@@ -1,4 +1,3 @@
-/// <reference types="vite/client" />
 import type { ServiceCatalog } from '../types';
 
 const getHeaders = () => {
@@ -17,7 +16,9 @@ export const serviceCatalogApi = {
       headers: getHeaders()
     });
     if (!response.ok) throw new Error('Failed to fetch service catalogs');
-    return response.json();
+    const data = await response.json();
+    console.debug('[API] getServiceCatalogs success:', data.length, 'items');
+    return data;
   },
 
   getServiceCatalog: async (id: number): Promise<ServiceCatalog> => {

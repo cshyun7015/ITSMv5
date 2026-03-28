@@ -8,6 +8,8 @@ import com.itsm.backend.admin.commoncode.CommonCode;
 import com.itsm.backend.admin.commoncode.CommonCodeRepository;
 import com.itsm.backend.servicecatalog.ServiceCatalog;
 import com.itsm.backend.servicecatalog.ServiceCatalogRepository;
+import com.itsm.backend.servicecatalog.CatalogField;
+import com.itsm.backend.servicecatalog.CatalogFieldRepository;
 import com.itsm.backend.knowledge.Knowledge;
 import com.itsm.backend.knowledge.KnowledgeRepository;
 import org.springframework.boot.CommandLineRunner;
@@ -22,6 +24,7 @@ public class DataInitializer implements CommandLineRunner {
     @Autowired private CompanyRepository companyRepository;
     @Autowired private UserRepository userRepository;
     @Autowired private ServiceCatalogRepository serviceCatalogRepository;
+    @Autowired private CatalogFieldRepository catalogFieldRepository;
     @Autowired private KnowledgeRepository knowledgeRepository;
     @Autowired private CommonCodeRepository commonCodeRepository;
 
@@ -74,12 +77,46 @@ public class DataInitializer implements CommandLineRunner {
             createCommonCodeIfAbsent(c[0], c[1], c[2], Integer.parseInt(c[3]));
         }
 
-        // 4. SERVICE CATALOGS
+        // 4. SERVICE CATALOGS (Structured)
         if (serviceCatalogRepository.count() == 0) {
-            serviceCatalogRepository.save(buildServiceCatalog(companyA, "신규 하드웨어 신청", "장비/기기", "💻", "업무에 필요한 노트북, 모니터 등의 장비를 신청합니다.",
-                "[{\"name\":\"deviceType\",\"label\":\"장비 종류\",\"type\":\"select\",\"options\":[\"노트북\",\"모니터\",\"도킹스테이션\"]},{\"name\":\"justification\",\"label\":\"사유\",\"type\":\"textarea\"}]"));
-            serviceCatalogRepository.save(buildServiceCatalog(companyA, "소프트웨어 설치", "SW/앱", "💿", "라이선스가 필요한 상용 소프트웨어 설치를 요청합니다.",
-                "[{\"name\":\"softwareName\",\"label\":\"SW 명칭\",\"type\":\"text\"},{\"name\":\"licenseKey\",\"label\":\"라이선스 보유 여부\",\"type\":\"checkbox\"}]"));
+            User admin = userRepository.findById("admin").orElse(null);
+
+            // 1) 신규 하드웨어 신청 (New Laptop Request)
+            ServiceCatalog laptop = buildServiceCatalog(companyA, "신규 하드웨어 신청", "IT Hardware", "💻", 
+                "업무에 필요한 노트북 장비를 신청합니다.", admin, "IT Support", 48, new java.math.BigDecimal("1500000"), "MEDIUM");
+            serviceCatalogRepository.save(laptop);
+            saveField(laptop, "laptop_model", "모델명", "TEXT", true, 1);
+            saveField(laptop, "justification", "사유", "TEXT", true, 2);
+            saveField(laptop, "office_loc", "수령 사무실", "SELECT", true, 3, "[\"Seoul\", \"Busan\", \"Pangyo\"]");
+
+            // 2) VPN 권한 신청 (VPN Access Grant)
+            ServiceCatalog vpn = buildServiceCatalog(companyA, "VPN 권한 신청", "Network", "🌐", 
+                "원격 근무를 위한 VPN 접근 권한을 신청합니다.", admin, "Network Team", 4, java.math.BigDecimal.ZERO, "HIGH");
+            serviceCatalogRepository.save(vpn);
+            saveField(vpn, "region", "접속 지역", "SELECT", true, 1, "[\"Asia\", \"Europe\", \"US\"]");
+            saveField(vpn, "reason", "접속 사유", "TEXT", true, 2);
+
+            // 3) MS Office 설치 (MS Office Install)
+            ServiceCatalog office = buildServiceCatalog(companyA, "MS Office 설치", "Software", "💿", 
+                "MS Office 라이선스 및 설치를 요청합니다.", admin, "IT Support", 8, new java.math.BigDecimal("300000"), "LOW");
+            serviceCatalogRepository.save(office);
+            saveField(office, "version", "버전", "SELECT", true, 1, "[\"Office 2021\", \"Microsoft 365\"]");
+            saveField(office, "asset_tag", "자산번호", "TEXT", true, 2);
+
+            // 4) 신입사원 온보딩 (New Employee Onboarding)
+            ServiceCatalog onboarding = buildServiceCatalog(companyA, "신입사원 온보딩", "HR / IT", "👤", 
+                "신규 입사자의 계정 및 장비 세팅을 요청합니다.", admin, "HR Support", 24, java.math.BigDecimal.ZERO, "MEDIUM");
+            serviceCatalogRepository.save(onboarding);
+            saveField(onboarding, "emp_name", "성명", "TEXT", true, 1);
+            saveField(onboarding, "dept", "부서", "SELECT", true, 2, "[\"Sales\", \"R&D\", \"HR\", \"Finance\"]");
+            saveField(onboarding, "start_date", "입사 예정일", "DATE", true, 3);
+
+            // 5) 건물 출입 카드 (Building Access Card)
+            ServiceCatalog accessCard = buildServiceCatalog(companyA, "건물 출입 카드", "Facilities", "💳", 
+                "사무실 출입 카드를 발급 또는 갱신 요청합니다.", admin, "Security Team", 72, new java.math.BigDecimal("10000"), "LOW");
+            serviceCatalogRepository.save(accessCard);
+            saveField(accessCard, "card_type", "발급 유형", "SELECT", true, 1, "[\"New\", \"Renewal\", \"Replacement\"]");
+            saveField(accessCard, "emp_id", "사번", "TEXT", true, 2);
         }
 
         // 5. KNOWLEDGE
@@ -124,11 +161,26 @@ public class DataInitializer implements CommandLineRunner {
         });
     }
 
-    private ServiceCatalog buildServiceCatalog(Company company, String name, String category, String icon, String desc, String schema) {
+    private ServiceCatalog buildServiceCatalog(Company company, String name, String category, String icon, String desc, 
+                                               User owner, String group, int sla, java.math.BigDecimal cost, String urgency) {
         ServiceCatalog c = new ServiceCatalog();
         c.setCompany(company); c.setCatalogName(name); c.setCategory(category);
-        c.setIcon(icon); c.setDescription(desc); c.setFormSchema(schema);
+        c.setIcon(icon); c.setDescription(desc);
+        c.setServiceOwner(owner); c.setFulfillmentGroup(group); c.setSlaHours(sla);
+        c.setEstimatedCost(cost); c.setDefaultUrgency(urgency);
         c.setIsPublished(true);
         return c;
+    }
+
+    private void saveField(ServiceCatalog catalog, String name, String label, String type, boolean req, int order) {
+        saveField(catalog, name, label, type, req, order, null);
+    }
+
+    private void saveField(ServiceCatalog catalog, String name, String label, String type, boolean req, int order, String options) {
+        CatalogField f = new CatalogField();
+        f.setCatalog(catalog); f.setFieldName(name); f.setFieldLabel(label);
+        f.setFieldType(type); f.setRequired(req); f.setFieldOrder(order);
+        f.setFieldOptions(options);
+        catalogFieldRepository.save(f);
     }
 }

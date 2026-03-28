@@ -19,21 +19,35 @@ export const ServiceCatalogAdminPage: React.FC = () => {
     description: '', 
     category: '', 
     icon: '📋', 
-    formSchema: '[]', 
-    isPublished: true 
+    isPublished: true,
+    ownerId: '',
+    fulfillmentGroup: '',
+    slaHours: 24,
+    estimatedCost: 0,
+    defaultUrgency: 'MEDIUM',
+    fields: [] as any[]
   });
-  
+
+  const [newField, setNewField] = useState({ fieldName: '', fieldLabel: '', fieldType: 'TEXT', isRequired: false, fieldOrder: 0 });
   const [modal, setModal] = useState({ isOpen: false, title: '', message: '', type: 'info' as any, onConfirm: () => {} });
 
   const fetchCatalogs = useCallback(async () => {
     setLoading(true);
     try {
       const data = await serviceCatalogApi.adminGetServiceCatalogs(search, page, 10);
+      console.debug('[ADMIN UI] Fetched catalogs:', data.totalElements, 'total items');
+      if (data.error && data.status === 403) {
+        setModal({ isOpen: true, title: '접근 권한 없음', message: '관리자 권한이 없거나 세션이 만료되었습니다. 다시 로그인해 주세요.', type: 'danger', onConfirm: () => { window.location.href = '/'; } });
+        return;
+      }
       setCatalogs(data.content || []);
       setTotalPages(data.totalPages);
       setTotalElements(data.totalElements);
-    } catch (e) {
+    } catch (e: any) {
       console.error('Failed to fetch catalogs:', e);
+      if (e.message?.includes('403')) {
+         setModal({ isOpen: true, title: '접근 권한 없음', message: '관리자 권한이 없거나 세션이 만료되었습니다.', type: 'danger', onConfirm: () => { window.location.href = '/'; } });
+      }
     } finally {
       setLoading(false);
     }
@@ -46,19 +60,40 @@ export const ServiceCatalogAdminPage: React.FC = () => {
     return () => clearTimeout(timer);
   }, [fetchCatalogs]);
 
+  const addField = () => {
+    if (!newField.fieldName || !newField.fieldLabel) return;
+    const currentFields = showForm ? catalogForm.fields : editingCatalog!.fields;
+    const updatedFields = [...currentFields, { ...newField, fieldOrder: currentFields.length + 1 }];
+    if (showForm) {
+      setCatalogForm({ ...catalogForm, fields: updatedFields });
+    } else {
+      setEditingCatalog({ ...editingCatalog!, fields: updatedFields });
+    }
+    setNewField({ fieldName: '', fieldLabel: '', fieldType: 'TEXT', isRequired: false, fieldOrder: 0 });
+  };
+
+  const removeField = (index: number) => {
+    const currentFields = showForm ? catalogForm.fields : editingCatalog!.fields;
+    const updatedFields = currentFields.filter((_: any, i: number) => i !== index);
+    if (showForm) {
+      setCatalogForm({ ...catalogForm, fields: updatedFields });
+    } else {
+      setEditingCatalog({ ...editingCatalog!, fields: updatedFields });
+    }
+  };
+
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      try { JSON.parse(catalogForm.formSchema); } catch(e) { 
-        setModal({ isOpen: true, title: '형식 오류', message: 'Form Schema는 유효한 JSON 배열이어야 합니다.', type: 'danger', onConfirm: () => setModal({ ...modal, isOpen: false }) });
-        return;
-      }
-
       await serviceCatalogApi.createServiceCatalog(catalogForm);
       setModal({ isOpen: true, title: '성공', message: '카탈로그 항목이 생성되었습니다.', type: 'success', onConfirm: () => { setModal({ ...modal, isOpen: false }); setShowForm(false); fetchCatalogs(); } });
-      setCatalogForm({ catalogName: '', description: '', category: '', icon: '📋', formSchema: '[]', isPublished: true });
-    } catch (e) {
-      setModal({ isOpen: true, title: '오류', message: '오류가 발생했습니다.', type: 'danger', onConfirm: () => setModal({ ...modal, isOpen: false }) });
+      setCatalogForm({ catalogName: '', description: '', category: '', icon: '📋', isPublished: true, ownerId: '', fulfillmentGroup: '', slaHours: 24, estimatedCost: 0, defaultUrgency: 'MEDIUM', fields: [] });
+    } catch (e: any) {
+      if (e.message?.includes('403')) {
+        setModal({ isOpen: true, title: '접근 권한 없음', message: '관리자 권한이 없습니다.', type: 'danger', onConfirm: () => setModal({ ...modal, isOpen: false }) });
+      } else {
+        setModal({ isOpen: true, title: '오류', message: '오류가 발생했습니다.', type: 'danger', onConfirm: () => setModal({ ...modal, isOpen: false }) });
+      }
     }
   };
 
@@ -66,15 +101,14 @@ export const ServiceCatalogAdminPage: React.FC = () => {
     e.preventDefault();
     if (!editingCatalog) return;
     try {
-      try { JSON.parse(editingCatalog.formSchema); } catch(e) { 
-        setModal({ isOpen: true, title: '형식 오류', message: 'Form Schema는 유효한 JSON 배열이어야 합니다.', type: 'danger', onConfirm: () => setModal({ ...modal, isOpen: false }) });
-        return;
-      }
-
       await serviceCatalogApi.updateServiceCatalog(editingCatalog.id, editingCatalog);
       setModal({ isOpen: true, title: '수정 완료', message: '정보가 성공적으로 반영되었습니다.', type: 'success', onConfirm: () => { setModal({ ...modal, isOpen: false }); setEditingCatalog(null); fetchCatalogs(); } });
-    } catch (e) {
-      setModal({ isOpen: true, title: '오류', message: '수정 중 오류가 발생했습니다.', type: 'danger', onConfirm: () => setModal({ ...modal, isOpen: false }) });
+    } catch (e: any) {
+      if (e.message?.includes('403')) {
+        setModal({ isOpen: true, title: '접근 권한 없음', message: '관리자 권한이 없습니다.', type: 'danger', onConfirm: () => setModal({ ...modal, isOpen: false }) });
+      } else {
+        setModal({ isOpen: true, title: '오류', message: '수정 중 오류가 발생했습니다.', type: 'danger', onConfirm: () => setModal({ ...modal, isOpen: false }) });
+      }
     }
   };
 
@@ -99,12 +133,21 @@ export const ServiceCatalogAdminPage: React.FC = () => {
     }
   };
 
+  const renderFormField = (field: any, index: number) => (
+    <div key={index} style={{ display: 'flex', gap: '1rem', alignItems: 'center', backgroundColor: '#252525', padding: '0.75rem', borderRadius: '8px', marginBottom: '0.5rem', border: '1px solid #333' }}>
+      <div style={{ flex: 1, color: '#fff' }}>{field.fieldLabel} <span style={{color: '#666', fontSize: '0.8rem'}}>({field.fieldName})</span></div>
+      <div style={{ width: '80px', color: '#339af0', fontSize: '0.8rem', fontWeight: 'bold' }}>{field.fieldType}</div>
+      <div style={{ color: field.isRequired ? '#ff6b6b' : '#666', fontSize: '0.8rem' }}>{field.isRequired ? 'Required' : 'Optional'}</div>
+      <button type="button" onClick={() => removeField(index)} style={{ padding: '0.3rem 0.6rem', backgroundColor: 'transparent', border: 'none', color: '#ff6b6b', cursor: 'pointer' }}>✕</button>
+    </div>
+  );
+
   return (
     <div style={{ padding: '1rem' }}>
       <AdminModal {...modal} onCancel={() => setModal({ ...modal, isOpen: false })} />
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-        <h2 style={{ color: '#fff', margin: 0 }}>서비스 카탈로그 마스터 ({totalElements})</h2>
+        <h2 style={{ color: '#fff', margin: 0 }}>서비스 카탈로그 관리 ({totalElements})</h2>
         <div style={{ display: 'flex', gap: '1rem' }}>
           <input 
             placeholder="검색..." 
@@ -120,6 +163,10 @@ export const ServiceCatalogAdminPage: React.FC = () => {
 
       {(showForm || editingCatalog) && (
         <form onSubmit={showForm ? handleCreate : handleUpdate} style={{ backgroundColor: '#1e1e1e', padding: '2rem', borderRadius: '12px', border: `1px solid ${editingCatalog ? '#339af0' : '#444'}`, marginBottom: '2rem' }}>
+          <h3 style={{ color: '#fff', marginTop: 0, marginBottom: '2rem', borderBottom: '1px solid #333', paddingBottom: '1rem' }}>
+            {showForm ? '새 서비스 카탈로그 등록' : '서비스 카탈로그 수정'}
+          </h3>
+          
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.5rem', marginBottom: '1.5rem' }}>
             <div>
               <label style={{ display: 'block', color: '#aaa', fontSize: '0.85rem', marginBottom: '0.5rem' }}>카탈로그 이름</label>
@@ -134,19 +181,75 @@ export const ServiceCatalogAdminPage: React.FC = () => {
               <input value={showForm ? catalogForm.icon : editingCatalog!.icon} onChange={e => showForm ? setCatalogForm({...catalogForm, icon: e.target.value}) : setEditingCatalog({...editingCatalog!, icon: e.target.value})} style={{ width: '100%', padding: '0.8rem', borderRadius: '8px', border: '1px solid #444', backgroundColor: '#252525', color: '#fff' }} />
             </div>
           </div>
-          <div style={{ marginBottom: '1.5rem' }}>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.5rem', marginBottom: '1.5rem' }}>
+            <div>
+              <label style={{ display: 'block', color: '#aaa', fontSize: '0.85rem', marginBottom: '0.5rem' }}>SLA (시간)</label>
+              <input type="number" value={showForm ? catalogForm.slaHours : editingCatalog!.slaHours} onChange={e => showForm ? setCatalogForm({...catalogForm, slaHours: parseInt(e.target.value)}) : setEditingCatalog({...editingCatalog!, slaHours: parseInt(e.target.value)})} style={{ width: '100%', padding: '0.8rem', borderRadius: '8px', border: '1px solid #444', backgroundColor: '#252525', color: '#fff' }} />
+            </div>
+            <div>
+              <label style={{ display: 'block', color: '#aaa', fontSize: '0.85rem', marginBottom: '0.5rem' }}>추정 비용 ($)</label>
+              <input type="number" value={showForm ? catalogForm.estimatedCost : editingCatalog!.estimatedCost} onChange={e => showForm ? setCatalogForm({...catalogForm, estimatedCost: parseFloat(e.target.value)}) : setEditingCatalog({...editingCatalog!, estimatedCost: parseFloat(e.target.value)})} style={{ width: '100%', padding: '0.8rem', borderRadius: '8px', border: '1px solid #444', backgroundColor: '#252525', color: '#fff' }} />
+            </div>
+            <div>
+              <label style={{ display: 'block', color: '#aaa', fontSize: '0.85rem', marginBottom: '0.5rem' }}>기본 긴급도</label>
+              <select value={showForm ? catalogForm.defaultUrgency : editingCatalog!.defaultUrgency} onChange={e => showForm ? setCatalogForm({...catalogForm, defaultUrgency: e.target.value}) : setEditingCatalog({...editingCatalog!, defaultUrgency: e.target.value})} style={{ width: '100%', padding: '0.8rem', borderRadius: '8px', border: '1px solid #444', backgroundColor: '#252525', color: '#fff' }}>
+                <option value="LOW">LOW</option>
+                <option value="MEDIUM">MEDIUM</option>
+                <option value="HIGH">HIGH</option>
+                <option value="CRITICAL">CRITICAL</option>
+              </select>
+            </div>
+             <div>
+              <label style={{ display: 'block', color: '#aaa', fontSize: '0.85rem', marginBottom: '0.5rem' }}>이행 그룹</label>
+              <input value={showForm ? catalogForm.fulfillmentGroup : editingCatalog!.fulfillmentGroup} onChange={e => showForm ? setCatalogForm({...catalogForm, fulfillmentGroup: e.target.value}) : setEditingCatalog({...editingCatalog!, fulfillmentGroup: e.target.value})} style={{ width: '100%', padding: '0.8rem', borderRadius: '8px', border: '1px solid #444', backgroundColor: '#252525', color: '#fff' }} />
+            </div>
+          </div>
+
+          <div style={{ marginBottom: '2.5rem' }}>
             <label style={{ display: 'block', color: '#aaa', fontSize: '0.85rem', marginBottom: '0.5rem' }}>설명</label>
             <textarea required value={showForm ? catalogForm.description : editingCatalog!.description} onChange={e => showForm ? setCatalogForm({...catalogForm, description: e.target.value}) : setEditingCatalog({...editingCatalog!, description: e.target.value})} rows={2} style={{ width: '100%', padding: '0.8rem', borderRadius: '8px', border: '1px solid #444', backgroundColor: '#252525', color: '#fff', fontFamily: 'inherit' }} />
           </div>
-          <div style={{ marginBottom: '1.5rem' }}>
-            <label style={{ display: 'block', color: '#aaa', fontSize: '0.85rem', marginBottom: '0.5rem' }}>Form Schema (JSON Layout)</label>
-            <textarea value={showForm ? catalogForm.formSchema : editingCatalog!.formSchema} onChange={e => showForm ? setCatalogForm({...catalogForm, formSchema: e.target.value}) : setEditingCatalog({...editingCatalog!, formSchema: e.target.value})} rows={8} style={{ width: '100%', padding: '0.8rem', borderRadius: '8px', border: '1px solid #444', backgroundColor: '#252525', color: '#fcc419', fontFamily: 'monospace', fontSize: '0.9rem' }} />
+
+          <div style={{ marginBottom: '2rem', padding: '1.5rem', backgroundColor: '#181818', borderRadius: '12px', border: '1px dashed #333' }}>
+            <h4 style={{ color: '#339af0', marginTop: 0, marginBottom: '1.5rem' }}>동적 필드 구성</h4>
+            
+            <div style={{ marginBottom: '1.5rem' }}>
+              {(showForm ? catalogForm.fields : editingCatalog!.fields).map((f: any, i: number) => renderFormField(f, i))}
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '2fr 2fr 2fr 1fr auto', gap: '0.75rem', alignItems: 'flex-end', padding: '1rem', backgroundColor: '#252525', borderRadius: '8px' }}>
+              <div>
+                <label style={{ display: 'block', color: '#888', fontSize: '0.75rem', marginBottom: '0.3rem' }}>필드 명 (ID)</label>
+                <input placeholder="fieldName" value={newField.fieldName} onChange={e => setNewField({...newField, fieldName: e.target.value})} style={{ width: '100%', padding: '0.5rem', borderRadius: '6px', border: '1px solid #444', backgroundColor: '#1e1e1e', color: '#fff' }} />
+              </div>
+              <div>
+                <label style={{ display: 'block', color: '#888', fontSize: '0.75rem', marginBottom: '0.3rem' }}>라벨 (표시용)</label>
+                <input placeholder="Field Label" value={newField.fieldLabel} onChange={e => setNewField({...newField, fieldLabel: e.target.value})} style={{ width: '100%', padding: '0.5rem', borderRadius: '6px', border: '1px solid #444', backgroundColor: '#1e1e1e', color: '#fff' }} />
+              </div>
+              <div>
+                <label style={{ display: 'block', color: '#888', fontSize: '0.75rem', marginBottom: '0.3rem' }}>타입</label>
+                <select value={newField.fieldType} onChange={e => setNewField({...newField, fieldType: e.target.value})} style={{ width: '100%', padding: '0.5rem', borderRadius: '6px', border: '1px solid #444', backgroundColor: '#1e1e1e', color: '#fff' }}>
+                  <option value="TEXT">TEXT</option>
+                  <option value="NUMBER">NUMBER</option>
+                  <option value="SELECT">SELECT</option>
+                  <option value="CHECKBOX">CHECKBOX</option>
+                  <option value="DATE">DATE</option>
+                </select>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '0.3rem' }}>
+                <label style={{ color: '#888', fontSize: '0.75rem', marginBottom: '0.3rem' }}>필수</label>
+                <input type="checkbox" checked={newField.isRequired} onChange={e => setNewField({...newField, isRequired: e.target.checked})} style={{ width: '1.2rem', height: '1.2rem' }} />
+              </div>
+              <button type="button" onClick={addField} style={{ padding: '0.6rem 1.2rem', borderRadius: '6px', border: 'none', backgroundColor: '#339af0', color: '#fff', fontWeight: 'bold', cursor: 'pointer' }}>추가</button>
+            </div>
           </div>
-          <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
-             <button type="submit" style={{ padding: '0.8rem 2.5rem', borderRadius: '8px', border: 'none', backgroundColor: editingCatalog ? '#339af0' : '#51cf66', color: editingCatalog ? '#fff' : '#000', fontWeight: 'bold', cursor: 'pointer' }}>
-               {editingCatalog ? '수정 사항 저장' : '등록'}
+
+          <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end', borderTop: '1px solid #333', paddingTop: '1.5rem' }}>
+             <button type="submit" style={{ padding: '1rem 3rem', borderRadius: '8px', border: 'none', backgroundColor: editingCatalog ? '#339af0' : '#51cf66', color: editingCatalog ? '#fff' : '#000', fontWeight: 'bold', cursor: 'pointer', fontSize: '1.05rem', boxShadow: '0 4px 12px rgba(0,0,0,0.3)' }}>
+               {editingCatalog ? '수정 사항 저장' : '새 카탈로그 등록'}
              </button>
-             <button type="button" onClick={() => { setShowForm(false); setEditingCatalog(null); }} style={{ padding: '0.8rem 2.5rem', borderRadius: '8px', border: '1px solid #444', backgroundColor: 'transparent', color: '#888', cursor: 'pointer' }}>취소</button>
+             <button type="button" onClick={() => { setShowForm(false); setEditingCatalog(null); }} style={{ padding: '1rem 2.5rem', borderRadius: '8px', border: '1px solid #444', backgroundColor: 'transparent', color: '#888', cursor: 'pointer', fontWeight: 500 }}>취소</button>
           </div>
         </form>
       )}

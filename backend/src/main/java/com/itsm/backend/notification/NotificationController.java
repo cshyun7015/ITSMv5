@@ -43,4 +43,19 @@ public class NotificationController {
         notifications.forEach(n -> n.setRead(true));
         notificationRepository.saveAll(notifications);
     }
+    @GetMapping("/debug-session")
+    public Map<String, Object> debugSession() {
+        var auth = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null) {
+            return Map.of("authenticated", false);
+        }
+        return Map.of(
+            "authenticated", auth.isAuthenticated(),
+            "name", auth.getName(),
+            "authorities", auth.getAuthorities().stream()
+                .map(a -> a.getAuthority())
+                .toList(),
+            "principal", auth.getPrincipal()
+        );
+    }
 }

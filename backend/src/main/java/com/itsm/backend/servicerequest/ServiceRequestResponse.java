@@ -13,7 +13,7 @@ public class ServiceRequestResponse {
     private String status;
     private String priority;
     private String resolution;
-    private String formData;
+    private java.util.List<RequestValueResponse> requestValues;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private LocalDateTime resolvedAt;
@@ -22,6 +22,13 @@ public class ServiceRequestResponse {
     private AssigneeInfo assignee;
     private CompanyInfo company;
     private ServiceCatalogInfo catalog;
+
+    @Getter @Builder
+    public static class RequestValueResponse {
+        private String fieldName;
+        private String fieldLabel;
+        private String fieldValue;
+    }
 
     @Getter @Builder
     public static class RequesterInfo {

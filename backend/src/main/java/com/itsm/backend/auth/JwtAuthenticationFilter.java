@@ -4,8 +4,6 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -31,12 +29,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String companyId = claims.get("companyId", String.class);
 
             if (role != null && !role.isEmpty()) {
-                // Store companyId as a detail in the request for downstream extraction
+                // [SECURITY DEBUG] Setting authorities for role
+                var authorities = List.of(new org.springframework.security.core.authority.SimpleGrantedAuthority(role));
+                
                 CompanyAwareAuthentication auth = new CompanyAwareAuthentication(
-                        userId, companyId, null, List.of(new SimpleGrantedAuthority(role)));
+                        userId, companyId, null, authorities);
                 auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-                SecurityContextHolder.getContext().setAuthentication(auth);
+                org.springframework.security.core.context.SecurityContext context = org.springframework.security.core.context.SecurityContextHolder.getContext();
+                context.setAuthentication(auth);
+                
+                System.out.println("[SECURITY DEBUG] " + request.getMethod() + " " + request.getRequestURI() + " - Auth success: " + userId + " (" + role + ")");
             }
         }
         filterChain.doFilter(request, response);

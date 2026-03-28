@@ -21,9 +21,15 @@ public class ServiceCatalog {
     private String description;
     private String category;
     private String icon;
-    
-    @Column(columnDefinition = "TEXT")
-    private String formSchema;
-    
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id")
+    private com.itsm.backend.admin.user.User serviceOwner;
+
+    private String fulfillmentGroup;
+    private Integer slaHours;
+    private java.math.BigDecimal estimatedCost;
+    private String defaultUrgency; // LOW, MEDIUM, HIGH
+
     private Boolean isPublished;
 }

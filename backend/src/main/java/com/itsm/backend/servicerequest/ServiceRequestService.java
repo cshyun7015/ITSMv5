@@ -1,10 +1,15 @@
 package com.itsm.backend.servicerequest;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.itsm.backend.servicecatalog.CatalogField;
+import com.itsm.backend.servicecatalog.CatalogFieldRepository;
 import com.itsm.backend.servicecatalog.ServiceCatalog;
 import com.itsm.backend.servicecatalog.ServiceCatalogRepository;
 import com.itsm.backend.admin.user.User;
 import com.itsm.backend.admin.user.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -12,16 +17,20 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ServiceRequestService {
 
     private final ServiceRequestRepository repository;
     private final UserRepository userRepository;
     private final ServiceCatalogRepository catalogRepository;
+    private final CatalogFieldRepository fieldRepository;
     private final ServiceRequestMapper mapper;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     public List<ServiceRequestResponse> getRequestsForUser(String userId) {
         return repository.findByRequester_UserId(userId).stream()
@@ -53,11 +62,17 @@ public class ServiceRequestService {
         sr.setCatalog(catalog);
         sr.setTitle(dto.getTitle() != null ? dto.getTitle() : catalog.getCatalogName() + " 요청");
         sr.setDescription(dto.getDescription());
-        sr.setFormData(dto.getFormData() != null ? dto.getFormData() : "{}");
         sr.setStatus("OPEN");
         sr.setPriority(dto.getPriority() != null ? dto.getPriority() : "MEDIUM");
         
-        return mapper.toResponse(repository.save(sr));
+        ServiceRequest saved = repository.save(sr);
+        
+        if (dto.getFormData() != null) {
+            log.debug("[REQUEST] Parsing dynamic form data: {}", dto.getFormData());
+            saveRequestValues(saved, catalog, dto.getFormData());
+        }
+        
+        return mapper.toResponse(saved);
     }
 
     @Transactional
@@ -80,9 +95,33 @@ public class ServiceRequestService {
         }
         if (dto.getTitle() != null) sr.setTitle(dto.getTitle());
         if (dto.getDescription() != null) sr.setDescription(dto.getDescription());
-        if (dto.getFormData() != null) sr.setFormData(dto.getFormData());
+        
+        if (dto.getFormData() != null) {
+            // Clear existing and recreate (simplistic transition)
+            sr.getRequestValues().clear();
+            saveRequestValues(sr, sr.getCatalog(), dto.getFormData());
+        }
 
         return mapper.toResponse(repository.save(sr));
+    }
+
+    private void saveRequestValues(ServiceRequest sr, ServiceCatalog catalog, String formDataJson) {
+        try {
+            Map<String, Object> values = objectMapper.readValue(formDataJson, new TypeReference<Map<String, Object>>() {});
+            List<CatalogField> fields = fieldRepository.findByCatalogOrderByFieldOrder(catalog);
+            
+            for (CatalogField field : fields) {
+                if (values.containsKey(field.getFieldName())) {
+                    RequestValue rv = new RequestValue();
+                    rv.setRequest(sr);
+                    rv.setField(field);
+                    rv.setFieldValue(String.valueOf(values.get(field.getFieldName())));
+                    sr.getRequestValues().add(rv);
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to parse form data: " + e.getMessage());
+        }
     }
 
     @Transactional
@@ -90,12 +129,10 @@ public class ServiceRequestService {
         ServiceRequest sr = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Request not found"));
         
-        // Security: Only the requester can cancel
         if (!sr.getRequester().getUserId().equals(userId)) {
             throw new RuntimeException("Unauthorized: Only the requester can cancel this request.");
         }
         
-        // Only OPEN requests can be canceled
         if (!"OPEN".equals(sr.getStatus())) {
             throw new RuntimeException("Only requests in 'OPEN' status can be canceled.");
         }

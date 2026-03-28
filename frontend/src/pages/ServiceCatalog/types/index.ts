@@ -4,8 +4,14 @@ export type ServiceCatalog = {
   description: string;
   category: string;
   icon: string;
-  formSchema: string;
+  ownerId?: string;
+  ownerName?: string;
+  fulfillmentGroup?: string;
+  slaHours?: number;
+  estimatedCost?: number;
+  defaultUrgency?: string;
   isPublished: boolean;
+  fields: FormField[];
   company?: {
     companyId: string;
     companyName: string;
@@ -13,8 +19,11 @@ export type ServiceCatalog = {
 };
 
 export type FormField = {
-  name: string;
-  label: string;
-  type: 'text' | 'number' | 'textarea' | 'select' | 'checkbox';
-  options?: string[];
+  id?: number;
+  fieldName: string;
+  fieldLabel: string;
+  fieldType: 'TEXT' | 'NUMBER' | 'DATE' | 'SELECT' | 'CHECKBOX' | 'textarea';
+  isRequired: boolean;
+  fieldOrder: number;
+  fieldOptions?: string; // JSON string from backend
 };

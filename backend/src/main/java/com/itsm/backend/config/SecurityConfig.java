@@ -5,7 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -30,17 +30,16 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll() // Preflight skip
                 .requestMatchers("/api/auth/**", "/api/test", "/actuator/**", "/api/events/webhook").permitAll()
-                .requestMatchers("/api/admin/**").hasAuthority("ROLE_ADMIN")
+                .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .anyRequest().authenticated() 
             )
-            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+            .addFilterBefore(jwtFilter, BasicAuthenticationFilter.class);
         
         return http.build();
     }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-        // 프론트엔드 연동을 위한 CORS 기본 오픈
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
         config.setAllowedOriginPatterns(List.of("*"));
