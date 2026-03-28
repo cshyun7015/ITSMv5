@@ -8,11 +8,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ProblemService {
 
     private final ProblemRepository problemRepository;
@@ -35,31 +37,59 @@ public class ProblemService {
     public ProblemResponse getProblem(Long id) {
         return problemRepository.findById(id)
                 .map(problemMapper::toResponse)
-                .orElse(null);
+                .orElseThrow(() -> new RuntimeException("Problem not found: " + id));
     }
 
     @Transactional
     public ProblemResponse createProblem(Problem problem, String companyId) {
         Company company = companyRepository.findById(companyId)
                 .orElseThrow(() -> new RuntimeException("Company not found"));
+        
         problem.setCompany(company);
-        if (problem.getStatus() == null) problem.setStatus("OPEN");
+        if (problem.getStatus() == null) problem.setStatus("PRB_NEW");
+        if (problem.getUrgency() == null) problem.setUrgency("Medium");
+        if (problem.getImpact() == null) problem.setImpact("Medium");
+        
+        problem.setPriority(calculatePriority(problem.getUrgency(), problem.getImpact()));
+        problem.setCreatedAt(LocalDateTime.now());
+        
         return problemMapper.toResponse(problemRepository.save(problem));
     }
 
     @Transactional
-    public ProblemResponse updateProblem(Long id, Problem problemDetails) {
+    public ProblemResponse updateProblem(Long id, Problem updates) {
         Problem problem = problemRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Problem not found"));
         
-        problem.setTitle(problemDetails.getTitle());
-        problem.setDescription(problemDetails.getDescription());
-        problem.setRootCause(problemDetails.getRootCause());
-        problem.setWorkaround(problemDetails.getWorkaround());
-        problem.setStatus(problemDetails.getStatus());
-        problem.setPriority(problemDetails.getPriority());
+        if (updates.getTitle() != null) problem.setTitle(updates.getTitle());
+        if (updates.getDescription() != null) problem.setDescription(updates.getDescription());
+        if (updates.getRootCause() != null) problem.setRootCause(updates.getRootCause());
+        if (updates.getWorkaround() != null) problem.setWorkaround(updates.getWorkaround());
+        if (updates.getResolution() != null) problem.setResolution(updates.getResolution());
+        if (updates.getCategory() != null) problem.setCategory(updates.getCategory());
+        if (updates.getAssignedGroup() != null) problem.setAssignedGroup(updates.getAssignedGroup());
+        
+        if (updates.getStatus() != null) {
+            String newStatus = updates.getStatus();
+            problem.setStatus(newStatus);
+            if ("PRB_RESOLVED".equals(newStatus)) {
+                problem.setResolvedAt(LocalDateTime.now());
+            } else if ("PRB_CLOSED".equals(newStatus)) {
+                problem.setClosedAt(LocalDateTime.now());
+            }
+        }
+        
+        if (updates.getUrgency() != null) problem.setUrgency(updates.getUrgency());
+        if (updates.getImpact() != null) problem.setImpact(updates.getImpact());
+        
+        problem.setPriority(calculatePriority(problem.getUrgency(), problem.getImpact()));
         
         return problemMapper.toResponse(problemRepository.save(problem));
+    }
+
+    @Transactional
+    public void deleteProblem(Long id) {
+        problemRepository.deleteById(id);
     }
 
     @Transactional
@@ -71,5 +101,12 @@ public class ProblemService {
         
         incident.setProblem(problem);
         incidentRepository.save(incident);
+    }
+
+    private String calculatePriority(String urgency, String impact) {
+        if ("High".equalsIgnoreCase(urgency) && "High".equalsIgnoreCase(impact)) return "Critical";
+        if ("High".equalsIgnoreCase(urgency) || "High".equalsIgnoreCase(impact)) return "High";
+        if ("Low".equalsIgnoreCase(urgency) && "Low".equalsIgnoreCase(impact)) return "Low";
+        return "Medium";
     }
 }

@@ -4,31 +4,31 @@ import type { ChangeStatus } from '../types';
 
 const STATUS_COLOR: Record<ChangeStatus, string> = {
   CHG_DRAFT: 'border-slate-500/50 text-slate-400 bg-slate-500/10',
-  CHG_SUBMITTED: 'border-blue-500/50 text-blue-400 bg-blue-500/10',
-  CHG_REVIEW: 'border-amber-500/50 text-amber-400 bg-amber-500/10',
-  CHG_APPROVED: 'border-green-500/50 text-green-400 bg-green-500/10',
-  CHG_SCHEDULED: 'border-emerald-500/50 text-emerald-400 bg-emerald-500/10',
-  CHG_IMPLEMENTING: 'border-indigo-500/50 text-indigo-400 bg-indigo-500/10',
-  CHG_CLOSED: 'border-slate-700/50 text-slate-500 bg-slate-700/5',
+  CHG_AUTHORIZATION: 'border-amber-500/50 text-amber-400 bg-amber-500/10',
+  CHG_SCHEDULED: 'border-blue-500/50 text-blue-400 bg-blue-500/10',
+  CHG_IMPLEMENTATION: 'border-orange-500/50 text-orange-400 bg-orange-500/10',
+  CHG_REVIEW: 'border-indigo-500/50 text-indigo-400 bg-indigo-500/10',
+  CHG_COMPLETED: 'border-green-500/50 text-green-400 bg-green-500/10',
+  CHG_CANCELED: 'border-red-500/50 text-red-400 bg-red-500/10',
 };
 
 const STATUS_LABEL: Record<ChangeStatus, string> = {
-  CHG_DRAFT: 'DRAFT',
-  CHG_SUBMITTED: 'SUBMITTED',
-  CHG_REVIEW: 'TECHNICAL REVIEW',
-  CHG_APPROVED: 'CAB APPROVED',
-  CHG_SCHEDULED: 'SCHEDULED',
-  CHG_IMPLEMENTING: 'IMPLEMENTING',
-  CHG_CLOSED: 'CLOSED',
+  CHG_DRAFT: '초안 (DRAFT)',
+  CHG_AUTHORIZATION: '승인 대기 (AUTH)',
+  CHG_SCHEDULED: '예약됨 (SCHEDULED)',
+  CHG_IMPLEMENTATION: '수행 중 (IMP)',
+  CHG_REVIEW: '사후 검토 (REVIEW)',
+  CHG_COMPLETED: '완료 (COMPLETED)',
+  CHG_CANCELED: '취소 (CANCELED)',
 };
 
-const ChangeList: React.FC<{ user: any }> = ({ user }) => {
+const ChangeList: React.FC<{ user: any, onSelectDetail: (id: number) => void }> = ({ user, onSelectDetail }) => {
   const { changes, loading, error, createChange } = useChanges();
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ 
     title: '', description: '', changeReason: '', riskAssessment: '', 
     impactAnalysis: '', implementationPlan: '', rollbackPlan: '', 
-    changeType: 'Normal', risk: 'Medium', priority: 'Medium',
+    testPlan: '', changeType: 'Normal', risk: 'Medium', priority: 'Medium',
     plannedStart: '', plannedEnd: '' 
   });
   const [submitting, setSubmitting] = useState(false);
@@ -42,7 +42,7 @@ const ChangeList: React.FC<{ user: any }> = ({ user }) => {
       setForm({ 
         title: '', description: '', changeReason: '', riskAssessment: '', 
         impactAnalysis: '', implementationPlan: '', rollbackPlan: '', 
-        changeType: 'Normal', risk: 'Medium', priority: 'Medium',
+        testPlan: '', changeType: 'Normal', risk: 'Medium', priority: 'Medium',
         plannedStart: '', plannedEnd: '' 
       });
     } catch (e) {
@@ -129,15 +129,27 @@ const ChangeList: React.FC<{ user: any }> = ({ user }) => {
               </div>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-500 tracking-[0.2em] uppercase">Post-Change Verification & Rollback Plan</label>
-              <textarea 
-                placeholder="Step-by-step restoration procedure if verification fails..." 
-                rows={3} 
-                value={form.rollbackPlan} 
-                onChange={e => setForm({ ...form, rollbackPlan: e.target.value })} 
-                className="w-full px-6 py-4 bg-black border-b-2 border-slate-800 text-white focus:outline-none focus:border-emerald-500 transition-all font-bold resize-none"
-              />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-slate-500 tracking-[0.2em] uppercase">Rollback Plan *필수</label>
+                <textarea 
+                  placeholder="Step-by-step restoration procedure..." 
+                  rows={2} 
+                  value={form.rollbackPlan} 
+                  onChange={e => setForm({ ...form, rollbackPlan: e.target.value })} 
+                  className="w-full px-6 py-4 bg-black border-b-2 border-slate-800 text-white focus:outline-none focus:border-red-500 transition-all font-bold resize-none"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-slate-500 tracking-[0.2em] uppercase">Verification Test Plan</label>
+                <textarea 
+                  placeholder="How will you verify implementation success?" 
+                  rows={2} 
+                  value={form.testPlan} 
+                  onChange={e => setForm({ ...form, testPlan: e.target.value })} 
+                  className="w-full px-6 py-4 bg-black border-b-2 border-slate-800 text-white focus:outline-none focus:border-emerald-500 transition-all font-bold resize-none"
+                />
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
@@ -184,7 +196,11 @@ const ChangeList: React.FC<{ user: any }> = ({ user }) => {
             <span className="text-slate-700 font-black tracking-[0.5em] uppercase">No active records</span>
           </div>
         ) : changes.map(chg => (
-          <div key={chg.id} className="group relative bg-[#0a0a0c] border border-slate-800 p-8 transition-all hover:border-emerald-500/40 hover:bg-black/80">
+          <div 
+            key={chg.id} 
+            onClick={() => onSelectDetail(chg.id)}
+            className="group relative bg-[#0a0a0c] border border-slate-800 p-8 transition-all hover:border-emerald-500/40 hover:bg-black/80 cursor-pointer"
+          >
             <div className="absolute left-0 top-0 bottom-0 w-1 bg-slate-800 group-hover:bg-emerald-600 transition-all"></div>
             
             <div className="flex flex-wrap justify-between items-start gap-8">

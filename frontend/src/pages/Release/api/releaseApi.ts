@@ -19,6 +19,14 @@ export const releaseApi = {
     return response.json();
   },
 
+  getDetail: async (id: number): Promise<Release> => {
+    const response = await fetch(`${getApiUrl()}/api/releases/${id}`, {
+      headers: getHeaders()
+    });
+    if (!response.ok) throw new Error('Failed to fetch release detail');
+    return response.json();
+  },
+
   createRelease: async (data: ReleaseCreateRequest): Promise<Release> => {
     const response = await fetch(`${getApiUrl()}/api/releases`, {
       method: 'POST',
@@ -26,6 +34,16 @@ export const releaseApi = {
       body: JSON.stringify(data)
     });
     if (!response.ok) throw new Error('Failed to create release plan');
+    return response.json();
+  },
+
+  updateRelease: async (id: number, data: Partial<Release>): Promise<Release> => {
+    const response = await fetch(`${getApiUrl()}/api/releases/${id}`, {
+      method: 'PUT',
+      headers: getHeaders(),
+      body: JSON.stringify(data)
+    });
+    if (!response.ok) throw new Error('Failed to update release info');
     return response.json();
   },
 
@@ -37,5 +55,13 @@ export const releaseApi = {
     });
     if (!response.ok) throw new Error('Failed to update release status');
     return response.json();
+  },
+
+  deleteRelease: async (id: number): Promise<void> => {
+    const response = await fetch(`${getApiUrl()}/api/releases/${id}`, {
+      method: 'DELETE',
+      headers: getHeaders()
+    });
+    if (!response.ok) throw new Error('Failed to delete release plan');
   }
 };

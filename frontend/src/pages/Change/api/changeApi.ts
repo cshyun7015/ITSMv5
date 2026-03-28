@@ -19,6 +19,14 @@ export const changeApi = {
     return response.json();
   },
 
+  getDetail: async (id: number): Promise<Change> => {
+    const response = await fetch(`${getApiUrl()}/api/changes/${id}`, {
+      headers: getHeaders()
+    });
+    if (!response.ok) throw new Error('Failed to fetch change detail');
+    return response.json();
+  },
+
   createChange: async (data: ChangeCreateRequest): Promise<Change> => {
     const response = await fetch(`${getApiUrl()}/api/changes`, {
       method: 'POST',
@@ -26,6 +34,16 @@ export const changeApi = {
       body: JSON.stringify(data)
     });
     if (!response.ok) throw new Error('Failed to create change request');
+    return response.json();
+  },
+
+  updateChange: async (id: number, data: Partial<Change>): Promise<Change> => {
+    const response = await fetch(`${getApiUrl()}/api/changes/${id}`, {
+      method: 'PUT',
+      headers: getHeaders(),
+      body: JSON.stringify(data)
+    });
+    if (!response.ok) throw new Error('Failed to update change request');
     return response.json();
   },
 
@@ -37,5 +55,13 @@ export const changeApi = {
     });
     if (!response.ok) throw new Error('Failed to update change status');
     return response.json();
+  },
+
+  deleteChange: async (id: number): Promise<void> => {
+    const response = await fetch(`${getApiUrl()}/api/changes/${id}`, {
+      method: 'DELETE',
+      headers: getHeaders()
+    });
+    if (!response.ok) throw new Error('Failed to delete change request');
   }
 };

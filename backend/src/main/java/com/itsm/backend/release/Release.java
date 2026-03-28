@@ -26,9 +26,27 @@ public class Release {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    private String status;      // REL_PLANNED, REL_DEVELOPING, REL_TESTING, REL_DEPROYING, REL_COMPLETED, REL_ROLLED_BACK
+    private String status;      // REL_PLANNING, REL_BUILD, REL_TESTING, REL_ROLLOUT, REL_COMPLETED, REL_FAILED
     private String releaseType; // Major, Minor, Patch, Emergency
     
+    private String version;
+    private String buildNumber;
+    
+    @Column(columnDefinition = "TEXT")
+    private String packageUrl;
+    
+    private String deploymentMethod; // Blue/Green, Canary, etc.
+    
+    @Column(columnDefinition = "TEXT")
+    private String backoutPlan;
+    
+    @Column(columnDefinition = "TEXT")
+    private String testEvidenceUrl;
+    
+    @Column(columnDefinition = "TEXT")
+    private String releaseNotes;
+
+    @com.fasterxml.jackson.annotation.JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     private LocalDateTime targetDate;
     
     private LocalDateTime createdAt;

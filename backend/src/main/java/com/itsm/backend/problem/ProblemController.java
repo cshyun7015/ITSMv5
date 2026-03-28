@@ -2,6 +2,7 @@ package com.itsm.backend.problem;
 
 import com.itsm.backend.auth.SecurityUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -26,7 +27,13 @@ public class ProblemController {
         }
     }
 
+    @GetMapping("/{id}")
+    public ProblemResponse getProblem(@PathVariable Long id) {
+        return problemService.getProblem(id);
+    }
+
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public ProblemResponse createProblem(@RequestBody Problem problem) {
         String companyId = SecurityUtils.getCurrentCompanyId();
         return problemService.createProblem(problem, companyId);
@@ -35,6 +42,12 @@ public class ProblemController {
     @PutMapping("/{id}")
     public ProblemResponse updateProblem(@PathVariable Long id, @RequestBody Problem problem) {
         return problemService.updateProblem(id, problem);
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteProblem(@PathVariable Long id) {
+        problemService.deleteProblem(id);
     }
 
     @PostMapping("/{problemId}/link/{incidentId}")

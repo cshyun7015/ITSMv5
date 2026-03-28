@@ -3,10 +3,19 @@ import { useProblems } from '../hooks/useProblems';
 import type { Problem, ProblemStatus, ProblemPriority } from '../types';
 
 const STATUS_COLOR: Record<ProblemStatus, string> = {
-  OPEN: 'border-blue-500/50 text-blue-400 bg-blue-500/10',
-  INVESTIGATING: 'border-amber-500/50 text-amber-400 bg-amber-500/10',
-  RESOLVED: 'border-green-500/50 text-green-400 bg-green-500/10',
-  CLOSED: 'border-slate-500/50 text-slate-400 bg-slate-500/10',
+  PRB_NEW: 'border-blue-500/50 text-blue-400 bg-blue-500/10',
+  PRB_RCA: 'border-amber-500/50 text-amber-400 bg-amber-500/10',
+  PRB_KNOWN_ERROR: 'border-orange-500/50 text-orange-400 bg-orange-500/10',
+  PRB_RESOLVED: 'border-green-500/50 text-green-400 bg-green-500/10',
+  PRB_CLOSED: 'border-slate-500/50 text-slate-400 bg-slate-500/10',
+};
+
+const STATUS_LABEL: Record<ProblemStatus, string> = {
+  PRB_NEW: '신규 (New)',
+  PRB_RCA: '원인 분석 중 (RCA)',
+  PRB_KNOWN_ERROR: '기지 오류 (Known Error)',
+  PRB_RESOLVED: '해결됨 (Resolved)',
+  PRB_CLOSED: '종료 (Closed)',
 };
 
 const PRIORITY_COLOR: Record<ProblemPriority, string> = {
@@ -16,16 +25,16 @@ const PRIORITY_COLOR: Record<ProblemPriority, string> = {
   Low: 'bg-slate-500 text-white',
 };
 
-const ProblemList: React.FC<{ user: any }> = ({ user }) => {
+const ProblemList: React.FC<{ user: any, onSelectDetail: (id: number) => void }> = ({ user, onSelectDetail }) => {
   const { problems, loading, error, createProblem } = useProblems();
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ 
     title: '', 
     description: '', 
-    priority: 'Medium', 
-    rootCause: '', 
-    workaround: '', 
-    status: 'OPEN' 
+    urgency: 'Medium',
+    impact: 'Medium',
+    category: '',
+    status: 'PRB_NEW' 
   });
   const [submitting, setSubmitting] = useState(false);
 
@@ -35,7 +44,7 @@ const ProblemList: React.FC<{ user: any }> = ({ user }) => {
     try {
       await createProblem(form);
       setShowForm(false);
-      setForm({ title: '', description: '', priority: 'Medium', rootCause: '', workaround: '', status: 'OPEN' });
+      setForm({ title: '', description: '', urgency: 'Medium', impact: 'Medium', category: '', status: 'PRB_NEW' });
     } catch (e) {
       console.error(e);
     } finally {
@@ -98,57 +107,42 @@ const ProblemList: React.FC<{ user: any }> = ({ user }) => {
               />
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="space-y-2">
-                <label className="text-sm font-bold text-slate-400 ml-1">Root Cause (RCA)</label>
-                <textarea 
-                  value={form.rootCause} 
-                  onChange={e => setForm({ ...form, rootCause: e.target.value })} 
-                  rows={4} 
-                  placeholder="Findings from technical investigation..."
-                  className="w-full px-5 py-4 rounded-2xl border border-slate-700 bg-slate-900/50 text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all font-semibold resize-none"
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-bold text-slate-400 ml-1">Temporary Workaround</label>
-                <textarea 
-                  value={form.workaround} 
-                  onChange={e => setForm({ ...form, workaround: e.target.value })} 
-                  rows={4} 
-                  placeholder="Instructions to restore service temporarily..."
-                  className="w-full px-5 py-4 rounded-2xl border border-slate-700 bg-slate-900/50 text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all font-semibold resize-none"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="space-y-2">
-                <label className="text-sm font-bold text-slate-400 ml-1">Priority Level</label>
+                <label className="text-sm font-bold text-slate-400 ml-1">Urgency</label>
                 <select 
-                  value={form.priority} 
-                  onChange={e => setForm({ ...form, priority: e.target.value })} 
+                  value={form.urgency} 
+                  onChange={e => setForm({ ...form, urgency: e.target.value })} 
                   className="w-full px-5 py-4 rounded-2xl border border-slate-700 bg-slate-900/50 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all font-bold cursor-pointer"
                 >
-                  <option>Critical</option>
                   <option>High</option>
                   <option>Medium</option>
                   <option>Low</option>
                 </select>
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-bold text-slate-400 ml-1">Investigation Status</label>
+                <label className="text-sm font-bold text-slate-400 ml-1">Impact</label>
                 <select 
-                  value={form.status} 
-                  onChange={e => setForm({ ...form, status: e.target.value })} 
+                  value={form.impact} 
+                  onChange={e => setForm({ ...form, impact: e.target.value })} 
                   className="w-full px-5 py-4 rounded-2xl border border-slate-700 bg-slate-900/50 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all font-bold cursor-pointer"
                 >
-                  <option value="OPEN">Open</option>
-                  <option value="INVESTIGATING">Investigating</option>
-                  <option value="RESOLVED">Resolved</option>
-                  <option value="CLOSED">Closed</option>
+                  <option>High</option>
+                  <option>Medium</option>
+                  <option>Low</option>
                 </select>
               </div>
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-slate-400 ml-1">Category</label>
+                <input 
+                  placeholder="e.g. Database, Network"
+                  value={form.category} 
+                  onChange={e => setForm({ ...form, category: e.target.value })} 
+                  className="w-full px-5 py-4 rounded-2xl border border-slate-700 bg-slate-900/50 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all font-bold cursor-pointer"
+                />
+              </div>
             </div>
+
 
             <button 
               type="submit" 
@@ -170,7 +164,11 @@ const ProblemList: React.FC<{ user: any }> = ({ user }) => {
           </div>
         ) : (
           problems.map((prob: Problem) => (
-            <div key={prob.id} className="group bg-slate-800/40 hover:bg-slate-800/60 border border-slate-700/50 rounded-[2rem] p-8 transition-all duration-500 hover:shadow-3xl hover:border-indigo-500/30">
+            <div 
+              key={prob.id} 
+              onClick={() => onSelectDetail(prob.id)}
+              className="group bg-slate-800/40 hover:bg-slate-800/60 border border-slate-700/50 rounded-[2rem] p-8 transition-all duration-500 hover:shadow-3xl hover:border-indigo-500/30 cursor-pointer"
+            >
               <div className="flex flex-wrap justify-between items-start gap-8 mb-8">
                 <div className="flex-1 min-w-[300px]">
                   <div className="flex flex-wrap items-center gap-4 mb-4">
@@ -183,7 +181,7 @@ const ProblemList: React.FC<{ user: any }> = ({ user }) => {
                   <p className="text-slate-400 text-lg leading-relaxed font-medium line-clamp-2 italic">{prob.description}</p>
                 </div>
                 <div className={`px-6 py-2 rounded-2xl text-[12px] font-black tracking-widest uppercase border shadow-inner ${STATUS_COLOR[prob.status as ProblemStatus]}`}>
-                  {prob.status}
+                  {STATUS_LABEL[prob.status as ProblemStatus] || prob.status}
                 </div>
               </div>
               

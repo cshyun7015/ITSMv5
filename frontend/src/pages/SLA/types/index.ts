@@ -1,22 +1,28 @@
-export type SLA = {
-  id: number;
-  companyId: string;
-  serviceName: string;
-  targetValue: number;
-  actualValue: number;
-  unit: string;
-  period: string;
-  status: SLAStatus;
-  createdAt: string;
-  updatedAt: string;
-};
+export type SlaStatus = 'SLA_DRAFT' | 'SLA_ACTIVE' | 'SLA_INACTIVE' | 'SLA_EXPIRED';
 
-export type SLAStatus = 'SLA_MET' | 'SLA_NOT_MET' | 'SLA_WARNING';
+export interface SlaMetric {
+  id?: number;
+  name: string;
+  description?: string;
+  targetValue?: number;
+  unit?: string;
+  warningThreshold?: number;
+  criticalThreshold?: number;
+  frequency?: string;
+  isActive: boolean;
+}
 
-export type SLACreateRequest = {
-  serviceName: string;
-  targetValue: number;
-  actualValue: number;
-  unit: string;
-  period: string;
-};
+export interface Sla {
+  id?: number;
+  name: string;
+  description?: string;
+  customerName?: string;
+  status: SlaStatus;
+  serviceHours?: string;
+  startDate?: string;
+  endDate?: string;
+  companyId?: string;
+  metrics: SlaMetric[];
+  createdAt?: string;
+  updatedAt?: string;
+}

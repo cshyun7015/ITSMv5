@@ -3,28 +3,28 @@ import { useReleases } from '../hooks/useReleases';
 import type { ReleaseStatus } from '../types';
 
 const STATUS_COLOR: Record<ReleaseStatus, string> = {
-  REL_PLANNED: 'border-slate-500/50 text-slate-400 bg-slate-500/10',
-  REL_DEVELOPING: 'border-blue-500/50 text-blue-400 bg-blue-500/10',
-  REL_TESTING: 'border-amber-500/50 text-amber-400 bg-amber-500/10',
-  REL_DEPLOYING: 'border-indigo-500/50 text-indigo-400 bg-indigo-500/10',
-  REL_COMPLETED: 'border-emerald-500/50 text-emerald-400 bg-emerald-500/10',
-  REL_ROLLED_BACK: 'border-red-500/50 text-red-500 bg-red-500/10',
+  REL_PLANNING: 'border-slate-500/50 text-slate-400 bg-slate-500/10',
+  REL_BUILD: 'border-yellow-500/50 text-yellow-400 bg-yellow-500/10',
+  REL_TESTING: 'border-blue-500/50 text-blue-400 bg-blue-500/10',
+  REL_ROLLOUT: 'border-orange-500/50 text-orange-400 bg-orange-500/10',
+  REL_COMPLETED: 'border-green-500/50 text-green-400 bg-green-500/10',
+  REL_FAILED: 'border-red-500/50 text-red-400 bg-red-500/10',
 };
 
 const STATUS_LABEL: Record<ReleaseStatus, string> = {
-  REL_PLANNED: 'PLANNED',
-  REL_DEVELOPING: 'DEVELOPING',
-  REL_TESTING: 'TESTING',
-  REL_DEPLOYING: 'DEPLOYING',
-  REL_COMPLETED: 'COMPLETED',
-  REL_ROLLED_BACK: 'ROLLED BACK',
+  REL_PLANNING: '계획 중 (PLANNING)',
+  REL_BUILD: '빌드 (BUILD)',
+  REL_TESTING: '테스트 (TESTING)',
+  REL_ROLLOUT: '배포 수행 (ROLLOUT)',
+  REL_COMPLETED: '완료 (COMPLETED)',
+  REL_FAILED: '실패/회수 (FAILED)',
 };
 
-const ReleaseList: React.FC<{ user: any }> = ({ user }) => {
+const ReleaseList: React.FC<{ user: any, onSelectDetail: (id: number) => void }> = ({ user, onSelectDetail }) => {
   const { releases, loading, error, createRelease } = useReleases();
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ 
-    title: '', description: '', releaseType: 'Minor', targetDate: '' 
+    title: '', description: '', releaseType: 'Minor', version: '', buildNumber: '', targetDate: '' 
   });
   const [submitting, setSubmitting] = useState(false);
 
@@ -32,11 +32,17 @@ const ReleaseList: React.FC<{ user: any }> = ({ user }) => {
     e.preventDefault();
     setSubmitting(true);
     try {
-      await createRelease(form);
+      // Send null if targetDate is empty string to avoid Jackson parsing error
+      const payload = { 
+        ...form, 
+        targetDate: form.targetDate || undefined 
+      };
+      await createRelease(payload as any);
       setShowForm(false);
-      setForm({ title: '', description: '', releaseType: 'Minor', targetDate: '' });
-    } catch (e) {
+      setForm({ title: '', description: '', releaseType: 'Minor', version: '', buildNumber: '', targetDate: '' });
+    } catch (e: any) {
       console.error(e);
+      // Optional: Give feedback if needed, but for now we follow the existing log pattern
     } finally {
       setSubmitting(false);
     }
@@ -98,15 +104,25 @@ const ReleaseList: React.FC<{ user: any }> = ({ user }) => {
               />
             </div>
 
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-500 tracking-widest uppercase">Release Manifest / Description</label>
-              <textarea 
-                placeholder="List major features and fixes included in this release..." 
-                rows={3} 
-                value={form.description} 
-                onChange={e => setForm({ ...form, description: e.target.value })} 
-                className="w-full px-6 py-4 bg-black/40 border border-slate-800 text-slate-300 focus:outline-none focus:border-blue-500 transition-all font-medium resize-none text-sm"
-              />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-slate-500 tracking-widest uppercase">Version</label>
+                <input 
+                  placeholder="v1.0.0" 
+                  value={form.version} 
+                  onChange={e => setForm({ ...form, version: e.target.value })} 
+                  className="w-full px-6 py-4 bg-black/40 border border-slate-800 text-white focus:outline-none focus:border-blue-500 transition-all font-bold text-sm"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-slate-500 tracking-widest uppercase">Build Number</label>
+                <input 
+                  placeholder="2026.03.28-01" 
+                  value={form.buildNumber} 
+                  onChange={e => setForm({ ...form, buildNumber: e.target.value })} 
+                  className="w-full px-6 py-4 bg-black/40 border border-slate-800 text-white focus:outline-none focus:border-blue-500 transition-all font-bold text-sm"
+                />
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
@@ -155,8 +171,12 @@ const ReleaseList: React.FC<{ user: any }> = ({ user }) => {
             <span className="text-slate-600 font-black tracking-[0.5em] uppercase text-sm">Deployment Registry Empty</span>
           </div>
         ) : releases.map(rel => (
-          <div key={rel.id} className="group relative bg-slate-900 border border-slate-800 p-8 transition-all hover:bg-black hover:border-blue-500/30 overflow-hidden">
-            <div className={`absolute top-0 right-0 px-4 py-1 text-[8px] font-black tracking-widest uppercase ${statusTagColor(rel.status)}`}>
+          <div 
+            key={rel.id} 
+            onClick={() => onSelectDetail(rel.id)}
+            className="group relative bg-slate-900 border border-slate-800 p-8 transition-all hover:bg-black hover:border-blue-500/30 overflow-hidden cursor-pointer"
+          >
+            <div className={`absolute top-0 right-0 px-4 py-1 text-[8px] font-black tracking-widest uppercase border ${STATUS_COLOR[rel.status as ReleaseStatus]}`}>
                {STATUS_LABEL[rel.status as ReleaseStatus] || rel.status}
             </div>
             
@@ -192,13 +212,5 @@ const ReleaseList: React.FC<{ user: any }> = ({ user }) => {
   );
 };
 
-const statusTagColor = (status: string) => {
-  switch(status) {
-    case 'REL_COMPLETED': return 'bg-emerald-600 text-white';
-    case 'REL_DEPLOYING': return 'bg-indigo-600 text-white';
-    case 'REL_ROLLED_BACK': return 'bg-red-600 text-white';
-    default: return 'bg-slate-800 text-slate-400';
-  }
-};
 
 export default ReleaseList;

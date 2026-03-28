@@ -17,12 +17,17 @@ public class ChangeResponse {
     private String impactAnalysis;
     private String implementationPlan;
     private String rollbackPlan;
+    private String testPlan;
     private String changeType;
     private String status;
     private String risk;
     private String priority;
+    private String assignedGroup;
     private LocalDateTime plannedStart;
     private LocalDateTime plannedEnd;
+    private LocalDateTime actualStart;
+    private LocalDateTime actualEnd;
+    private String reviewNotes;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

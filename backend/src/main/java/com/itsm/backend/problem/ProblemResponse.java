@@ -14,6 +14,13 @@ public class ProblemResponse {
     private String workaround;
     private String status;
     private String priority;
+    private String urgency;
+    private String impact;
+    private String category;
+    private String resolution;
+    private String assignedGroup;
     private LocalDateTime createdAt;
+    private LocalDateTime resolvedAt;
+    private LocalDateTime closedAt;
     private String companyId;
 }

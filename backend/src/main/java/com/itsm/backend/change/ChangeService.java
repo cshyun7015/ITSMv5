@@ -9,11 +9,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ChangeService {
 
     private final ChangeRepository changeRepository;
@@ -37,7 +39,7 @@ public class ChangeService {
     public ChangeResponse getChange(Long id) {
         return changeRepository.findById(id)
                 .map(changeMapper::toResponse)
-                .orElse(null);
+                .orElseThrow(() -> new RuntimeException("Change request not found: " + id));
     }
 
     @Transactional
@@ -64,6 +66,40 @@ public class ChangeService {
     }
 
     @Transactional
+    public ChangeResponse updateChange(Long id, Change updates) {
+        Change cr = changeRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Change request not found"));
+        
+        if (updates.getTitle() != null) cr.setTitle(updates.getTitle());
+        if (updates.getDescription() != null) cr.setDescription(updates.getDescription());
+        if (updates.getChangeReason() != null) cr.setChangeReason(updates.getChangeReason());
+        if (updates.getRiskAssessment() != null) cr.setRiskAssessment(updates.getRiskAssessment());
+        if (updates.getImpactAnalysis() != null) cr.setImpactAnalysis(updates.getImpactAnalysis());
+        if (updates.getImplementationPlan() != null) cr.setImplementationPlan(updates.getImplementationPlan());
+        if (updates.getRollbackPlan() != null) cr.setRollbackPlan(updates.getRollbackPlan());
+        if (updates.getTestPlan() != null) cr.setTestPlan(updates.getTestPlan());
+        
+        if (updates.getChangeType() != null) cr.setChangeType(updates.getChangeType());
+        if (updates.getRisk() != null) cr.setRisk(updates.getRisk());
+        if (updates.getPriority() != null) cr.setPriority(updates.getPriority());
+        if (updates.getAssignedGroup() != null) cr.setAssignedGroup(updates.getAssignedGroup());
+        
+        if (updates.getPlannedStart() != null) cr.setPlannedStart(updates.getPlannedStart());
+        if (updates.getPlannedEnd() != null) cr.setPlannedEnd(updates.getPlannedEnd());
+        if (updates.getActualStart() != null) cr.setActualStart(updates.getActualStart());
+        if (updates.getActualEnd() != null) cr.setActualEnd(updates.getActualEnd());
+        
+        if (updates.getReviewNotes() != null) cr.setReviewNotes(updates.getReviewNotes());
+        
+        if (updates.getStatus() != null) {
+            cr.setStatus(updates.getStatus());
+        }
+        
+        cr.setUpdatedAt(LocalDateTime.now());
+        return changeMapper.toResponse(changeRepository.save(cr));
+    }
+
+    @Transactional
     public ChangeResponse updateStatus(Long id, String status, String companyId, String role) {
         Change cr = changeRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Change request not found"));
@@ -74,6 +110,7 @@ public class ChangeService {
         }
         
         cr.setStatus(status);
+        cr.setUpdatedAt(LocalDateTime.now());
         Change updated = changeRepository.save(cr);
         
         if (cr.getRequester() != null) {
@@ -86,5 +123,10 @@ public class ChangeService {
         }
         
         return changeMapper.toResponse(updated);
+    }
+
+    @Transactional
+    public void deleteChange(Long id) {
+        changeRepository.deleteById(id);
     }
 }

@@ -31,6 +31,7 @@ public class SecurityConfig {
                 .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll() // Preflight skip
                 .requestMatchers("/api/auth/**", "/api/test", "/actuator/**", "/api/events/webhook").permitAll()
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                .requestMatchers("/api/releases/**", "/api/slas/**").authenticated() 
                 .anyRequest().authenticated() 
             )
             .addFilterBefore(jwtFilter, BasicAuthenticationFilter.class);

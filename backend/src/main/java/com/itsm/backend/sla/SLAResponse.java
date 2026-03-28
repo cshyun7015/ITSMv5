@@ -1,20 +1,21 @@
 package com.itsm.backend.sla;
 
-import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
 import java.time.LocalDateTime;
+import java.util.List;
 
-@Getter
-@Builder
-public class SLAResponse {
+@Data
+public class SlaResponse {
     private Long id;
+    private String name;
+    private String description;
+    private String customerName;
+    private SlaStatus status;
+    private String serviceHours;
+    private LocalDateTime startDate;
+    private LocalDateTime endDate;
     private String companyId;
-    private String serviceName;
-    private Double targetValue;
-    private Double actualValue;
-    private String unit;
-    private String period;
-    private String status;
+    private List<SlaMetricResponse> metrics;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

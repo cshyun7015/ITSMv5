@@ -29,20 +29,57 @@ export function useChanges() {
     }
   };
 
-  const updateStatus = async (id: number, status: string) => {
-    try {
-      const updated = await changeApi.updateStatus(id, status);
-      await fetchChanges();
-      return updated;
-    } catch (err: any) {
-      setError(err.message);
-      throw err;
-    }
-  };
-
   useEffect(() => {
     fetchChanges();
   }, [fetchChanges]);
 
-  return { changes, loading, error, refresh: fetchChanges, createChange, updateStatus };
+  return { changes, loading, error, refresh: fetchChanges, createChange };
+}
+
+export function useChangeDetail(id: number | null) {
+  const [change, setChange] = useState<Change | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchDetail = useCallback(async () => {
+    if (id === null) return;
+    setLoading(true);
+    try {
+      const data = await changeApi.getDetail(id);
+      setChange(data);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }, [id]);
+
+  useEffect(() => {
+    fetchDetail();
+  }, [fetchDetail]);
+
+  const updateChange = async (updates: Partial<Change>) => {
+    if (!id) return null;
+    try {
+      const updated = await changeApi.updateChange(id, updates);
+      setChange(updated);
+      return updated;
+    } catch (err: any) {
+      setError(err.message);
+      return null;
+    }
+  };
+
+  const deleteChange = async () => {
+    if (!id) return false;
+    try {
+      await changeApi.deleteChange(id);
+      return true;
+    } catch (err: any) {
+      setError(err.message);
+      return false;
+    }
+  };
+
+  return { change, loading, error, refresh: fetchDetail, updateChange, deleteChange };
 }

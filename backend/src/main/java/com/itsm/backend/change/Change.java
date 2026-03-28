@@ -50,13 +50,23 @@ public class Change {
     @Column(columnDefinition = "TEXT")
     private String rollbackPlan;
 
+    @Column(columnDefinition = "TEXT")
+    private String testPlan;
+
     private String changeType;  // Standard, Normal, Emergency
-    private String status;      // CHG_DRAFT, CHG_SUBMITTED, CHG_REVIEW, CHG_APPROVED, CHG_SCHEDULED, CHG_IMPLEMENTING, CHG_CLOSED
+    private String status;      // CHG_DRAFT, CHG_AUTHORIZATION, CHG_SCHEDULED, CHG_IMPLEMENTATION, CHG_REVIEW, CHG_COMPLETED, CHG_CANCELED
     private String risk;        // Low, Medium, High
     private String priority;    // Low, Medium, High, Critical
 
+    private String assignedGroup;
+
     private LocalDateTime plannedStart;
     private LocalDateTime plannedEnd;
+    private LocalDateTime actualStart;
+    private LocalDateTime actualEnd;
+
+    @Column(columnDefinition = "TEXT")
+    private String reviewNotes;
     
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

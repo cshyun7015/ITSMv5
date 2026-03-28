@@ -1,173 +1,121 @@
 import React, { useState } from 'react';
-import { useSLAs } from '../hooks/useSLAs';
-import type { SLAStatus } from '../types';
+import { useSlas } from '../hooks/useSlas';
+import type { Sla } from '../types';
 
-const STATUS_CONFIG: Record<SLAStatus, { label: string; color: string; bg: string; icon: string }> = {
-  SLA_MET: { label: 'COMPLIANT', color: 'text-emerald-400', bg: 'bg-emerald-500/10', icon: 'M5 13l4 4L19 7' },
-  SLA_WARNING: { label: 'AT RISK', color: 'text-amber-400', bg: 'bg-amber-500/10', icon: 'M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z' },
-  SLA_NOT_MET: { label: 'BREACHED', color: 'text-red-400', bg: 'bg-red-500/10', icon: 'M6 18L18 6M6 6l12 12' },
-};
+interface SlaListProps {
+  onSelectDetail: (id: number) => void;
+}
 
-const SLAList: React.FC<{ user: any }> = ({ user }) => {
-  const { slas, loading, createSLA } = useSLAs();
-  const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ 
-    serviceName: '', targetValue: 99.9, actualValue: 0, unit: '%', period: new Date().toISOString().slice(0, 7) 
+const SlaList: React.FC<SlaListProps> = ({ onSelectDetail }) => {
+  const { slas, loading, error, createSla } = useSlas();
+  const [showCreate, setShowCreate] = useState(false);
+  const [newSla, setNewSla] = useState<Partial<Sla>>({
+    name: '',
+    customerName: '',
+    description: '',
+    status: 'SLA_DRAFT',
+    serviceHours: '24x7',
+    metrics: []
   });
-  const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitting(true);
-    try {
-      await createSLA(form);
-      setShowForm(false);
-      setForm({ serviceName: '', targetValue: 99.9, actualValue: 0, unit: '%', period: new Date().toISOString().slice(0, 7) });
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setSubmitting(false);
-    }
+    const res = await createSla(newSla);
+    if (res) setShowCreate(false);
   };
 
-  if (loading) return (
-    <div className="flex items-center justify-center p-20">
-      <div className="flex space-x-2">
-        <div className="h-2 w-2 bg-emerald-500 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
-        <div className="h-2 w-2 bg-emerald-500 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
-        <div className="h-2 w-2 bg-emerald-500 rounded-full animate-bounce"></div>
-      </div>
-    </div>
-  );
+  if (loading && slas.length === 0) return <div style={{ color: '#aaa', textAlign: 'center', padding: '5rem' }}>Loading SLA agreements...</div>;
 
   return (
-    <div className="p-10">
-      <div className="flex justify-between items-end mb-12">
-        <div className="space-y-4">
-          <div className="flex items-center gap-4">
-             <div className="w-12 h-[2px] bg-emerald-500"></div>
-             <span className="text-emerald-500 font-black text-xs tracking-[0.5em] uppercase">Service Quality Assurance</span>
-          </div>
-          <h1 className="text-6xl font-black text-white tracking-tighter uppercase leading-none">SLA Monitoring</h1>
-          <p className="text-slate-500 font-bold text-sm tracking-widest uppercase italic max-w-xl">Real-time performance tracking against contractual service level agreements.</p>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div>
+          <h2 style={{ color: '#fff', margin: 0, fontSize: '1.8rem', fontWeight: 700 }}>Service Level Agreements</h2>
+          <p style={{ color: '#666', margin: '0.4rem 0 0 0', fontWeight: 500 }}>Define and manage your service quality targets and metrics.</p>
         </div>
         <button 
-          onClick={() => setShowForm(!showForm)} 
-          className={`px-10 py-4 font-black text-xs tracking-widest transition-all clip-path-polygon ${
-            showForm ? 'bg-slate-800 text-slate-500' : 'bg-white text-black hover:bg-emerald-500 hover:text-white'
-          }`}
-          style={{ clipPath: 'polygon(10% 0, 100% 0, 90% 100%, 0 100%)' }}
+          onClick={() => setShowCreate(!showCreate)}
+          style={{ padding: '0.8rem 1.5rem', backgroundColor: '#339af0', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}
         >
-          {showForm ? 'CLOSE RECORD' : 'LOG SLA RECORD'}
+          {showCreate ? 'CANCEL' : 'CREATE NEW SLA'}
         </button>
       </div>
 
-      {showForm && (
-        <form onSubmit={handleSubmit} className="bg-slate-900 border-l-4 border-emerald-500 p-12 mb-16 animate-in fade-in slide-in-from-left-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-500 tracking-widest uppercase">Service / Metric Name</label>
-              <input 
-                required 
-                placeholder="Systems Availability..." 
-                value={form.serviceName} 
-                onChange={e => setForm({ ...form, serviceName: e.target.value })} 
-                className="w-full px-0 py-3 bg-transparent border-b-2 border-slate-800 text-white focus:outline-none focus:border-emerald-500 transition-all font-black text-lg"
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-500 tracking-widest uppercase">Target Threshold</label>
-              <div className="flex items-center gap-4">
+      {showCreate && (
+        <div style={{ backgroundColor: '#1a1a1a', padding: '2rem', borderRadius: '12px', border: '2px solid #339af0' }}>
+          <form onSubmit={handleCreate} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+              <div>
+                <label htmlFor="sla-name" style={{ display: 'block', color: '#888', marginBottom: '0.5rem', fontSize: '0.85rem' }}>Agreement Name</label>
                 <input 
-                  type="number" step="0.01"
-                  value={form.targetValue} 
-                  onChange={e => setForm({ ...form, targetValue: parseFloat(e.target.value) })} 
-                  className="flex-1 px-0 py-3 bg-transparent border-b-2 border-slate-800 text-white focus:outline-none focus:border-emerald-500 transition-all font-black text-2xl"
+                  id="sla-name"
+                  required
+                  placeholder="e.g., Enterprise Cloud Support SLA"
+                  value={newSla.name}
+                  onChange={e => setNewSla({...newSla, name: e.target.value})}
+                  style={{ width: '100%', padding: '0.8rem', backgroundColor: '#111', border: '1px solid #333', borderRadius: '8px', color: '#fff' }} 
                 />
-                <span className="text-slate-700 font-black text-xl">{form.unit}</span>
+              </div>
+              <div>
+                <label htmlFor="customer-name" style={{ display: 'block', color: '#888', marginBottom: '0.5rem', fontSize: '0.85rem' }}>Customer / Client Name</label>
+                <input 
+                  id="customer-name"
+                  required
+                  placeholder="ACME Corp"
+                  value={newSla.customerName}
+                  onChange={e => setNewSla({...newSla, customerName: e.target.value})}
+                  style={{ width: '100%', padding: '0.8rem', backgroundColor: '#111', border: '1px solid #333', borderRadius: '8px', color: '#fff' }} 
+                />
               </div>
             </div>
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-500 tracking-widest uppercase">Actual Measured Value</label>
-              <input 
-                type="number" step="0.01"
-                value={form.actualValue} 
-                onChange={e => setForm({ ...form, actualValue: parseFloat(e.target.value) })} 
-                className="w-full px-0 py-3 bg-transparent border-b-2 border-slate-800 text-white focus:outline-none focus:border-emerald-500 transition-all font-black text-2xl text-emerald-400"
+            <div>
+              <label htmlFor="description" style={{ display: 'block', color: '#888', marginBottom: '0.5rem', fontSize: '0.85rem' }}>Description</label>
+              <textarea 
+                id="description"
+                rows={3}
+                placeholder="Details of the agreement scope and objectives..."
+                value={newSla.description}
+                onChange={e => setNewSla({...newSla, description: e.target.value})}
+                style={{ width: '100%', padding: '0.8rem', backgroundColor: '#111', border: '1px solid #333', borderRadius: '8px', color: '#fff' }} 
               />
             </div>
-          </div>
-          
-          <div className="mt-12 flex justify-between items-center">
-             <div className="flex gap-10">
-                <div className="space-y-2">
-                  <label className="text-[9px] font-black text-slate-600 tracking-widest uppercase">Unit</label>
-                  <select value={form.unit} onChange={e => setForm({ ...form, unit: e.target.value })} className="bg-transparent border-b border-slate-800 text-white font-black text-xs uppercase focus:outline-none">
-                    <option>%</option><option>ms</option><option>min</option><option>hr</option>
-                  </select>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-[9px] font-black text-slate-600 tracking-widest uppercase">Measurement Period</label>
-                  <input type="month" value={form.period} onChange={e => setForm({ ...form, period: e.target.value })} className="bg-transparent border-b border-slate-800 text-white font-black text-xs uppercase focus:outline-none" />
-                </div>
-             </div>
-             <button 
-                type="submit" 
-                disabled={submitting} 
-                className="px-12 py-5 bg-emerald-600 text-white font-black tracking-[0.3em] uppercase hover:bg-emerald-500 active:scale-95 transition-all disabled:bg-slate-800"
-              >
-                {submitting ? 'RECORDING...' : 'COMMIT AUDIT DATA'}
-              </button>
-          </div>
-        </form>
+            <button type="submit" style={{ padding: '1rem', backgroundColor: '#339af0', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>
+              INITIATE AGREEMENT
+            </button>
+          </form>
+        </div>
       )}
 
-      <div className="space-y-8">
-        {slas.length === 0 ? (
-          <div className="p-32 text-center bg-slate-900 border border-slate-800 border-dashed">
-            <span className="text-slate-700 font-black tracking-[1em] uppercase">Historical matrix empty</span>
-          </div>
-        ) : slas.map(sla => {
-          const config = STATUS_CONFIG[sla.status] || STATUS_CONFIG.SLA_MET;
-          const percentage = Math.min(100, Math.max(0, (sla.actualValue / (sla.targetValue || 1)) * 100));
-          
-          return (
-            <div key={sla.id} className="group flex items-center bg-[#0a0a0c] border border-slate-900 p-8 hover:bg-black hover:border-emerald-500/20 transition-all">
-              <div className="w-48">
-                <div className="text-[9px] font-black text-slate-600 tracking-widest uppercase mb-1">Period: {sla.period}</div>
-                <h4 className="text-lg font-black text-white group-hover:text-emerald-400 transition-colors uppercase tracking-tight">{sla.serviceName}</h4>
-              </div>
+      {error && <div style={{ padding: '1rem', backgroundColor: '#fa525222', color: '#fa5252', borderRadius: '8px', border: '1px solid #fa525244' }}>{error}</div>}
 
-              <div className="flex-1 px-16">
-                 <div className="flex justify-between text-[10px] font-black tracking-widest uppercase mb-3">
-                    <span className="text-slate-500">Threshold: {sla.targetValue}{sla.unit}</span>
-                    <span className={config.color}>Measured: {sla.actualValue}{sla.unit}</span>
-                 </div>
-                 <div className="h-2 w-full bg-slate-900 overflow-hidden relative">
-                    <div 
-                      className={`h-full transition-all duration-1000 ease-out ${percentage >= 95 ? 'bg-emerald-500' : percentage >= 90 ? 'bg-amber-500' : 'bg-red-500'}`}
-                      style={{ width: `${percentage}%` }}
-                    ></div>
-                    <div className="absolute top-0 right-0 bottom-0 w-[2px] bg-white opacity-20 shadow-[0_0_10px_white]" style={{ left: '99.9%' }}></div>
-                 </div>
-              </div>
-
-              <div className="flex items-center gap-8 w-64 justify-end">
-                 <div className={`px-4 py-2 border ${config.bg} ${config.color} border-current text-[10px] font-black tracking-widest flex items-center gap-2`}>
-                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d={config.icon} /></svg>
-                   {config.label}
-                 </div>
-                 <div className="text-right">
-                    <div className="text-[8px] font-black text-slate-700 uppercase">Audit Timestamp</div>
-                    <div className="text-[10px] font-black text-slate-500">{new Date(sla.createdAt).toLocaleDateString()}</div>
-                 </div>
-              </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))', gap: '1.5rem' }}>
+        {slas.map(sla => (
+          <div 
+            key={sla.id}
+            onClick={() => sla.id && onSelectDetail(sla.id)}
+            style={{ backgroundColor: '#1a1a1a', padding: '1.5rem', borderRadius: '12px', border: '1px solid #333', cursor: 'pointer', transition: 'transform 0.2s', borderLeft: `6px solid ${sla.status === 'SLA_ACTIVE' ? '#51cf66' : '#888'}` }}
+            onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-4px)'}
+            onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
+               <span style={{ fontSize: '0.7rem', color: '#555', fontWeight: 800, textTransform: 'uppercase' }}>{sla.status}</span>
+               <span style={{ fontSize: '0.7rem', color: '#888' }}>{sla.serviceHours}</span>
             </div>
-          );
-        })}
+            <h3 style={{ margin: '0 0 0.5rem 0', color: '#fff' }}>{sla.name || sla.status || "Untitled SLA"}</h3>
+            <div style={{ fontSize: '0.85rem', color: '#339af0', fontWeight: 600, marginBottom: '1rem' }}>{sla.customerName}</div>
+            <p style={{ fontSize: '0.8rem', color: '#888', lineClamp: 2, display: '-webkit-box', WebkitBoxOrient: 'vertical', overflow: 'hidden', margin: 0 }}>
+              {sla.description || 'No description provided.'}
+            </p>
+            <div style={{ marginTop: '1.5rem', display: 'flex', gap: '0.5rem' }}>
+               {sla.metrics?.map((m, idx) => (
+                  <span key={idx} style={{ padding: '0.2rem 0.5rem', backgroundColor: '#2c2c2c', borderRadius: '4px', fontSize: '0.65rem', color: '#aaa' }}>{m.name}</span>
+               ))}
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
 };
 
-export default SLAList;
+export default SlaList;

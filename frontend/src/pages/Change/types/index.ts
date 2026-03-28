@@ -9,24 +9,29 @@ export type Change = {
   impactAnalysis: string;
   implementationPlan: string;
   rollbackPlan: string;
+  testPlan: string;
   changeType: string;
   status: ChangeStatus;
   risk: string;
   priority: string;
+  assignedGroup: string;
   plannedStart: string | null;
   plannedEnd: string | null;
+  actualStart: string | null;
+  actualEnd: string | null;
+  reviewNotes: string;
   createdAt: string;
   updatedAt: string;
 };
 
 export type ChangeStatus = 
   | 'CHG_DRAFT' 
-  | 'CHG_SUBMITTED' 
-  | 'CHG_REVIEW' 
-  | 'CHG_APPROVED' 
+  | 'CHG_AUTHORIZATION' 
   | 'CHG_SCHEDULED' 
-  | 'CHG_IMPLEMENTING' 
-  | 'CHG_CLOSED';
+  | 'CHG_IMPLEMENTATION' 
+  | 'CHG_REVIEW' 
+  | 'CHG_COMPLETED' 
+  | 'CHG_CANCELED';
 
 export type ChangeCreateRequest = {
   title: string;
@@ -36,6 +41,7 @@ export type ChangeCreateRequest = {
   impactAnalysis: string;
   implementationPlan: string;
   rollbackPlan: string;
+  testPlan?: string;
   changeType: string;
   risk: string;
   priority: string;

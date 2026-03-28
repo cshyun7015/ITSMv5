@@ -19,6 +19,14 @@ export const problemApi = {
     return response.json();
   },
 
+  getDetail: async (id: number): Promise<Problem> => {
+    const response = await fetch(`${getApiUrl()}/api/problems/${id}`, {
+      headers: getHeaders()
+    });
+    if (!response.ok) throw new Error('Failed to fetch problem detail');
+    return response.json();
+  },
+
   createProblem: async (data: ProblemCreateRequest): Promise<Problem> => {
     const response = await fetch(`${getApiUrl()}/api/problems`, {
       method: 'POST',
@@ -29,7 +37,7 @@ export const problemApi = {
     return response.json();
   },
 
-  updateProblem: async (id: number, data: Partial<ProblemCreateRequest>): Promise<Problem> => {
+  updateProblem: async (id: number, data: Partial<Problem>): Promise<Problem> => {
     const response = await fetch(`${getApiUrl()}/api/problems/${id}`, {
       method: 'PUT',
       headers: getHeaders(),
@@ -37,6 +45,14 @@ export const problemApi = {
     });
     if (!response.ok) throw new Error('Failed to update problem');
     return response.json();
+  },
+
+  deleteProblem: async (id: number): Promise<void> => {
+    const response = await fetch(`${getApiUrl()}/api/problems/${id}`, {
+      method: 'DELETE',
+      headers: getHeaders()
+    });
+    if (!response.ok) throw new Error('Failed to delete problem');
   },
 
   linkIncident: async (problemId: number, incidentId: number): Promise<void> => {

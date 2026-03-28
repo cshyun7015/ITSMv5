@@ -16,7 +16,14 @@ public class ProblemMapper {
                 .workaround(problem.getWorkaround())
                 .status(problem.getStatus())
                 .priority(problem.getPriority())
+                .urgency(problem.getUrgency())
+                .impact(problem.getImpact())
+                .category(problem.getCategory())
+                .resolution(problem.getResolution())
+                .assignedGroup(problem.getAssignedGroup())
                 .createdAt(problem.getCreatedAt())
+                .resolvedAt(problem.getResolvedAt())
+                .closedAt(problem.getClosedAt())
                 .companyId(problem.getCompany() != null ? problem.getCompany().getCompanyId() : null)
                 .build();
     }

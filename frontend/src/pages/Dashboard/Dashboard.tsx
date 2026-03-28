@@ -18,6 +18,9 @@ import ServiceList from '../Service/ServiceList';
 import ReleasePage from '../Release';
 import SLAPage from '../SLA';
 import ServiceRequestPage from '../ServiceRequest';
+import CIPage from '../CI';
+
+import SlaMonitor from './components/SlaMonitor';
 
 export default function Dashboard({ user, onLogout }: { user: any, onLogout: () => void }) {
   const [currentView, setCurrentView] = useState('DASHBOARD');
@@ -46,24 +49,36 @@ export default function Dashboard({ user, onLogout }: { user: any, onLogout: () 
     switch (currentView) {
       case 'DASHBOARD':
         return (
-          <div style={{ backgroundColor: '#1e1e1e', padding: '2.5rem', borderRadius: '12px', border: '1px solid #333', boxShadow: '0 8px 32px rgba(0,0,0,0.4)', display: 'flex', flexDirection: 'column' }}>
-            <h3 style={{ color: '#fff', marginBottom: '1.5rem', fontSize: '1.4rem' }}>Secure MSP Operations Dashboard</h3>
-            <p style={{ color: '#aaa', lineHeight: '1.6', fontSize: '0.95rem' }}>
-              Welcome back to the ITIL v5 ITSM platform. All data is isolated by Company ID and synced with the backend in real-time.
-            </p>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '2rem', marginTop: '3rem' }}>
-              <div style={{ backgroundColor: '#252525', padding: '1.75rem', borderRadius: '12px', borderLeft: '5px solid #339af0' }}>
-                <div style={{ color: '#888', marginBottom: '0.75rem', fontSize: '0.85rem', fontWeight: 600 }}>Open SR Tickets</div>
-                <div style={{ color: '#fff', fontSize: '3rem', fontWeight: 800 }}>{stats.openTickets}</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+            <div style={{ backgroundColor: '#1e1e1e', padding: '2.5rem', borderRadius: '12px', border: '1px solid #333', boxShadow: '0 8px 32px rgba(0,0,0,0.4)', display: 'flex', flexDirection: 'column' }}>
+              <h3 style={{ color: '#fff', marginBottom: '1.5rem', fontSize: '1.4rem' }}>Secure MSP Operations Dashboard</h3>
+              <p style={{ color: '#aaa', lineHeight: '1.6', fontSize: '0.95rem' }}>
+                Welcome back to the ITIL v5 ITSM platform. All data is isolated by Company ID and synced with the backend in real-time.
+              </p>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '2rem', marginTop: '3rem' }}>
+                <div style={{ backgroundColor: '#252525', padding: '1.75rem', borderRadius: '12px', borderLeft: '5px solid #339af0' }}>
+                  <div style={{ color: '#888', marginBottom: '0.75rem', fontSize: '0.85rem', fontWeight: 600 }}>Open SR Tickets</div>
+                  <div style={{ color: '#fff', fontSize: '3rem', fontWeight: 800 }}>{stats.openTickets}</div>
+                </div>
+                <div style={{ backgroundColor: '#252525', padding: '1.75rem', borderRadius: '12px', borderLeft: '5px solid #51cf66' }}>
+                  <div style={{ color: '#888', marginBottom: '0.75rem', fontSize: '0.85rem', fontWeight: 600 }}>SLA Compliance</div>
+                  <div style={{ color: '#fff', fontSize: '3rem', fontWeight: 800 }}>{stats.slaCompliance}</div>
+                </div>
+                <div style={{ backgroundColor: '#252525', padding: '1.75rem', borderRadius: '12px', borderLeft: '5px solid #ff6b6b' }}>
+                  <div style={{ color: '#888', marginBottom: '0.75rem', fontSize: '0.85rem', fontWeight: 600 }}>Active Incidents</div>
+                  <div style={{ color: '#fff', fontSize: '3rem', fontWeight: 800 }}>{stats.activeIncidents}</div>
+                </div>
               </div>
-              <div style={{ backgroundColor: '#252525', padding: '1.75rem', borderRadius: '12px', borderLeft: '5px solid #51cf66' }}>
-                <div style={{ color: '#888', marginBottom: '0.75rem', fontSize: '0.85rem', fontWeight: 600 }}>SLA Compliance</div>
-                <div style={{ color: '#fff', fontSize: '3rem', fontWeight: 800 }}>{stats.slaCompliance}</div>
-              </div>
-              <div style={{ backgroundColor: '#252525', padding: '1.75rem', borderRadius: '12px', borderLeft: '5px solid #ff6b6b' }}>
-                <div style={{ color: '#888', marginBottom: '0.75rem', fontSize: '0.85rem', fontWeight: 600 }}>Active Incidents</div>
-                <div style={{ color: '#fff', fontSize: '3rem', fontWeight: 800 }}>{stats.activeIncidents}</div>
-              </div>
+            </div>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
+               <div style={{ backgroundColor: '#1e1e1e', padding: '2rem', borderRadius: '12px', border: '1px solid #333' }}>
+                  <SlaMonitor />
+               </div>
+               <div style={{ backgroundColor: '#1e1e1e', padding: '2rem', borderRadius: '12px', border: '1px solid #333' }}>
+                  <h4 style={{ color: '#aaa', margin: '0 0 1rem 0', fontSize: '0.9rem', fontWeight: 600 }}>최근 시스템 이벤트</h4>
+                  <div style={{ color: '#444', fontSize: '0.85rem' }}>이벤트 스트림을 로딩 중입니다...</div>
+               </div>
             </div>
           </div>
         );
@@ -87,6 +102,8 @@ export default function Dashboard({ user, onLogout }: { user: any, onLogout: () 
         return <SLAPage user={user} />;
       case 'ASSETS':
         return <AssetPage user={user} />;
+      case 'CONFIG_MGMT':
+        return <CIPage user={user} />;
       case 'SVC_MGMT':
         return <ServiceList user={user} />;
       case 'KNOWLEDGE':

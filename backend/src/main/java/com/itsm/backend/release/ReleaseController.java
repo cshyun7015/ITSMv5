@@ -2,6 +2,7 @@ package com.itsm.backend.release;
 
 import com.itsm.backend.auth.SecurityUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
@@ -9,7 +10,6 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/releases")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
 public class ReleaseController {
 
     private final ReleaseService releaseService;
@@ -26,10 +26,21 @@ public class ReleaseController {
         }
     }
 
+    @GetMapping("/{id}")
+    public ReleaseResponse getRelease(@PathVariable Long id) {
+        return releaseService.getRelease(id);
+    }
+
     @PostMapping
-    public ReleaseResponse createRelease(@RequestBody Release release) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public ReleaseResponse createRelease(@RequestBody Release releaseRequest) {
         String companyId = SecurityUtils.getCurrentCompanyId();
-        return releaseService.createRelease(release, companyId);
+        return releaseService.createRelease(releaseRequest, companyId);
+    }
+
+    @PutMapping("/{id}")
+    public ReleaseResponse updateRelease(@PathVariable Long id, @RequestBody Release releaseRequest) {
+        return releaseService.updateRelease(id, releaseRequest);
     }
 
     @PatchMapping("/{id}/status")
@@ -38,5 +49,11 @@ public class ReleaseController {
         String role = SecurityUtils.getCurrentRole();
         String status = payload.get("status");
         return releaseService.updateStatus(id, status, companyId, role);
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteRelease(@PathVariable Long id) {
+        releaseService.deleteRelease(id);
     }
 }

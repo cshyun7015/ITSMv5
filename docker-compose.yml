@@ -11,6 +11,7 @@ services:
       - "${FRONTEND_PORT:-3000}:3000"
     environment:
       - VITE_API_URL=http://localhost:${BACKEND_PORT:-8080}
+      - TZ=Asia/Seoul
     volumes:
       - ./frontend:/app
       - /app/node_modules
@@ -32,6 +33,7 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/${POSTGRES_DB}
       - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
       - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+      - TZ=Asia/Seoul
     restart: unless-stopped
     depends_on:
       postgres:
@@ -39,6 +41,7 @@ services:
     networks:
       - itsm-network
     volumes:
+      - ./backend:/app
       - ./backend/data:/app/data
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
@@ -60,6 +63,7 @@ services:
       MARIADB_DATABASE: ${MARIADB_DATABASE}
       MARIADB_USER: ${MARIADB_USER}
       MARIADB_PASSWORD: ${MARIADB_PASSWORD}
+      TZ: Asia/Seoul
     ports:
       - "${MARIADB_PORT}:3306"
     volumes:
@@ -84,6 +88,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
+      TZ: Asia/Seoul
     ports:
       - "${POSTGRES_PORT}:5432"
     volumes:

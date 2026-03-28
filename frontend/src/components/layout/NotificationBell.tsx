@@ -40,7 +40,7 @@ export default function NotificationBell({ user }: { user: any }) {
 
   useEffect(() => {
     fetchCount();
-    const interval = setInterval(fetchCount, 30000); // Poll every 30s
+    const interval = setInterval(fetchCount, 30000000); // Poll every 30s
     return () => clearInterval(interval);
   }, [user.userId]);
 

@@ -1,37 +1,86 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
+import type { Sla } from '../types';
 import { slaApi } from '../api/slaApi';
-import type { SLA, SLACreateRequest } from '../types';
 
-export function useSLAs() {
-  const [slas, setSLAs] = useState<SLA[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+export const useSlas = () => {
+    const [slas, setSlas] = useState<Sla[]>([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
-  const fetchSLAs = useCallback(async () => {
-    try {
-      const data = await slaApi.getSLAs();
-      setSLAs(data);
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+    const fetchSlas = useCallback(async () => {
+        setLoading(true);
+        try {
+            const data = await slaApi.getSlas();
+            setSlas(data);
+        } catch (e: any) {
+            setError(e.message);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
 
-  const createSLA = async (data: SLACreateRequest) => {
-    try {
-      const created = await slaApi.createSLA(data);
-      await fetchSLAs();
-      return created;
-    } catch (err: any) {
-      setError(err.message);
-      throw err;
-    }
-  };
+    useEffect(() => {
+        fetchSlas();
+    }, [fetchSlas]);
 
-  useEffect(() => {
-    fetchSLAs();
-  }, [fetchSLAs]);
+    const createSla = async (data: Partial<Sla>) => {
+        try {
+            const res = await slaApi.createSla(data);
+            await fetchSlas();
+            return res;
+        } catch (e: any) {
+            setError(e.message);
+            return null;
+        }
+    };
 
-  return { slas, loading, error, refresh: fetchSLAs, createSLA };
-}
+    return { slas, loading, error, createSla, refresh: fetchSlas };
+};
+
+export const useSlaDetail = (id: number | null) => {
+    const [sla, setSla] = useState<Sla | null>(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+
+    const fetchSla = useCallback(async () => {
+        if (!id) return;
+        setLoading(true);
+        try {
+            const data = await slaApi.getSla(id);
+            setSla(data);
+        } catch (e: any) {
+            setError(e.message);
+        } finally {
+            setLoading(false);
+        }
+    }, [id]);
+
+    useEffect(() => {
+        fetchSla();
+    }, [fetchSla]);
+
+    const updateSla = async (data: Partial<Sla>) => {
+        if (!id) return null;
+        try {
+            const res = await slaApi.updateSla(id, data);
+            setSla(res);
+            return res;
+        } catch (e: any) {
+            setError(e.message);
+            return null;
+        }
+    };
+
+    const deleteSla = async () => {
+        if (!id) return false;
+        try {
+            await slaApi.deleteSla(id);
+            return true;
+        } catch (e: any) {
+            setError(e.message);
+            return false;
+        }
+    };
+
+    return { sla, loading, error, updateSla, deleteSla, refresh: fetchSla };
+};

@@ -40,7 +40,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 context.setAuthentication(auth);
                 
                 System.out.println("[SECURITY DEBUG] " + request.getMethod() + " " + request.getRequestURI() + " - Auth success: " + userId + " (" + role + ")");
+            } else {
+                System.out.println("[SECURITY DEBUG] " + request.getMethod() + " " + request.getRequestURI() + " - Role missing in token");
             }
+        } else if (token != null) {
+            System.out.println("[SECURITY DEBUG] " + request.getMethod() + " " + request.getRequestURI() + " - Invalid token provided");
         }
         filterChain.doFilter(request, response);
     }
