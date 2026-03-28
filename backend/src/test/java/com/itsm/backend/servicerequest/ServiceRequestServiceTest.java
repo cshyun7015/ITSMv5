@@ -34,11 +34,10 @@ class ServiceRequestServiceTest {
     void createRequest_Success() {
         // Given
         String userId = "user1";
-        CreateServiceRequestDTO dto = new CreateServiceRequestDTO();
+        ServiceRequestRequest dto = new ServiceRequestRequest();
         dto.setCatalogId(1L);
-        dto.setTitle("Laptop Request");
-        dto.setPriority("HIGH");
-
+        dto.setTitle("Test Request");
+        
         Company company = new Company();
         company.setCompanyId("C1");
         

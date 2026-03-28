@@ -5,9 +5,10 @@ import AdminModal from '../../../components/admin/AdminModal';
 
 interface ServiceRequestListProps {
   onSelectDetail: (id: number) => void;
+  onManualCreate: () => void;
 }
 
-export const ServiceRequestList: React.FC<ServiceRequestListProps> = ({ onSelectDetail }) => {
+export const ServiceRequestList: React.FC<ServiceRequestListProps> = ({ onSelectDetail, onManualCreate }) => {
   const {
     requests,
     loading,
@@ -76,6 +77,15 @@ export const ServiceRequestList: React.FC<ServiceRequestListProps> = ({ onSelect
             onChange={e => updateFilters({ search: e.target.value })} 
             style={{ padding: '0.7rem 1rem', borderRadius: '8px', border: '1px solid #444', backgroundColor: '#1e1e1e', color: '#fff', width: '250px' }} 
           />
+          <button 
+            onClick={() => {
+              console.debug('[SR_LIST] Manual Create button clicked');
+              onManualCreate();
+            }} 
+            style={{ padding: '0.7rem 1.5rem', borderRadius: '8px', border: 'none', backgroundColor: '#339af0', color: '#fff', cursor: 'pointer', fontWeight: 'bold' }}
+          >
+            + 수동 요청 등록
+          </button>
           <button onClick={refresh} style={{ padding: '0.7rem 1.5rem', borderRadius: '8px', border: 'none', backgroundColor: '#444', color: '#fff', cursor: 'pointer' }}>
             새로고침
           </button>

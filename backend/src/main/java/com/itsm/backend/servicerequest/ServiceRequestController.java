@@ -29,7 +29,7 @@ public class ServiceRequestController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ServiceRequestResponse createRequest(@RequestBody CreateServiceRequestDTO dto) {
+    public ServiceRequestResponse createRequest(@RequestBody ServiceRequestRequest dto) {
         String userId = SecurityUtils.getCurrentUserId();
         return requestService.createRequest(userId, dto);
     }

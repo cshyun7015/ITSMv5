@@ -37,5 +37,15 @@ export const serviceRequestApi = {
       headers: getHeaders()
     });
     if (!res.ok) throw new Error('Failed to delete request');
+  },
+  
+  createRequest: async (payload: any): Promise<ServiceRequest> => {
+    const res = await fetch(`${apiUrl}/api/requests`, {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error('Failed to create request');
+    return res.json();
   }
 };

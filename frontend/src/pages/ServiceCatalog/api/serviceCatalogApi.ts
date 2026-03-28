@@ -34,9 +34,9 @@ export const serviceCatalogApi = {
     let url = `${getApiUrl()}/api/admin/catalogs?page=${page}&size=${size}&search=${encodeURIComponent(search)}`;
     if (companyId) url += `&companyId=${companyId}`;
     
-    console.log('[DEBUG] Fetching admin catalogs:', url);
+    //console.log('[DEBUG] Fetching admin catalogs:', url);
     const headers = getHeaders();
-    console.log('[DEBUG] Headers:', headers);
+    //console.log('[DEBUG] Headers:', headers);
     
     const response = await fetch(url, { headers });
     if (!response.ok) {

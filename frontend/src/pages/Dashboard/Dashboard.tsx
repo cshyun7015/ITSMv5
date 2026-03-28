@@ -7,7 +7,6 @@ import Header from '../../components/layout/Header';
 import Sidebar from '../../components/layout/Sidebar';
 import MyTickets from '../MyTickets/MyTickets';
 import ChangePage from '../Change';
-import AdminPage from '../Admin/AdminPage';
 import CompanyManagement from '../Admin/Company';
 import UserManagement from '../Admin/User';
 import CodeManagement from '../Admin/Code';
@@ -70,7 +69,7 @@ export default function Dashboard({ user, onLogout }: { user: any, onLogout: () 
         );
       case 'CATALOG':
       case 'REQUEST_FORM':
-        return user.role === 'ROLE_ADMIN' ? <ServiceCatalogAdminPage /> : <ServiceCatalogPage user={user} />;
+        return user.role === 'ROLE_ADMIN' ? <ServiceCatalogAdminPage user={user} /> : <ServiceCatalogPage user={user} />;
       case 'SR_MANAGEMENT':
       case 'SR_DETAIL':
         return <ServiceRequestPage user={user} />;

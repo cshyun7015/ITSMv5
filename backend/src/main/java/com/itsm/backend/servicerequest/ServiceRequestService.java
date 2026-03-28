@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional(readOnly = true)
 public class ServiceRequestService {
 
     private final ServiceRequestRepository repository;
@@ -49,16 +50,22 @@ public class ServiceRequestService {
     }
 
     @Transactional
-    public ServiceRequestResponse createRequest(String userId, CreateServiceRequestDTO dto) {
-        User requester = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+    public ServiceRequestResponse createRequest(String currentUserId, ServiceRequestRequest dto) {
+        String targetUserId = (dto.getRequesterId() != null && !dto.getRequesterId().isEmpty()) 
+                ? dto.getRequesterId() : currentUserId;
+        
+        log.info("[REQUEST] Creating service request for catalog ID: {}, Requested By: (Current: {}, Target: {})", 
+                dto.getCatalogId(), currentUserId, targetUserId);
+
+        User requester = userRepository.findById(targetUserId)
+                .orElseThrow(() -> new RuntimeException("User not found: " + targetUserId));
         
         ServiceCatalog catalog = catalogRepository.findById(dto.getCatalogId())
                 .orElseThrow(() -> new RuntimeException("Catalog not found"));
 
         ServiceRequest sr = new ServiceRequest();
         sr.setRequester(requester);
-        sr.setCompany(requester.getCompany());
+        sr.setCompany(requester.getCompany()); // Always use requester's company for multi-tenancy
         sr.setCatalog(catalog);
         sr.setTitle(dto.getTitle() != null ? dto.getTitle() : catalog.getCatalogName() + " 요청");
         sr.setDescription(dto.getDescription());
