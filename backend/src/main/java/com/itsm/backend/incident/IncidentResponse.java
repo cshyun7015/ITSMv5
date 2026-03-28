@@ -16,7 +16,15 @@ public class IncidentResponse {
     private String status;
     private String priority;
     private String impact;
+    private String urgency;
+    private String category;
+    private String subcategory;
+    private String source;
+    private String assignedGroup;
+    private String resolutionCode;
+    private String resolutionDescription;
     private Long assetId;
     private LocalDateTime createdAt;
     private LocalDateTime resolvedAt;
+    private LocalDateTime closedAt;
 }

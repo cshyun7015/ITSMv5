@@ -19,6 +19,14 @@ export const incidentApi = {
     return response.json();
   },
 
+  getDetail: async (id: number): Promise<Incident> => {
+    const response = await fetch(`${getApiUrl()}/api/incidents/${id}`, {
+      headers: getHeaders()
+    });
+    if (!response.ok) throw new Error('Failed to fetch incident detail');
+    return response.json();
+  },
+
   createIncident: async (data: IncidentCreateRequest): Promise<Incident> => {
     const response = await fetch(`${getApiUrl()}/api/incidents`, {
       method: 'POST',
@@ -27,6 +35,24 @@ export const incidentApi = {
     });
     if (!response.ok) throw new Error('Failed to create incident');
     return response.json();
+  },
+
+  updateIncident: async (id: number, data: Partial<Incident>): Promise<Incident> => {
+    const response = await fetch(`${getApiUrl()}/api/incidents/${id}`, {
+      method: 'PATCH',
+      headers: getHeaders(),
+      body: JSON.stringify(data)
+    });
+    if (!response.ok) throw new Error('Failed to update incident');
+    return response.json();
+  },
+
+  deleteIncident: async (id: number): Promise<void> => {
+    const response = await fetch(`${getApiUrl()}/api/incidents/${id}`, {
+      method: 'DELETE',
+      headers: getHeaders()
+    });
+    if (!response.ok) throw new Error('Failed to delete incident');
   },
 
   getAttachments: async (id: number): Promise<any[]> => {

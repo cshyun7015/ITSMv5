@@ -18,9 +18,17 @@ public class IncidentMapper {
                 .status(incident.getStatus())
                 .priority(incident.getPriority())
                 .impact(incident.getImpact())
+                .urgency(incident.getUrgency())
+                .category(incident.getCategory())
+                .subcategory(incident.getSubcategory())
+                .source(incident.getSource())
+                .assignedGroup(incident.getAssignedGroup())
+                .resolutionCode(incident.getResolutionCode())
+                .resolutionDescription(incident.getResolutionDescription())
                 .assetId(incident.getAssetId())
                 .createdAt(incident.getCreatedAt())
                 .resolvedAt(incident.getResolvedAt())
+                .closedAt(incident.getClosedAt())
                 .build();
     }
 }

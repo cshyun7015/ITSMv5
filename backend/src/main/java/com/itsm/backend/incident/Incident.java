@@ -42,9 +42,14 @@ public class Incident {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    private String status;    // INC_OPEN, INC_IN_PROGRESS, INC_RESOLVED, INC_CLOSED
+    private String status;    // INC_OPEN, INC_IN_PROGRESS, INC_ON_HOLD, INC_RESOLVED, INC_CLOSED, INC_CANCELED
     private String priority;  // Critical, High, Medium, Low
     private String impact;    // Service-wide, Department, Individual
+    private String urgency;   // High, Medium, Low
+    
+    private String category;
+    private String subcategory;
+    private String source;     // Portal, Email, Call, Monitoring, Manual
 
     @com.fasterxml.jackson.annotation.JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
@@ -54,6 +59,13 @@ public class Incident {
     @Column(name = "asset_id")
     private Long assetId;
 
+    private String assignedGroup;
+    
+    private String resolutionCode;
+    @Column(columnDefinition = "TEXT")
+    private String resolutionDescription;
+
     private LocalDateTime createdAt;
     private LocalDateTime resolvedAt;
+    private LocalDateTime closedAt;
 }

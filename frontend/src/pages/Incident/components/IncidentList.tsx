@@ -8,14 +8,18 @@ const STATUS_COLOR: Record<IncidentStatus, string> = {
   INC_OPEN: '#ff6b6b',
   INC_IN_PROGRESS: '#ff922b',
   INC_RESOLVED: '#51cf66',
-  INC_CLOSED: '#888',
+  INC_ON_HOLD: '#adb5bd',
+  INC_CLOSED: '#495057',
+  INC_CANCELED: '#fa5252',
 };
 
 const STATUS_LABEL: Record<IncidentStatus, string> = {
   INC_OPEN: '🔴 신규 접수',
   INC_IN_PROGRESS: '🟠 처리 중',
   INC_RESOLVED: '🟢 조치 완료',
+  INC_ON_HOLD: '⚪ 보류',
   INC_CLOSED: '⚫ 종료',
+  INC_CANCELED: '🔴 취소됨',
 };
 
 const PRIORITY_COLOR: Record<IncidentPriority, string> = {
@@ -25,7 +29,7 @@ const PRIORITY_COLOR: Record<IncidentPriority, string> = {
   Low: '#74c0fc',
 };
 
-const IncidentList: React.FC<{ user: any }> = ({ user }) => {
+const IncidentList: React.FC<{ user: any, onSelectDetail: (id: number) => void }> = ({ user, onSelectDetail }) => {
   const { incidents, loading, error, createIncident, refresh } = useIncidents();
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ title: '', description: '', priority: 'Medium', impact: 'Individual', assetId: '' });
@@ -185,7 +189,11 @@ const IncidentList: React.FC<{ user: any }> = ({ user }) => {
           </div>
         ) : (
           incidents.map((inc: Incident) => (
-            <div key={inc.id} className="group bg-slate-800/50 hover:bg-slate-800/80 border border-slate-700/60 rounded-3xl p-6 transition-all duration-300 hover:shadow-2xl hover:border-slate-500/40">
+            <div 
+              key={inc.id} 
+              onClick={() => onSelectDetail(inc.id)}
+              className="group bg-slate-800/50 hover:bg-slate-800/80 border border-slate-700/60 rounded-3xl p-6 transition-all duration-300 hover:shadow-2xl hover:border-slate-500/40 cursor-pointer"
+            >
               <div className="flex flex-wrap justify-between items-start gap-6">
                 <div className="flex-1 min-w-[300px]">
                   <div className="flex flex-wrap items-center gap-3 mb-4">

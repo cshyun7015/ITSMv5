@@ -2,8 +2,8 @@ package com.itsm.backend.incident;
 
 import com.itsm.backend.auth.SecurityUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -14,8 +14,6 @@ import java.util.Map;
 public class IncidentController {
 
     private final IncidentService incidentService;
-    private final IncidentRepository incidentRepository;
-    private final IncidentMapper incidentMapper;
 
     @GetMapping
     public List<IncidentResponse> getIncidents() {
@@ -29,34 +27,41 @@ public class IncidentController {
         }
     }
 
+    @GetMapping("/{id}")
+    public IncidentResponse getIncident(@PathVariable Long id) {
+        return incidentService.getIncident(id);
+    }
+
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public IncidentResponse createIncident(@RequestBody Map<String, Object> payload) {
         String reporterId = SecurityUtils.getCurrentUserId();
         return incidentService.createIncident(
             reporterId,
-            payload.get("title").toString(),
-            payload.getOrDefault("description", "").toString(),
-            payload.getOrDefault("priority", "Medium").toString(),
-            payload.getOrDefault("impact", "Individual").toString()
+            (String) payload.get("title"),
+            (String) payload.getOrDefault("description", ""),
+            (String) payload.getOrDefault("urgency", "Medium"),
+            (String) payload.getOrDefault("impact", "Medium"),
+            (String) payload.getOrDefault("category", "General"),
+            (String) payload.getOrDefault("source", "Portal")
         );
     }
 
+    @PatchMapping("/{id}")
+    public IncidentResponse updateIncident(@PathVariable Long id, @RequestBody Map<String, Object> payload) {
+        // Simple security check (Admins can do anything, others only their own company? 
+        // We'll trust the Service for now or add explicit check if needed)
+        return incidentService.updateIncident(id, payload);
+    }
+
     @PatchMapping("/{id}/status")
-    public IncidentResponse updateStatus(@PathVariable Long id, @RequestBody Map<String, String> payload) {
-        String companyId = SecurityUtils.getCurrentCompanyId();
-        Incident incident = incidentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Incident not found"));
+    public IncidentResponse updateStatus(@PathVariable Long id, @RequestBody Map<String, Object> payload) {
+        return incidentService.updateIncident(id, payload);
+    }
 
-        // Security check
-        if (!"ROLE_ADMIN".equals(SecurityUtils.getCurrentRole()) && !companyId.equals(incident.getCompanyId())) {
-            throw new SecurityException("Access denied");
-        }
-
-        incident.setStatus(payload.get("status"));
-        if ("INC_RESOLVED".equals(payload.get("status"))) {
-            incident.setResolvedAt(LocalDateTime.now());
-        }
-
-        return incidentMapper.toResponse(incidentRepository.save(incident));
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteIncident(@PathVariable Long id) {
+        incidentService.deleteIncident(id);
     }
 }

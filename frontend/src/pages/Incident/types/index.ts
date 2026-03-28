@@ -8,19 +8,28 @@ export type Incident = {
   status: IncidentStatus;
   priority: IncidentPriority;
   impact: string;
+  urgency: string;
+  category: string;
+  subcategory?: string;
+  source: string;
+  assignedGroup?: string;
+  resolutionCode?: string;
+  resolutionDescription?: string;
   assetId: number | null;
   createdAt: string;
   resolvedAt: string | null;
+  closedAt: string | null;
 };
 
-export type IncidentStatus = 'INC_OPEN' | 'INC_IN_PROGRESS' | 'INC_RESOLVED' | 'INC_CLOSED';
+export type IncidentStatus = 'INC_OPEN' | 'INC_IN_PROGRESS' | 'INC_ON_HOLD' | 'INC_RESOLVED' | 'INC_CLOSED' | 'INC_CANCELED';
 export type IncidentPriority = 'Critical' | 'High' | 'Medium' | 'Low';
 
 export type IncidentCreateRequest = {
   title: string;
   description: string;
-  priority: string;
+  urgency: string;
   impact: string;
-  assetId?: string;
-  reporterId: string;
+  category: string;
+  source: string;
+  assetId?: number;
 };
