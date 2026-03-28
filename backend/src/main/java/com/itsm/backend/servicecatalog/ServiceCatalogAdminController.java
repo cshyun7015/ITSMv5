@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/admin/catalogs")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*")
+@org.springframework.security.access.prepost.PreAuthorize("hasRole('ADMIN')")
 public class ServiceCatalogAdminController {
 
     private final ServiceCatalogService catalogService;

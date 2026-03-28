@@ -35,6 +35,7 @@ public class EventService {
     }
 
     @Transactional
+    @SuppressWarnings("unchecked")
     public void processWebhook(Map<String, Object> payload) {
         // Simple Grafana Webhook Parsing
         List<Map<String, Object>> alerts = (List<Map<String, Object>>) payload.get("alerts");

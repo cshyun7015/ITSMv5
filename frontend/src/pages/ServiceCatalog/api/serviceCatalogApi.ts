@@ -1,3 +1,4 @@
+/// <reference types="vite/client" />
 import type { ServiceCatalog } from '../types';
 
 const getHeaders = () => {
@@ -31,8 +32,16 @@ export const serviceCatalogApi = {
   adminGetServiceCatalogs: async (search: string, page: number, size: number, companyId?: string): Promise<any> => {
     let url = `${getApiUrl()}/api/admin/catalogs?page=${page}&size=${size}&search=${encodeURIComponent(search)}`;
     if (companyId) url += `&companyId=${companyId}`;
-    const response = await fetch(url, { headers: getHeaders() });
-    if (!response.ok) throw new Error('Failed to fetch admin service catalogs');
+    
+    console.log('[DEBUG] Fetching admin catalogs:', url);
+    const headers = getHeaders();
+    console.log('[DEBUG] Headers:', headers);
+    
+    const response = await fetch(url, { headers });
+    if (!response.ok) {
+      console.error('[DEBUG] Admin catalogs fetch failed:', response.status, response.statusText);
+      throw new Error('Failed to fetch admin service catalogs');
+    }
     return response.json();
   },
 

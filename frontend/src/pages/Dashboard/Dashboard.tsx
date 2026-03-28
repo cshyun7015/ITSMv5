@@ -8,30 +8,24 @@ import Sidebar from '../../components/layout/Sidebar';
 import MyTickets from '../MyTickets/MyTickets';
 import ChangePage from '../Change';
 import AdminPage from '../Admin/AdminPage';
+import CompanyManagement from '../Admin/Company';
+import UserManagement from '../Admin/User';
+import CodeManagement from '../Admin/Code';
 import AssetPage from '../Asset';
 import EventPage from '../Event';
 import IncidentPage from '../Incident';
-// import CIPage from '../CI';
 import ProblemPage from '../Problem';
 import ServiceList from '../Service/ServiceList';
 import ReleasePage from '../Release';
 import SLAPage from '../SLA';
-// import CatalogManagement from '../../components/admin/CatalogManagement';
 import ServiceRequestPage from '../ServiceRequest';
 
 export default function Dashboard({ user, onLogout }: { user: any, onLogout: () => void }) {
   const [currentView, setCurrentView] = useState('DASHBOARD');
-  const [selectedCatalogId, setSelectedCatalogId] = useState<number | null>(null);
-  const [selectedRequestId, setSelectedRequestId] = useState<number | null>(null);
   const [stats, setStats] = useState<any>({ openTickets: 0, inProgressTickets: 0, resolvedTickets: 0, slaCompliance: '-', activeIncidents: 0 });
 
   const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
   const token = localStorage.getItem('itsm_token');
-
-  const headers = () => ({
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`
-  });
 
   useEffect(() => {
     if (currentView === 'DASHBOARD') {
@@ -58,18 +52,17 @@ export default function Dashboard({ user, onLogout }: { user: any, onLogout: () 
             <p style={{ color: '#aaa', lineHeight: '1.6', fontSize: '0.95rem' }}>
               Welcome back to the ITIL v5 ITSM platform. All data is isolated by Company ID and synced with the backend in real-time.
             </p>
-            
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '2rem', marginTop: '3rem' }}>
-              <div style={{ backgroundColor: '#252525', padding: '1.75rem', borderRadius: '12px', borderLeft: '5px solid #339af0', boxShadow: '0 4px 12px rgba(0,0,0,0.3)' }}>
-                <div style={{ color: '#888', marginBottom: '0.75rem', fontSize: '0.85rem', fontWeight: 600, textTransform: 'uppercase' }}>Open SR Tickets</div>
+              <div style={{ backgroundColor: '#252525', padding: '1.75rem', borderRadius: '12px', borderLeft: '5px solid #339af0' }}>
+                <div style={{ color: '#888', marginBottom: '0.75rem', fontSize: '0.85rem', fontWeight: 600 }}>Open SR Tickets</div>
                 <div style={{ color: '#fff', fontSize: '3rem', fontWeight: 800 }}>{stats.openTickets}</div>
               </div>
-              <div style={{ backgroundColor: '#252525', padding: '1.75rem', borderRadius: '12px', borderLeft: '5px solid #51cf66', boxShadow: '0 4px 12px rgba(0,0,0,0.3)' }}>
-                <div style={{ color: '#888', marginBottom: '0.75rem', fontSize: '0.85rem', fontWeight: 600, textTransform: 'uppercase' }}>SLA Compliance</div>
+              <div style={{ backgroundColor: '#252525', padding: '1.75rem', borderRadius: '12px', borderLeft: '5px solid #51cf66' }}>
+                <div style={{ color: '#888', marginBottom: '0.75rem', fontSize: '0.85rem', fontWeight: 600 }}>SLA Compliance</div>
                 <div style={{ color: '#fff', fontSize: '3rem', fontWeight: 800 }}>{stats.slaCompliance}</div>
               </div>
-              <div style={{ backgroundColor: '#252525', padding: '1.75rem', borderRadius: '12px', borderLeft: '5px solid #ff6b6b', boxShadow: '0 4px 12px rgba(0,0,0,0.3)' }}>
-                <div style={{ color: '#888', marginBottom: '0.75rem', fontSize: '0.85rem', fontWeight: 600, textTransform: 'uppercase' }}>Active Incidents</div>
+              <div style={{ backgroundColor: '#252525', padding: '1.75rem', borderRadius: '12px', borderLeft: '5px solid #ff6b6b' }}>
+                <div style={{ color: '#888', marginBottom: '0.75rem', fontSize: '0.85rem', fontWeight: 600 }}>Active Incidents</div>
                 <div style={{ color: '#fff', fontSize: '3rem', fontWeight: 800 }}>{stats.activeIncidents}</div>
               </div>
             </div>
@@ -77,9 +70,7 @@ export default function Dashboard({ user, onLogout }: { user: any, onLogout: () 
         );
       case 'CATALOG':
       case 'REQUEST_FORM':
-        return user.role === 'ROLE_ADMIN' 
-          ? <ServiceCatalogAdminPage />
-          : <ServiceCatalogPage user={user} />;
+        return user.role === 'ROLE_ADMIN' ? <ServiceCatalogAdminPage /> : <ServiceCatalogPage user={user} />;
       case 'SR_MANAGEMENT':
       case 'SR_DETAIL':
         return <ServiceRequestPage user={user} />;
@@ -97,8 +88,6 @@ export default function Dashboard({ user, onLogout }: { user: any, onLogout: () 
         return <SLAPage user={user} />;
       case 'ASSETS':
         return <AssetPage user={user} />;
-      case 'CONFIG_MGMT':
-        return <div>CI Page Placeholder</div>;
       case 'SVC_MGMT':
         return <ServiceList user={user} />;
       case 'KNOWLEDGE':
@@ -106,7 +95,12 @@ export default function Dashboard({ user, onLogout }: { user: any, onLogout: () 
       case 'MY_TICKETS':
         return <MyTickets user={user} />;
       case 'ADMIN':
-        return <AdminPage user={user} />;
+      case 'ADMIN_COMPANY':
+        return <CompanyManagement />;
+      case 'ADMIN_USER':
+        return <UserManagement />;
+      case 'ADMIN_CODE':
+        return <CodeManagement />;
       default:
         return <div style={{ color: '#fff' }}>View {currentView} not found.</div>;
     }
@@ -115,7 +109,6 @@ export default function Dashboard({ user, onLogout }: { user: any, onLogout: () 
   return (
     <div style={{ display: 'flex', height: '100vh', width: '100%', backgroundColor: '#121212', color: '#e0e0e0', overflow: 'hidden' }}>
       <Sidebar currentView={currentView} setCurrentView={setCurrentView} user={user} />
-      
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         <div style={{ padding: '1.5rem 2.5rem', flex: 1, overflowY: 'auto' }}>
           <Header currentView={currentView} user={user} onLogout={onLogout} />

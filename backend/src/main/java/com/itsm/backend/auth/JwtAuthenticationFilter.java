@@ -4,17 +4,14 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.List;
 
-@Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
@@ -33,12 +30,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String role = claims.get("role", String.class);
             String companyId = claims.get("companyId", String.class);
 
-            // Store companyId as a detail in the request for downstream extraction
-            CompanyAwareAuthentication auth = new CompanyAwareAuthentication(
-                    userId, companyId, null, List.of(new SimpleGrantedAuthority(role)));
-            auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            if (role != null && !role.isEmpty()) {
+                // Store companyId as a detail in the request for downstream extraction
+                CompanyAwareAuthentication auth = new CompanyAwareAuthentication(
+                        userId, companyId, null, List.of(new SimpleGrantedAuthority(role)));
+                auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-            SecurityContextHolder.getContext().setAuthentication(auth);
+                SecurityContextHolder.getContext().setAuthentication(auth);
+            }
         }
         filterChain.doFilter(request, response);
     }
